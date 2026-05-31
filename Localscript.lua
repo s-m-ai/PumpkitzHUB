@@ -1,4 +1,4 @@
--- Pumpkitz Hub 🎃 V0.9.2 | Kill Aura External Loader + Delta Optimized
+-- Pumpkitz Hub 🎃 V0.9.3 | Update Panel + Immortal Toggle | Delta Optimized
 task.spawn(function()
 	repeat task.wait() until game:IsLoaded()
 
@@ -15,7 +15,7 @@ task.spawn(function()
 		if not playerGui or not playerGui.Parent then return end
 		
 		local screenGui = Instance.new("ScreenGui")
-		screenGui.Name = "PumpkitzHub_V09_2"
+		screenGui.Name = "PumpkitzHub_V09_3"
 		screenGui.ResetOnSpawn = false
 		screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 		screenGui.IgnoreGuiInset = true
@@ -63,7 +63,7 @@ task.spawn(function()
 		title.Size = UDim2.new(1, -85, 1, 0)
 		title.Position = UDim2.new(0, 12, 0, 0)
 		title.BackgroundTransparency = 1
-		title.Text = "Pumpkitz Hub 🎃 V0.9.2"
+		title.Text = "Pumpkitz Hub 🎃 V0.9.3"
 		title.TextColor3 = Color3.fromRGB(255, 255, 255)
 		title.TextSize = 18
 		title.Font = Enum.Font.GothamBold
@@ -162,7 +162,7 @@ task.spawn(function()
 
 		-- === INDEPENDENT TELEPORT GUI ===
 		local tpScreenGui = Instance.new("ScreenGui")
-		tpScreenGui.Name = "PumpkitzHub_TP_V09_2"
+		tpScreenGui.Name = "PumpkitzHub_TP_V09_3"
 		tpScreenGui.ResetOnSpawn = false
 		tpScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 		tpScreenGui.IgnoreGuiInset = true
@@ -371,6 +371,38 @@ task.spawn(function()
 			else jumpDebounce = false end
 		end
 
+		-- === IMMORTAL SYSTEM (God Mode) ===
+		local immortalActive = false
+		local immortalConn = nil
+		local originalMaxHealth = 100
+
+		local function toggleImmortal(state)
+			immortalActive = state
+			if immortalConn then immortalConn:Disconnect(); immortalConn = nil end
+			
+			if state then
+				if localPlayer.Character and localPlayer.Character:FindFirstChild("Humanoid") then
+					local hum = localPlayer.Character.Humanoid
+					originalMaxHealth = hum.MaxHealth
+					hum.MaxHealth = 1e9
+					hum.Health = hum.MaxHealth
+				end
+				immortalConn = RunService.Heartbeat:Connect(function()
+					if localPlayer.Character and localPlayer.Character:FindFirstChild("Humanoid") then
+						local hum = localPlayer.Character.Humanoid
+						if hum.Health < hum.MaxHealth then hum.Health = hum.MaxHealth end
+						if hum.MaxHealth < 1e9 then hum.MaxHealth = 1e9 end
+					end
+				end)
+			else
+				if localPlayer.Character and localPlayer.Character:FindFirstChild("Humanoid") then
+					local hum = localPlayer.Character.Humanoid
+					hum.MaxHealth = originalMaxHealth
+					hum.Health = math.min(hum.Health, originalMaxHealth)
+				end
+			end
+		end
+
 		-- === UI MANAGEMENT ===
 		local function clearContent()
 			for _, child in pairs(contentScroll:GetChildren()) do if child:IsA("GuiObject") then child:Destroy() end end
@@ -391,25 +423,45 @@ task.spawn(function()
 			return btn
 		end
 
-		local function createCatBtn(text)
-			local btn = Instance.new("TextButton", catScroll)
+		local function createCatBtn(parent, text)
+			local btn = Instance.new("TextButton", parent)
 			btn.Size = UDim2.new(0.9, 0, 0, 38); btn.BackgroundColor3 = Color3.fromRGB(45, 15, 5); btn.BorderSizePixel = 0
 			btn.Text = text; btn.TextColor3 = Color3.fromRGB(200, 200, 200); btn.TextSize = 14; btn.Font = Enum.Font.GothamBold; btn.Active = true
 			Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
 			return btn
 		end
 
-		local btnGen = createCatBtn("ทั่วไป")
-		local btnPlr = createCatBtn("👤 player")
-		local btnCombat = createCatBtn("⚔️ ต่อสู้")
-		local btnJoke = createCatBtn("🤡 แกล้ง")
-		local btnOther = createCatBtn("🌐 สคริปต์เกมอื่น")
+		local btnGen = createCatBtn(catScroll, "ทั่วไป")
+		local btnPlr = createCatBtn(catScroll, "👤 player")
+		local btnCombat = createCatBtn(catScroll, "⚔️ ต่อสู้")
+		local btnJoke = createCatBtn(catScroll, "🤡 แกล้ง")
+		local btnOther = createCatBtn(catScroll, "🌐 สคริปต์เกมอื่น")
+
+		-- === UPDATE BUTTON (Separate at bottom) ===
+		local updateDivider = Instance.new("Frame", catScroll)
+		updateDivider.Size = UDim2.new(0.9, 0, 0, 2)
+		updateDivider.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
+		updateDivider.BackgroundTransparency = 0.5
+		updateDivider.BorderSizePixel = 0
+		Instance.new("UICorner", updateDivider).CornerRadius = UDim.new(0, 1)
+
+		local btnUpdate = Instance.new("TextButton", catScroll)
+		btnUpdate.Size = UDim2.new(0.9, 0, 0, 38)
+		btnUpdate.BackgroundColor3 = Color3.fromRGB(30, 10, 3)
+		btnUpdate.BorderSizePixel = 0
+		btnUpdate.Text = "🔄 อัปเดต"
+		btnUpdate.TextColor3 = Color3.fromRGB(255, 200, 100)
+		btnUpdate.TextSize = 14
+		btnUpdate.Font = Enum.Font.GothamBold
+		btnUpdate.Active = true
+		Instance.new("UICorner", btnUpdate).CornerRadius = UDim.new(0, 6)
 
 		local function loadCategory(name)
 			clearContent()
 			for _, b in ipairs({btnGen, btnPlr, btnCombat, btnJoke, btnOther}) do
 				b.BackgroundColor3 = Color3.fromRGB(45, 15, 5); b.TextColor3 = Color3.fromRGB(200, 200, 200)
 			end
+			btnUpdate.BackgroundColor3 = Color3.fromRGB(30, 10, 3); btnUpdate.TextColor3 = Color3.fromRGB(255, 200, 100)
 			
 			if name == "ทั่วไป" then
 				btnGen.BackgroundColor3 = Color3.fromRGB(65, 20, 6); btnGen.TextColor3 = Color3.fromRGB(255, 180, 80)
@@ -437,6 +489,7 @@ task.spawn(function()
 
 				createToggleBtn(contentScroll, "Noclip 🚶‍♂️", Color3.fromRGB(230, 120, 20), Color3.fromRGB(55, 18, 6), toggleNoclip)
 				createToggleBtn(contentScroll, "กระโดดไม่จำกัด 🔄", Color3.fromRGB(230, 120, 20), Color3.fromRGB(55, 18, 6), toggleInfJump)
+				createToggleBtn(contentScroll, "อมตะ 💀", Color3.fromRGB(230, 120, 20), Color3.fromRGB(55, 18, 6), toggleImmortal)
 				
 				local flyBtn = Instance.new("TextButton", contentScroll)
 				flyBtn.Size = UDim2.new(0.95, 0, 0, 45); flyBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6); flyBtn.BorderSizePixel = 0
@@ -463,31 +516,13 @@ task.spawn(function()
 					task.spawn(function() pcall(function() loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Hitbox-Expander-224681"))() end); task.wait(1.5); if hitboxExpBtn and hitboxExpBtn.Parent then hitboxExpBtn.Text = "ขยายhitbox"; hitboxExpBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6) end end)
 				end)
 				
-				-- === KILL AURA BUTTON ===
 				local killAuraBtn = Instance.new("TextButton", contentScroll)
-				killAuraBtn.Size = UDim2.new(0.95, 0, 0, 45)
-				killAuraBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6)
-				killAuraBtn.BorderSizePixel = 0
-				killAuraBtn.Text = "คิล ออร่า"
-				killAuraBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-				killAuraBtn.TextSize = 15
-				killAuraBtn.Font = Enum.Font.GothamBold
-				killAuraBtn.Active = true
+				killAuraBtn.Size = UDim2.new(0.95, 0, 0, 45); killAuraBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6); killAuraBtn.BorderSizePixel = 0
+				killAuraBtn.Text = "คิล ออร่า"; killAuraBtn.TextColor3 = Color3.fromRGB(255, 255, 255); killAuraBtn.TextSize = 15; killAuraBtn.Font = Enum.Font.GothamBold; killAuraBtn.Active = true
 				Instance.new("UICorner", killAuraBtn).CornerRadius = UDim.new(0, 8)
-				
 				killAuraBtn.MouseButton1Click:Connect(function()
-					killAuraBtn.Text = "⏳ กำลังโหลด..."
-					killAuraBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-					task.spawn(function()
-						pcall(function()
-							loadstring(game:HttpGet('https://raw.githubusercontent.com/amdzy088/Kill-aura-slect-universal/refs/heads/main/Kill%20aura%20select%20universal'))()
-						end)
-						task.wait(1.5)
-						if killAuraBtn and killAuraBtn.Parent then
-							killAuraBtn.Text = "คิล ออร่า"
-							killAuraBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6)
-						end
-					end)
+					killAuraBtn.Text = "⏳ กำลังโหลด..."; killAuraBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+					task.spawn(function() pcall(function() loadstring(game:HttpGet('https://raw.githubusercontent.com/amdzy088/Kill-aura-slect-universal/refs/heads/main/Kill%20aura%20select%20universal'))() end); task.wait(1.5); if killAuraBtn and killAuraBtn.Parent then killAuraBtn.Text = "คิล ออร่า"; killAuraBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6) end end)
 				end)
 				
 			elseif name == "🤡 แกล้ง" then
@@ -538,6 +573,67 @@ task.spawn(function()
 				note.Text = "⚠️ ใช้ในเกมที่เกี่ยวข้องเท่านั้น:\n• 99 Nights (FoxLoader)\n• BloxFruits (QuantumOnyx)\n• MM2 / Survive Zombie Arena\nหากกดแล้วไม่เกิดอะไรขึ้น อาจเป็นเพราะ:\n• ไม่ใช่เกมที่เหมาะสม\n• สคริปต์อัปเดตหรือล่ม"
 				note.TextColor3 = Color3.fromRGB(150, 150, 150); note.TextSize = 11; note.Font = Enum.Font.GothamSemibold
 				note.TextXAlignment = Enum.TextXAlignment.Left; note.TextWrapped = true
+				
+			elseif name == "update" then
+				btnUpdate.BackgroundColor3 = Color3.fromRGB(50, 15, 5); btnUpdate.TextColor3 = Color3.fromRGB(255, 220, 150)
+				
+				local updateFrame = Instance.new("Frame", contentScroll)
+				updateFrame.Size = UDim2.new(0.95, 0, 0, 200)
+				updateFrame.BackgroundColor3 = Color3.fromRGB(30, 10, 3)
+				updateFrame.BorderSizePixel = 0
+				Instance.new("UICorner", updateFrame).CornerRadius = UDim.new(0, 8)
+				
+				local updateTitle = Instance.new("TextLabel", updateFrame)
+				updateTitle.Size = UDim2.new(1, 0, 0, 30)
+				updateTitle.Position = UDim2.new(0, 0, 0, 10)
+				updateTitle.BackgroundTransparency = 1
+				updateTitle.Text = "📋 รายการอัปเดต"
+				updateTitle.TextColor3 = Color3.fromRGB(255, 200, 100)
+				updateTitle.TextSize = 16
+				updateTitle.Font = Enum.Font.GothamBold
+				updateTitle.TextXAlignment = Enum.TextXAlignment.Center
+				
+				local versionLbl = Instance.new("TextLabel", updateFrame)
+				versionLbl.Size = UDim2.new(1, 0, 0, 25)
+				versionLbl.Position = UDim2.new(0, 0, 0, 45)
+				versionLbl.BackgroundTransparency = 1
+				versionLbl.Text = "เวอร์ชัน: V0.9.3"
+				versionLbl.TextColor3 = Color3.fromRGB(255, 255, 255)
+				versionLbl.TextSize = 14
+				versionLbl.Font = Enum.Font.GothamSemibold
+				versionLbl.TextXAlignment = Enum.TextXAlignment.Left
+				
+				local dateLbl = Instance.new("TextLabel", updateFrame)
+				dateLbl.Size = UDim2.new(1, 0, 0, 25)
+				dateLbl.Position = UDim2.new(0, 0, 0, 70)
+				dateLbl.BackgroundTransparency = 1
+				dateLbl.Text = "วันที่อัปเดต: 31 พฤษภาคม 2026"
+				dateLbl.TextColor3 = Color3.fromRGB(200, 200, 200)
+				dateLbl.TextSize = 13
+				dateLbl.Font = Enum.Font.Gotham
+				dateLbl.TextXAlignment = Enum.TextXAlignment.Left
+				
+				local changelogLbl = Instance.new("TextLabel", updateFrame)
+				changelogLbl.Size = UDim2.new(1, -20, 0, 60)
+				changelogLbl.Position = UDim2.new(0, 10, 0, 100)
+				changelogLbl.BackgroundTransparency = 1
+				changelogLbl.Text = "✨ สิ่งใหม่:\n• เพิ่มปุ่ม 'อมตะ' ในหมวด 👤 player\n• เพิ่มหน้าแสดงข้อมูลอัปเดตแยกด้านล่างเมนู"
+				changelogLbl.TextColor3 = Color3.fromRGB(180, 180, 180)
+				changelogLbl.TextSize = 12
+				changelogLbl.Font = Enum.Font.Gotham
+				changelogLbl.TextXAlignment = Enum.TextXAlignment.Left
+				changelogLbl.TextYAlignment = Enum.TextYAlignment.Top
+				changelogLbl.TextWrapped = true
+				
+				local creditsLbl = Instance.new("TextLabel", updateFrame)
+				creditsLbl.Size = UDim2.new(1, 0, 0, 25)
+				creditsLbl.Position = UDim2.new(0, 0, 1, -35)
+				creditsLbl.BackgroundTransparency = 1
+				creditsLbl.Text = "👤 สร้างโดย: Winning"
+				creditsLbl.TextColor3 = Color3.fromRGB(255, 180, 80)
+				creditsLbl.TextSize = 14
+				creditsLbl.Font = Enum.Font.GothamBold
+				creditsLbl.TextXAlignment = Enum.TextXAlignment.Center
 			end
 		end
 
@@ -546,6 +642,7 @@ task.spawn(function()
 		btnCombat.MouseButton1Click:Connect(function() loadCategory("⚔️ ต่อสู้") end)
 		btnJoke.MouseButton1Click:Connect(function() loadCategory("🤡 แกล้ง") end)
 		btnOther.MouseButton1Click:Connect(function() loadCategory("🌐 สคริปต์เกมอื่น") end)
+		btnUpdate.MouseButton1Click:Connect(function() loadCategory("update") end)
 		loadCategory("ทั่วไป")
 
 		-- === DRAG LOGIC ===
@@ -586,14 +683,14 @@ task.spawn(function()
 			mainFrame:TweenSize(UDim2.fromOffset(290, isMin and 40 or 300), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, 0.25, true)
 		end)
 		closeBtn.MouseButton1Click:Connect(function()
-			toggleESP(false); toggleShowHitbox(false); toggleAimlock(false); toggleNoclip(false); toggleInfJump(false)
+			toggleESP(false); toggleShowHitbox(false); toggleAimlock(false); toggleNoclip(false); toggleInfJump(false); toggleImmortal(false)
 			screenGui:Destroy(); tpScreenGui:Destroy()
 		end)
 		screenGui:GetPropertyChangedSignal("Parent"):Connect(function()
-			if not screenGui.Parent then toggleESP(false); toggleShowHitbox(false); toggleAimlock(false); toggleNoclip(false); toggleInfJump(false) end
+			if not screenGui.Parent then toggleESP(false); toggleShowHitbox(false); toggleAimlock(false); toggleNoclip(false); toggleInfJump(false); toggleImmortal(false) end
 		end)
 
-		print("[Pumpkitz Hub 🎃 V0.9.2] โหลดสำเร็จ | Kill Aura External Added | Delta Optimized")
+		print("[Pumpkitz Hub 🎃 V0.9.3] โหลดสำเร็จ | Update Panel + Immortal | Delta Optimized")
 	end
 
 	-- === LOADING SCREEN ===
@@ -614,7 +711,7 @@ task.spawn(function()
 
 	local loadingVersion = Instance.new("TextLabel", loadingFrame)
 	loadingVersion.Size = UDim2.new(1, 0, 0, 30); loadingVersion.Position = UDim2.fromScale(0.5, 0.42); loadingVersion.AnchorPoint = Vector2.new(0.5, 0.5)
-	loadingVersion.BackgroundTransparency = 1; loadingVersion.Text = "V0.9.2 | Delta Optimized"; loadingVersion.TextColor3 = Color3.fromRGB(200, 200, 200)
+	loadingVersion.BackgroundTransparency = 1; loadingVersion.Text = "V0.9.3 | Delta Optimized"; loadingVersion.TextColor3 = Color3.fromRGB(200, 200, 200)
 	loadingVersion.TextSize = 16; loadingVersion.Font = Enum.Font.GothamSemibold; loadingVersion.TextXAlignment = Enum.TextXAlignment.Center
 
 	local loadingBar = Instance.new("Frame", loadingFrame); loadingBar.Name = "LoadingBar"
