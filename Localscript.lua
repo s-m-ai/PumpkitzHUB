@@ -1,4 +1,4 @@
--- Pumpkitz Hub 🎃 V0.8.8 | Hitbox Expander + UI Fix | Delta Optimized
+-- Pumpkitz Hub 🎃 V0.8.9 | Hitbox Expander Removed | Delta Optimized
 task.spawn(function()
 	repeat task.wait() until game:IsLoaded()
 
@@ -15,7 +15,7 @@ task.spawn(function()
 		if not playerGui or not playerGui.Parent then return end
 		
 		local screenGui = Instance.new("ScreenGui")
-		screenGui.Name = "PumpkitzHub_V08_8"
+		screenGui.Name = "PumpkitzHub_V08_9"
 		screenGui.ResetOnSpawn = false
 		screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 		screenGui.IgnoreGuiInset = true
@@ -63,7 +63,7 @@ task.spawn(function()
 		title.Size = UDim2.new(1, -85, 1, 0)
 		title.Position = UDim2.new(0, 12, 0, 0)
 		title.BackgroundTransparency = 1
-		title.Text = "Pumpkitz Hub 🎃 V0.8.8"
+		title.Text = "Pumpkitz Hub 🎃 V0.8.9"
 		title.TextColor3 = Color3.fromRGB(255, 255, 255)
 		title.TextSize = 18
 		title.Font = Enum.Font.GothamBold
@@ -162,7 +162,7 @@ task.spawn(function()
 
 		-- === INDEPENDENT TELEPORT GUI ===
 		local tpScreenGui = Instance.new("ScreenGui")
-		tpScreenGui.Name = "PumpkitzHub_TP_V08_8"
+		tpScreenGui.Name = "PumpkitzHub_TP_V08_9"
 		tpScreenGui.ResetOnSpawn = false
 		tpScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 		tpScreenGui.IgnoreGuiInset = true
@@ -371,48 +371,6 @@ task.spawn(function()
 			else jumpDebounce = false end
 		end
 
-		-- === HITBOX EXPANDER SYSTEM (แทน Kill Aura) ===
-		local hitboxScaleActive = false
-		local currentHitboxScale = 1.0
-		local originalHitboxSizes = {}
-		local charAddedConnections = {}
-
-		local function applyHitboxScale(scale)
-			currentHitboxScale = math.max(0.1, tonumber(scale) or 1.0)
-			hitboxScaleActive = currentHitboxScale ~= 1.0
-			if not hitboxScaleActive then resetHitboxes(); return end
-
-			local function processChar(char)
-				if not char then return end
-				for _, part in ipairs(char:GetDescendants()) do
-					if part:IsA("BasePart") then
-						if not originalHitboxSizes[part] then originalHitboxSizes[part] = part.Size end
-						part.Size = originalHitboxSizes[part] * currentHitboxScale
-					end
-				end
-			end
-
-			for _, p in ipairs(Players:GetPlayers()) do
-				if p ~= localPlayer then
-					if p.Character then processChar(p.Character) end
-					if not charAddedConnections[p] then
-						charAddedConnections[p] = p.CharacterAdded:Connect(function(char)
-							task.wait(0.3)
-							if hitboxScaleActive then processChar(char) end
-						end)
-					end
-				end
-			end
-		end
-
-		local function resetHitboxes()
-			hitboxScaleActive = false; currentHitboxScale = 1.0
-			for part, origSize in pairs(originalHitboxSizes) do if part and part.Parent then part.Size = origSize end end
-			originalHitboxSizes = {}
-			for _, conn in pairs(charAddedConnections) do conn:Disconnect() end
-			charAddedConnections = {}
-		end
-
 		-- === UI MANAGEMENT ===
 		local function clearContent()
 			for _, child in pairs(contentScroll:GetChildren()) do if child:IsA("GuiObject") then child:Destroy() end end
@@ -495,40 +453,6 @@ task.spawn(function()
 				btnCombat.BackgroundColor3 = Color3.fromRGB(65, 20, 6); btnCombat.TextColor3 = Color3.fromRGB(255, 180, 80)
 				createToggleBtn(contentScroll, "แสดง Hitbox 👁️", Color3.fromRGB(230, 120, 20), Color3.fromRGB(55, 18, 6), toggleShowHitbox)
 				createToggleBtn(contentScroll, "ล็อกหัวใกล้สุด (LOS)", Color3.fromRGB(230, 120, 20), Color3.fromRGB(55, 18, 6), toggleAimlock)
-				
-				-- === HITBOX EXPANDER ROW ===
-				local hitboxRow = Instance.new("Frame", contentScroll)
-				hitboxRow.Size = UDim2.new(0.95, 0, 0, 42); hitboxRow.BackgroundTransparency = 1
-				local hbLayout = Instance.new("UIListLayout", hitboxRow)
-				hbLayout.FillDirection = Enum.FillDirection.Horizontal; hbLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-				hbLayout.VerticalAlignment = Enum.VerticalAlignment.Center; hbLayout.Padding = UDim.new(0, 8)
-
-				local hitboxBox = Instance.new("TextBox", hitboxRow)
-				hitboxBox.Size = UDim2.new(0.6, 0, 1, 0); hitboxBox.BackgroundColor3 = Color3.fromRGB(35, 12, 4); hitboxBox.BorderSizePixel = 0
-				hitboxBox.Text = "1.5"; hitboxBox.TextColor3 = Color3.fromRGB(255, 255, 255); hitboxBox.TextSize = 14; hitboxBox.Font = Enum.Font.GothamBold
-				hitboxBox.PlaceholderText = "ตัวคูณขนาด Hitbox (1.0 = ปกติ)"
-				hitboxBox.ClearTextOnFocus = false; hitboxBox.Active = true
-				Instance.new("UICorner", hitboxBox).CornerRadius = UDim.new(0, 6)
-
-				hitboxBox:GetPropertyChangedSignal("Text"):Connect(function()
-					local clean = string.gsub(hitboxBox.Text, "%D", "")
-					if hitboxBox.Text ~= clean then local p = hitboxBox.CursorPosition; hitboxBox.Text = clean; hitboxBox.CursorPosition = math.min(p, #clean + 1) end
-				end)
-
-				local hitboxBtn = Instance.new("TextButton", hitboxRow)
-				hitboxBtn.Size = UDim2.new(0.35, 0, 1, 0); hitboxBtn.BackgroundColor3 = Color3.fromRGB(200, 90, 15); hitboxBtn.BorderSizePixel = 0
-				hitboxBtn.Text = "ตกลง"; hitboxBtn.TextColor3 = Color3.fromRGB(255, 255, 255); hitboxBtn.TextSize = 14; hitboxBtn.Font = Enum.Font.GothamBold; hitboxBtn.Active = true
-				Instance.new("UICorner", hitboxBtn).CornerRadius = UDim.new(0, 6)
-
-				hitboxBtn.MouseButton1Click:Connect(function()
-					local val = tonumber(hitboxBox.Text)
-					if val and val > 0.1 then
-						applyHitboxScale(val)
-						hitboxBtn.Text = "✅ ใช้แล้ว"; task.delay(1, function() if hitboxBtn then hitboxBtn.Text = "ตกลง" end end)
-					else
-						hitboxBtn.Text = "❌ ผิดพลาด"; task.delay(1, function() if hitboxBtn then hitboxBtn.Text = "ตกลง" end end)
-					end
-				end)
 				
 			elseif name == "🤡 แกล้ง" then
 				btnJoke.BackgroundColor3 = Color3.fromRGB(65, 20, 6); btnJoke.TextColor3 = Color3.fromRGB(255, 180, 80)
@@ -615,14 +539,13 @@ task.spawn(function()
 		end)
 		closeBtn.MouseButton1Click:Connect(function()
 			toggleESP(false); toggleShowHitbox(false); toggleAimlock(false); toggleNoclip(false); toggleInfJump(false)
-			resetHitboxes()
 			screenGui:Destroy(); tpScreenGui:Destroy()
 		end)
 		screenGui:GetPropertyChangedSignal("Parent"):Connect(function()
-			if not screenGui.Parent then toggleESP(false); toggleShowHitbox(false); toggleAimlock(false); toggleNoclip(false); toggleInfJump(false); resetHitboxes() end
+			if not screenGui.Parent then toggleESP(false); toggleShowHitbox(false); toggleAimlock(false); toggleNoclip(false); toggleInfJump(false) end
 		end)
 
-		print("[Pumpkitz Hub 🎃 V0.8.8] โหลดสำเร็จ | Hitbox Expander + UI Fixed | Delta Optimized")
+		print("[Pumpkitz Hub 🎃 V0.8.9] โหลดสำเร็จ | Hitbox Expander Removed | Delta Optimized")
 	end
 
 	-- === LOADING SCREEN ===
@@ -643,7 +566,7 @@ task.spawn(function()
 
 	local loadingVersion = Instance.new("TextLabel", loadingFrame)
 	loadingVersion.Size = UDim2.new(1, 0, 0, 30); loadingVersion.Position = UDim2.fromScale(0.5, 0.42); loadingVersion.AnchorPoint = Vector2.new(0.5, 0.5)
-	loadingVersion.BackgroundTransparency = 1; loadingVersion.Text = "V0.8.8 | Delta Optimized"; loadingVersion.TextColor3 = Color3.fromRGB(200, 200, 200)
+	loadingVersion.BackgroundTransparency = 1; loadingVersion.Text = "V0.8.9 | Delta Optimized"; loadingVersion.TextColor3 = Color3.fromRGB(200, 200, 200)
 	loadingVersion.TextSize = 16; loadingVersion.Font = Enum.Font.GothamSemibold; loadingVersion.TextXAlignment = Enum.TextXAlignment.Center
 
 	local loadingBar = Instance.new("Frame", loadingFrame); loadingBar.Name = "LoadingBar"
