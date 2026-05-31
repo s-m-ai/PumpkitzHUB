@@ -1,4 +1,4 @@
--- ReaperHUB 💀 V0.8.3 | External Fly Loader + Multi-Jump | Delta Optimized
+-- ReaperHUB 💀 V0.8.4 | BloxFruits Script Loader + Fly Button Renamed | Delta Optimized
 task.spawn(function()
 	repeat task.wait() until game:IsLoaded()
 
@@ -12,7 +12,7 @@ task.spawn(function()
 
 	-- === MAIN GUI CORE ===
 	local screenGui = Instance.new("ScreenGui")
-	screenGui.Name = "ReaperHUB_V08_3"
+	screenGui.Name = "ReaperHUB_V08_4"
 	screenGui.ResetOnSpawn = false
 	screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	screenGui.IgnoreGuiInset = true
@@ -61,7 +61,7 @@ task.spawn(function()
 	title.Size = UDim2.new(1, -85, 1, 0)
 	title.Position = UDim2.new(0, 12, 0, 0)
 	title.BackgroundTransparency = 1
-	title.Text = "ReaperHUB 💀 V0.8.3"
+	title.Text = "ReaperHUB 💀 V0.8.4"
 	title.TextColor3 = Color3.fromRGB(255, 255, 255)
 	title.TextSize = 18
 	title.Font = Enum.Font.GothamBold
@@ -161,7 +161,7 @@ task.spawn(function()
 
 	-- === INDEPENDENT TELEPORT GUI ===
 	local tpScreenGui = Instance.new("ScreenGui")
-	tpScreenGui.Name = "ReaperHUB_TP_V08_3"
+	tpScreenGui.Name = "ReaperHUB_TP_V08_4"
 	tpScreenGui.ResetOnSpawn = false
 	tpScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	tpScreenGui.IgnoreGuiInset = true
@@ -460,12 +460,12 @@ task.spawn(function()
 			createToggleBtn(contentScroll, "Noclip 🚶‍♂️", Color3.fromRGB(180, 30, 30), Color3.fromRGB(50, 15, 15), toggleNoclip)
 			createToggleBtn(contentScroll, "กระโดดไม่จำกัด 🔄", Color3.fromRGB(180, 30, 30), Color3.fromRGB(50, 15, 15), toggleInfJump)
 			
-			-- === EXTERNAL FLY BUTTON ===
+			-- === EXTERNAL FLY BUTTON (Renamed) ===
 			local flyBtn = Instance.new("TextButton", contentScroll)
 			flyBtn.Size = UDim2.new(0.95, 0, 0, 45)
 			flyBtn.BackgroundColor3 = Color3.fromRGB(50, 15, 15)
 			flyBtn.BorderSizePixel = 0
-			flyBtn.Text = "บิน ✈️ (เปิดสคริปต์ภายนอก)"
+			flyBtn.Text = "Fly (บิน)"
 			flyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 			flyBtn.TextSize = 15
 			flyBtn.Font = Enum.Font.GothamBold
@@ -481,7 +481,7 @@ task.spawn(function()
 					end)
 					task.wait(1.5)
 					if flyBtn and flyBtn.Parent then
-						flyBtn.Text = "บิน ✈️ (เปิดสคริปต์ภายนอก)"
+						flyBtn.Text = "Fly (บิน)"
 						flyBtn.BackgroundColor3 = Color3.fromRGB(50, 15, 15)
 					end
 				end)
@@ -529,6 +529,7 @@ task.spawn(function()
 		elseif name == "🌐 สคริปต์เกมอื่น" then
 			btnOther.BackgroundColor3 = Color3.fromRGB(60, 18, 18); btnOther.TextColor3 = Color3.fromRGB(255, 80, 80)
 			
+			-- MM2 Script Button
 			local mm2Btn = Instance.new("TextButton", contentScroll)
 			mm2Btn.Size = UDim2.new(0.95, 0, 0, 45)
 			mm2Btn.BackgroundColor3 = Color3.fromRGB(50, 15, 15)
@@ -555,6 +556,7 @@ task.spawn(function()
 				end)
 			end)
 			
+			-- Zombie Arena Script Button
 			local zombieBtn = Instance.new("TextButton", contentScroll)
 			zombieBtn.Size = UDim2.new(0.95, 0, 0, 45)
 			zombieBtn.BackgroundColor3 = Color3.fromRGB(50, 15, 15)
@@ -581,9 +583,36 @@ task.spawn(function()
 				end)
 			end)
 			
+			-- === BLOX FRUITS SCRIPT BUTTON ===
+			local bfBtn = Instance.new("TextButton", contentScroll)
+			bfBtn.Size = UDim2.new(0.95, 0, 0, 45)
+			bfBtn.BackgroundColor3 = Color3.fromRGB(50, 15, 15)
+			bfBtn.BorderSizePixel = 0
+			bfBtn.Text = "สคริปต์BloxFruits"
+			bfBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+			bfBtn.TextSize = 15
+			bfBtn.Font = Enum.Font.GothamBold
+			bfBtn.Active = true
+			Instance.new("UICorner", bfBtn).CornerRadius = UDim.new(0, 8)
+			
+			bfBtn.MouseButton1Click:Connect(function()
+				bfBtn.Text = "⏳ กำลังโหลด..."
+				bfBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+				task.spawn(function()
+					pcall(function()
+						loadstring(game:HttpGet("https://raw.githubusercontent.com/flazhy/QuantumOnyx/refs/heads/main/QuantumOnyx.lua"))()
+					end)
+					task.wait(1.5)
+					if bfBtn and bfBtn.Parent then
+						bfBtn.Text = "สคริปต์BloxFruits"
+						bfBtn.BackgroundColor3 = Color3.fromRGB(50, 15, 15)
+					end
+				end)
+			end)
+			
 			local note = Instance.new("TextLabel", contentScroll)
-			note.Size = UDim2.new(0.95, 0, 0, 45); note.BackgroundTransparency = 1
-			note.Text = "⚠️ ใช้ในเกมที่เกี่ยวข้องเท่านั้น:\n• Survive Zombie Arena\n• Void Hub Supported Games\nหากกดแล้วไม่เกิดอะไรขึ้น อาจเป็นเพราะ:\n• ไม่ใช่เกมที่เหมาะสม\n• สคริปต์อัปเดตหรือล่ม"
+			note.Size = UDim2.new(0.95, 0, 0, 55); note.BackgroundTransparency = 1
+			note.Text = "⚠️ ใช้ในเกมที่เกี่ยวข้องเท่านั้น:\n• BloxFruits (QuantumOnyx)\n• MM2 / Survive Zombie Arena\nหากกดแล้วไม่เกิดอะไรขึ้น อาจเป็นเพราะ:\n• ไม่ใช่เกมที่เหมาะสม\n• สคริปต์อัปเดตหรือล่ม"
 			note.TextColor3 = Color3.fromRGB(150, 150, 150); note.TextSize = 11; note.Font = Enum.Font.GothamSemibold
 			note.TextXAlignment = Enum.TextXAlignment.Left; note.TextWrapped = true
 		end
@@ -641,6 +670,6 @@ task.spawn(function()
 		if not screenGui.Parent then toggleESP(false); toggleShowHitbox(false); toggleAimlock(false); toggleNoclip(false); toggleInfJump(false) end
 	end)
 
-	print("[ReaperHUB 💀 V0.8.3] โหลดสำเร็จ | External Fly Loader Added | Delta Optimized")
+	print("[ReaperHUB 💀 V0.8.4] โหลดสำเร็จ | BloxFruits Script + Fly Renamed | Delta Optimized")
 end)
 
