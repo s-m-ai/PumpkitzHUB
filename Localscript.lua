@@ -1,4 +1,4 @@
--- Pumpkitz Hub 🎃 V0.9.3 | 5s Loading + Max Immortal Health | Delta Optimized
+-- Pumpkitz Hub 🎃 V0.9.3 | Key System + 5s Loading + Max Immortal | Delta Optimized
 task.spawn(function()
 	repeat task.wait() until game:IsLoaded()
 
@@ -375,7 +375,7 @@ task.spawn(function()
 		local immortalActive = false
 		local immortalConn = nil
 		local originalMaxHealth = 100
-		local MAX_HEALTH = 9999999999999999999999 -- ค่าเลือดสูงสุดตามคำขอ
+		local MAX_HEALTH = 9999999999999999999999
 
 		local function toggleImmortal(state)
 			immortalActive = state
@@ -438,7 +438,6 @@ task.spawn(function()
 		local btnJoke = createCatBtn(catScroll, "🤡 แกล้ง")
 		local btnOther = createCatBtn(catScroll, "🌐 สคริปต์เกมอื่น")
 
-		-- === UPDATE BUTTON (Separate at bottom) ===
 		local updateDivider = Instance.new("Frame", catScroll)
 		updateDivider.Size = UDim2.new(0.9, 0, 0, 2)
 		updateDivider.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
@@ -691,10 +690,102 @@ task.spawn(function()
 			if not screenGui.Parent then toggleESP(false); toggleShowHitbox(false); toggleAimlock(false); toggleNoclip(false); toggleInfJump(false); toggleImmortal(false) end
 		end)
 
-		print("[Pumpkitz Hub 🎃 V0.9.3] โหลดสำเร็จ | 5s Loading + Max Immortal | Delta Optimized")
+		print("[Pumpkitz Hub 🎃 V0.9.3] โหลดสำเร็จ | Key System + Max Immortal | Delta Optimized")
 	end
 
-	-- === LOADING SCREEN (EXTENDED TO 5 SECONDS) ===
+	-- === KEY SYSTEM FUNCTION ===
+	local function showKeySystem()
+		if not playerGui or not playerGui.Parent then return end
+
+		local keyGui = Instance.new("ScreenGui")
+		keyGui.Name = "Pumpkitz_KeySystem"
+		keyGui.ResetOnSpawn = false
+		keyGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+		keyGui.IgnoreGuiInset = true
+		keyGui.DisplayOrder = 9999
+		keyGui.Enabled = true
+		keyGui.Parent = playerGui
+
+		local keyFrame = Instance.new("Frame", keyGui)
+		keyFrame.Name = "KeyFrame"
+		keyFrame.Size = UDim2.fromOffset(280, 220)
+		keyFrame.Position = UDim2.fromScale(0.5, 0.5)
+		keyFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+		keyFrame.BackgroundColor3 = Color3.fromRGB(20, 8, 2)
+		keyFrame.BorderSizePixel = 0
+		Instance.new("UICorner", keyFrame).CornerRadius = UDim.new(0, 12)
+		Instance.new("UIStroke", keyFrame).Color = Color3.fromRGB(255, 140, 0)
+
+		local title = Instance.new("TextLabel", keyFrame)
+		title.Size = UDim2.new(1, 0, 0, 40)
+		title.Position = UDim2.new(0, 0, 0, 20)
+		title.BackgroundTransparency = 1
+		title.Text = "🔑 ใส่คีย์เพื่อปลดล็อก"
+		title.TextColor3 = Color3.fromRGB(255, 255, 255)
+		title.TextSize = 18
+		title.Font = Enum.Font.GothamBold
+		title.TextXAlignment = Enum.TextXAlignment.Center
+
+		local keyBox = Instance.new("TextBox", keyFrame)
+		keyBox.Size = UDim2.new(0.85, 0, 0, 40)
+		keyBox.Position = UDim2.new(0.075, 0, 0, 70)
+		keyBox.BackgroundColor3 = Color3.fromRGB(35, 12, 4)
+		keyBox.BorderSizePixel = 0
+		keyBox.Text = ""
+		keyBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+		keyBox.TextSize = 16
+		keyBox.Font = Enum.Font.GothamBold
+		keyBox.PlaceholderText = "กรอกคีย์ที่นี่..."
+		keyBox.ClearTextOnFocus = true
+		keyBox.Active = true
+		Instance.new("UICorner", keyBox).CornerRadius = UDim.new(0, 8)
+
+		local submitBtn = Instance.new("TextButton", keyFrame)
+		submitBtn.Size = UDim2.new(0.85, 0, 0, 40)
+		submitBtn.Position = UDim2.new(0.075, 0, 0, 125)
+		submitBtn.BackgroundColor3 = Color3.fromRGB(230, 120, 20)
+		submitBtn.BorderSizePixel = 0
+		submitBtn.Text = "ยืนยัน"
+		submitBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+		submitBtn.TextSize = 16
+		submitBtn.Font = Enum.Font.GothamBold
+		submitBtn.Active = true
+		Instance.new("UICorner", submitBtn).CornerRadius = UDim.new(0, 8)
+
+		local statusLbl = Instance.new("TextLabel", keyFrame)
+		statusLbl.Size = UDim2.new(1, 0, 0, 25)
+		statusLbl.Position = UDim2.new(0, 0, 1, -35)
+		statusLbl.BackgroundTransparency = 1
+		statusLbl.Text = ""
+		statusLbl.TextColor3 = Color3.fromRGB(255, 80, 80)
+		statusLbl.TextSize = 13
+		statusLbl.Font = Enum.Font.GothamSemibold
+		statusLbl.TextXAlignment = Enum.TextXAlignment.Center
+
+		local function verifyKey()
+			local input = keyBox.Text:gsub("^%s*(.-)%s*$", "%1")
+			if input == "ผมคือคนไทย" then
+				statusLbl.Text = "✅ คีย์ถูกต้อง! กำลังเข้าระบบ..."
+				statusLbl.TextColor3 = Color3.fromRGB(50, 200, 50)
+				task.wait(0.8)
+				keyGui:Destroy()
+				loadMainGUI()
+			else
+				statusLbl.Text = "❌ คีย์ไม่ถูกต้อง กรุณาลองใหม่"
+				statusLbl.TextColor3 = Color3.fromRGB(255, 80, 80)
+				keyBox.Text = ""
+				task.wait(1)
+				statusLbl.Text = ""
+			end
+		end
+
+		submitBtn.MouseButton1Click:Connect(verifyKey)
+		keyBox.FocusLost:Connect(function(enterPressed)
+			if enterPressed then verifyKey() end
+		end)
+	end
+
+	-- === LOADING SCREEN (5 SECONDS) ===
 	local loadingGui = Instance.new("ScreenGui")
 	loadingGui.Name = "PumpkitzHub_Loading"; loadingGui.ResetOnSpawn = false
 	loadingGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling; loadingGui.IgnoreGuiInset = true
@@ -739,17 +830,16 @@ task.spawn(function()
 	creditAssistant.Size = UDim2.new(1, 0, 0, 25); creditAssistant.Position = UDim2.fromScale(0.5, 0.6); creditAssistant.AnchorPoint = Vector2.new(0.5, 0.5); creditAssistant.BackgroundTransparency = 1
 	creditAssistant.Text = "ผู้ช่วย:Qwen3.6-Plus"; creditAssistant.TextColor3 = Color3.fromRGB(200, 200, 200); creditAssistant.TextSize = 13; creditAssistant.Font = Enum.Font.GothamSemibold; creditAssistant.TextXAlignment = Enum.TextXAlignment.Center
 
-	-- Loading Animation (EXTENDED TO ~5 SECONDS)
+	-- Loading Animation (5 SECONDS) + KEY SYSTEM TRIGGER
 	task.spawn(function()
-		-- 100 iterations × 0.05s wait = 5 seconds for loading bar
 		for i = 0, 1, 0.01 do 
 			loadingBarFill.Size = UDim2.new(i, 0, 1, 0)
 			task.wait(0.05) 
 		end
 		loadingStatus.Text = "เตรียมความพร้อม..."
-		task.wait(1) -- Additional 1 second for final status
+		task.wait(0.5)
 		if loadingGui and loadingGui.Parent then loadingGui:Destroy() end
-		loadMainGUI()
+		showKeySystem()
 	end)
 end)
 
