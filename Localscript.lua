@@ -433,7 +433,7 @@ task.spawn(function()
 			flingBtn.Size = UDim2.new(0.95, 0, 0, 45)
 			flingBtn.BackgroundColor3 = Color3.fromRGB(50, 15, 15)
 			flingBtn.BorderSizePixel = 0
-			flingBtn.Text = "🚀 เปิด Fling GUI (ภายนอก)"
+			flingBtn.Text = "เปิดเตะคนออกแมพ"
 			flingBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 			flingBtn.TextSize = 15
 			flingBtn.Font = Enum.Font.GothamBold
@@ -449,7 +449,7 @@ task.spawn(function()
 					end)
 					task.wait(1.5)
 					if flingBtn and flingBtn.Parent then
-						flingBtn.Text = "🚀 เปิด Fling GUI"
+						flingBtn.Text = "เปิดเตะคนออกแมพ"
 						flingBtn.BackgroundColor3 = Color3.fromRGB(50, 15, 15)
 					end
 				end)
