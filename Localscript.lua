@@ -1,4 +1,4 @@
--- Pumpkitz Hub 🎃 V0.8.7 | Orange/Black Theme + Kill Aura + Menu Fix | Delta Optimized
+-- Pumpkitz Hub 🎃 V0.8.8 | Hitbox Expander + UI Fix | Delta Optimized
 task.spawn(function()
 	repeat task.wait() until game:IsLoaded()
 
@@ -10,12 +10,12 @@ task.spawn(function()
 	local playerGui = localPlayer:WaitForChild("PlayerGui", 10)
 	if not playerGui then error("[Pumpkitz Hub] PlayerGui ไม่พบ หรือถูกบล็อก") end
 
-	-- === MAIN GUI FUNCTION (ประกาศก่อนใช้งาน เพื่อป้องกัน nil error) ===
+	-- === MAIN GUI FUNCTION ===
 	local function loadMainGUI()
 		if not playerGui or not playerGui.Parent then return end
 		
 		local screenGui = Instance.new("ScreenGui")
-		screenGui.Name = "PumpkitzHub_V08_7"
+		screenGui.Name = "PumpkitzHub_V08_8"
 		screenGui.ResetOnSpawn = false
 		screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 		screenGui.IgnoreGuiInset = true
@@ -63,7 +63,7 @@ task.spawn(function()
 		title.Size = UDim2.new(1, -85, 1, 0)
 		title.Position = UDim2.new(0, 12, 0, 0)
 		title.BackgroundTransparency = 1
-		title.Text = "Pumpkitz Hub 🎃 V0.8.7"
+		title.Text = "Pumpkitz Hub 🎃 V0.8.8"
 		title.TextColor3 = Color3.fromRGB(255, 255, 255)
 		title.TextSize = 18
 		title.Font = Enum.Font.GothamBold
@@ -130,7 +130,7 @@ task.spawn(function()
 		conLayout.Padding = UDim.new(0, 8)
 		conLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
-		-- === ESP SYSTEM (Orange) ===
+		-- === ESP SYSTEM ===
 		local espHighlights = {}
 		local espActive = false
 		local function toggleESP(state)
@@ -162,7 +162,7 @@ task.spawn(function()
 
 		-- === INDEPENDENT TELEPORT GUI ===
 		local tpScreenGui = Instance.new("ScreenGui")
-		tpScreenGui.Name = "PumpkitzHub_TP_V08_7"
+		tpScreenGui.Name = "PumpkitzHub_TP_V08_8"
 		tpScreenGui.ResetOnSpawn = false
 		tpScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 		tpScreenGui.IgnoreGuiInset = true
@@ -354,72 +354,63 @@ task.spawn(function()
 		local infJumpConn = nil
 		local jumpCount = 0
 		local jumpDebounce = false
-
 		local function toggleInfJump(state)
-			infJumpActive = state
-			jumpCount = 0
+			infJumpActive = state; jumpCount = 0
 			if infJumpConn then infJumpConn:Disconnect(); infJumpConn = nil end
 			if state then
 				infJumpConn = UserInputService.InputBegan:Connect(function(input, gameProcessed)
 					if infJumpActive and (input.KeyCode == Enum.KeyCode.Space or input.UserInputType == Enum.UserInputType.Touch) then
-						if jumpDebounce then return end
-						jumpDebounce = true
+						if jumpDebounce then return end; jumpDebounce = true
 						task.delay(0.15, function() jumpDebounce = false end)
 						if localPlayer.Character and localPlayer.Character:FindFirstChild("Humanoid") and localPlayer.Character:FindFirstChild("HumanoidRootPart") then
-							local hum = localPlayer.Character.Humanoid
-							local hrp = localPlayer.Character.HumanoidRootPart
-							if hum:GetState() == Enum.HumanoidStateType.Freefall then
-								jumpCount = jumpCount + 1
-								local boost = math.min(50 + (jumpCount * 12), 180)
-								hrp.Velocity = Vector3.new(hrp.Velocity.X, boost, hrp.Velocity.Z)
-							else jumpCount = 0 end
+							local hum = localPlayer.Character.Humanoid; local hrp = localPlayer.Character.HumanoidRootPart
+							if hum:GetState() == Enum.HumanoidStateType.Freefall then jumpCount = jumpCount + 1; hrp.Velocity = Vector3.new(hrp.Velocity.X, math.min(50 + (jumpCount * 12), 180), hrp.Velocity.Z) else jumpCount = 0 end
 						end
 					end
 				end)
 			else jumpDebounce = false end
 		end
 
-		-- === KILL AURA SYSTEM ===
-		local killAuraActive = false
-		local killAuraConn = nil
-		local auraRadius = 5.0
-		local auraHighlight = nil
+		-- === HITBOX EXPANDER SYSTEM (แทน Kill Aura) ===
+		local hitboxScaleActive = false
+		local currentHitboxScale = 1.0
+		local originalHitboxSizes = {}
+		local charAddedConnections = {}
 
-		local function toggleKillAura(state)
-			killAuraActive = state
-			if killAuraConn then killAuraConn:Disconnect(); killAuraConn = nil end
-			if auraHighlight then auraHighlight:Destroy(); auraHighlight = nil end
-			
-			if state then
-				if localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart") then
-					auraHighlight = Instance.new("Highlight")
-					auraHighlight.Adornee = localPlayer.Character
-					auraHighlight.FillColor = Color3.fromRGB(255, 140, 0)
-					auraHighlight.FillTransparency = 0.7
-					auraHighlight.OutlineColor = Color3.fromRGB(255, 200, 50)
-					auraHighlight.OutlineTransparency = 0.3
-					auraHighlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-					auraHighlight.Parent = localPlayer.Character
-				end
+		local function applyHitboxScale(scale)
+			currentHitboxScale = math.max(0.1, tonumber(scale) or 1.0)
+			hitboxScaleActive = currentHitboxScale ~= 1.0
+			if not hitboxScaleActive then resetHitboxes(); return end
 
-				killAuraConn = RunService.Heartbeat:Connect(function()
-					if not localPlayer.Character or not localPlayer.Character:FindFirstChild("HumanoidRootPart") then return end
-					local hrp = localPlayer.Character.HumanoidRootPart
-					for _, p in ipairs(Players:GetPlayers()) do
-						if p ~= localPlayer and p.Character and p.Character:FindFirstChild("HumanoidRootPart") and p.Character:FindFirstChild("Humanoid") then
-							local dist = (hrp.Position - p.Character.HumanoidRootPart.Position).Magnitude
-							if dist <= auraRadius and p.Character.Humanoid.Health > 0 then
-								p.Character.Humanoid:TakeDamage(50)
-								local bv = Instance.new("BodyVelocity")
-								bv.Velocity = (p.Character.HumanoidRootPart.Position - hrp.Position).Unit * 35
-								bv.MaxForce = Vector3.new(400000, 400000, 400000)
-								bv.Parent = p.Character.HumanoidRootPart
-								task.delay(0.15, function() if bv then bv:Destroy() end end)
-							end
-						end
+			local function processChar(char)
+				if not char then return end
+				for _, part in ipairs(char:GetDescendants()) do
+					if part:IsA("BasePart") then
+						if not originalHitboxSizes[part] then originalHitboxSizes[part] = part.Size end
+						part.Size = originalHitboxSizes[part] * currentHitboxScale
 					end
-				end)
+				end
 			end
+
+			for _, p in ipairs(Players:GetPlayers()) do
+				if p ~= localPlayer then
+					if p.Character then processChar(p.Character) end
+					if not charAddedConnections[p] then
+						charAddedConnections[p] = p.CharacterAdded:Connect(function(char)
+							task.wait(0.3)
+							if hitboxScaleActive then processChar(char) end
+						end)
+					end
+				end
+			end
+		end
+
+		local function resetHitboxes()
+			hitboxScaleActive = false; currentHitboxScale = 1.0
+			for part, origSize in pairs(originalHitboxSizes) do if part and part.Parent then part.Size = origSize end end
+			originalHitboxSizes = {}
+			for _, conn in pairs(charAddedConnections) do conn:Disconnect() end
+			charAddedConnections = {}
 		end
 
 		-- === UI MANAGEMENT ===
@@ -429,10 +420,8 @@ task.spawn(function()
 
 		local function createToggleBtn(parent, text, onCol, offCol, callback)
 			local btn = Instance.new("TextButton", parent)
-			btn.Size = UDim2.new(0.95, 0, 0, 45)
-			btn.BackgroundColor3 = offCol; btn.BorderSizePixel = 0
-			btn.Text = text; btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-			btn.TextSize = 16; btn.Font = Enum.Font.GothamBold; btn.Active = true
+			btn.Size = UDim2.new(0.95, 0, 0, 45); btn.BackgroundColor3 = offCol; btn.BorderSizePixel = 0
+			btn.Text = text; btn.TextColor3 = Color3.fromRGB(255, 255, 255); btn.TextSize = 16; btn.Font = Enum.Font.GothamBold; btn.Active = true
 			Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
 			local active = false
 			btn.MouseButton1Click:Connect(function()
@@ -446,10 +435,8 @@ task.spawn(function()
 
 		local function createCatBtn(text)
 			local btn = Instance.new("TextButton", catScroll)
-			btn.Size = UDim2.new(0.9, 0, 0, 38)
-			btn.BackgroundColor3 = Color3.fromRGB(45, 15, 5); btn.BorderSizePixel = 0
-			btn.Text = text; btn.TextColor3 = Color3.fromRGB(200, 200, 200)
-			btn.TextSize = 14; btn.Font = Enum.Font.GothamBold; btn.Active = true
+			btn.Size = UDim2.new(0.9, 0, 0, 38); btn.BackgroundColor3 = Color3.fromRGB(45, 15, 5); btn.BorderSizePixel = 0
+			btn.Text = text; btn.TextColor3 = Color3.fromRGB(200, 200, 200); btn.TextSize = 14; btn.Font = Enum.Font.GothamBold; btn.Active = true
 			Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
 			return btn
 		end
@@ -494,22 +481,12 @@ task.spawn(function()
 				createToggleBtn(contentScroll, "กระโดดไม่จำกัด 🔄", Color3.fromRGB(230, 120, 20), Color3.fromRGB(55, 18, 6), toggleInfJump)
 				
 				local flyBtn = Instance.new("TextButton", contentScroll)
-				flyBtn.Size = UDim2.new(0.95, 0, 0, 45)
-				flyBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6)
-				flyBtn.BorderSizePixel = 0
-				flyBtn.Text = "Fly (บิน)"
-				flyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-				flyBtn.TextSize = 15
-				flyBtn.Font = Enum.Font.GothamBold
-				flyBtn.Active = true
+				flyBtn.Size = UDim2.new(0.95, 0, 0, 45); flyBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6); flyBtn.BorderSizePixel = 0
+				flyBtn.Text = "Fly (บิน)"; flyBtn.TextColor3 = Color3.fromRGB(255, 255, 255); flyBtn.TextSize = 15; flyBtn.Font = Enum.Font.GothamBold; flyBtn.Active = true
 				Instance.new("UICorner", flyBtn).CornerRadius = UDim.new(0, 8)
 				flyBtn.MouseButton1Click:Connect(function()
 					flyBtn.Text = "⏳ กำลังโหลด..."; flyBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-					task.spawn(function()
-						pcall(function() loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-universal-fly-111281"))() end)
-						task.wait(1.5)
-						if flyBtn and flyBtn.Parent then flyBtn.Text = "Fly (บิน)"; flyBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6) end
-					end)
+					task.spawn(function() pcall(function() loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-universal-fly-111281"))() end); task.wait(1.5); if flyBtn and flyBtn.Parent then flyBtn.Text = "Fly (บิน)"; flyBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6) end end)
 				end)
 				
 				local tpBtn = Instance.new("TextButton", contentScroll); tpBtn.Size = UDim2.new(0.95, 0, 0, 45); tpBtn.BackgroundColor3 = Color3.fromRGB(45, 15, 5); tpBtn.BorderSizePixel = 0; tpBtn.Text = "📍 เปิดหน้าต่าง Teleport"; tpBtn.TextColor3 = Color3.fromRGB(255, 255, 255); tpBtn.TextSize = 16; tpBtn.Font = Enum.Font.GothamBold; tpBtn.Active = true; Instance.new("UICorner", tpBtn).CornerRadius = UDim.new(0, 8); tpBtn.MouseButton1Click:Connect(openTPGui)
@@ -518,93 +495,74 @@ task.spawn(function()
 				btnCombat.BackgroundColor3 = Color3.fromRGB(65, 20, 6); btnCombat.TextColor3 = Color3.fromRGB(255, 180, 80)
 				createToggleBtn(contentScroll, "แสดง Hitbox 👁️", Color3.fromRGB(230, 120, 20), Color3.fromRGB(55, 18, 6), toggleShowHitbox)
 				createToggleBtn(contentScroll, "ล็อกหัวใกล้สุด (LOS)", Color3.fromRGB(230, 120, 20), Color3.fromRGB(55, 18, 6), toggleAimlock)
-				createToggleBtn(contentScroll, "Kill Aura 🟠", Color3.fromRGB(230, 120, 20), Color3.fromRGB(55, 18, 6), toggleKillAura)
+				
+				-- === HITBOX EXPANDER ROW ===
+				local hitboxRow = Instance.new("Frame", contentScroll)
+				hitboxRow.Size = UDim2.new(0.95, 0, 0, 42); hitboxRow.BackgroundTransparency = 1
+				local hbLayout = Instance.new("UIListLayout", hitboxRow)
+				hbLayout.FillDirection = Enum.FillDirection.Horizontal; hbLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+				hbLayout.VerticalAlignment = Enum.VerticalAlignment.Center; hbLayout.Padding = UDim.new(0, 8)
+
+				local hitboxBox = Instance.new("TextBox", hitboxRow)
+				hitboxBox.Size = UDim2.new(0.6, 0, 1, 0); hitboxBox.BackgroundColor3 = Color3.fromRGB(35, 12, 4); hitboxBox.BorderSizePixel = 0
+				hitboxBox.Text = "1.5"; hitboxBox.TextColor3 = Color3.fromRGB(255, 255, 255); hitboxBox.TextSize = 14; hitboxBox.Font = Enum.Font.GothamBold
+				hitboxBox.PlaceholderText = "ตัวคูณขนาด Hitbox (1.0 = ปกติ)"
+				hitboxBox.ClearTextOnFocus = false; hitboxBox.Active = true
+				Instance.new("UICorner", hitboxBox).CornerRadius = UDim.new(0, 6)
+
+				hitboxBox:GetPropertyChangedSignal("Text"):Connect(function()
+					local clean = string.gsub(hitboxBox.Text, "%D", "")
+					if hitboxBox.Text ~= clean then local p = hitboxBox.CursorPosition; hitboxBox.Text = clean; hitboxBox.CursorPosition = math.min(p, #clean + 1) end
+				end)
+
+				local hitboxBtn = Instance.new("TextButton", hitboxRow)
+				hitboxBtn.Size = UDim2.new(0.35, 0, 1, 0); hitboxBtn.BackgroundColor3 = Color3.fromRGB(200, 90, 15); hitboxBtn.BorderSizePixel = 0
+				hitboxBtn.Text = "ตกลง"; hitboxBtn.TextColor3 = Color3.fromRGB(255, 255, 255); hitboxBtn.TextSize = 14; hitboxBtn.Font = Enum.Font.GothamBold; hitboxBtn.Active = true
+				Instance.new("UICorner", hitboxBtn).CornerRadius = UDim.new(0, 6)
+
+				hitboxBtn.MouseButton1Click:Connect(function()
+					local val = tonumber(hitboxBox.Text)
+					if val and val > 0.1 then
+						applyHitboxScale(val)
+						hitboxBtn.Text = "✅ ใช้แล้ว"; task.delay(1, function() if hitboxBtn then hitboxBtn.Text = "ตกลง" end end)
+					else
+						hitboxBtn.Text = "❌ ผิดพลาด"; task.delay(1, function() if hitboxBtn then hitboxBtn.Text = "ตกลง" end end)
+					end
+				end)
 				
 			elseif name == "🤡 แกล้ง" then
 				btnJoke.BackgroundColor3 = Color3.fromRGB(65, 20, 6); btnJoke.TextColor3 = Color3.fromRGB(255, 180, 80)
-				
 				local flingBtn = Instance.new("TextButton", contentScroll)
-				flingBtn.Size = UDim2.new(0.95, 0, 0, 45)
-				flingBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6)
-				flingBtn.BorderSizePixel = 0
-				flingBtn.Text = "🚀 เปิด Fling GUI (ภายนอก)"
-				flingBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-				flingBtn.TextSize = 15
-				flingBtn.Font = Enum.Font.GothamBold
-				flingBtn.Active = true
+				flingBtn.Size = UDim2.new(0.95, 0, 0, 45); flingBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6); flingBtn.BorderSizePixel = 0
+				flingBtn.Text = "🚀 เปิด Fling GUI (ภายนอก)"; flingBtn.TextColor3 = Color3.fromRGB(255, 255, 255); flingBtn.TextSize = 15; flingBtn.Font = Enum.Font.GothamBold; flingBtn.Active = true
 				Instance.new("UICorner", flingBtn).CornerRadius = UDim.new(0, 8)
 				flingBtn.MouseButton1Click:Connect(function()
 					flingBtn.Text = "⏳ กำลังโหลด..."; flingBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-					task.spawn(function()
-						pcall(function() loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Ultimate-fling-gui-228952"))() end)
-						task.wait(1.5)
-						if flingBtn and flingBtn.Parent then flingBtn.Text = "🚀 เปิด Fling GUI (ภายนอก)"; flingBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6) end
-					end)
+					task.spawn(function() pcall(function() loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Ultimate-fling-gui-228952"))() end); task.wait(1.5); if flingBtn and flingBtn.Parent then flingBtn.Text = "🚀 เปิด Fling GUI (ภายนอก)"; flingBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6) end end)
 				end)
-				
-				local note = Instance.new("TextLabel", contentScroll)
-				note.Size = UDim2.new(0.95, 0, 0, 20); note.BackgroundTransparency = 1
-				note.Text = "(ใช้ได้เฉพาะแมพที่ตัวชนกันได้)"
-				note.TextColor3 = Color3.fromRGB(150, 150, 150); note.TextSize = 12; note.Font = Enum.Font.GothamSemibold
+				local note = Instance.new("TextLabel", contentScroll); note.Size = UDim2.new(0.95, 0, 0, 20); note.BackgroundTransparency = 1
+				note.Text = "(ใช้ได้เฉพาะแมพที่ตัวชนกันได้)"; note.TextColor3 = Color3.fromRGB(150, 150, 150); note.TextSize = 12; note.Font = Enum.Font.GothamSemibold
 				note.TextXAlignment = Enum.TextXAlignment.Center; note.TextWrapped = true
 				
 			elseif name == "🌐 สคริปต์เกมอื่น" then
 				btnOther.BackgroundColor3 = Color3.fromRGB(65, 20, 6); btnOther.TextColor3 = Color3.fromRGB(255, 180, 80)
+				local mm2Btn = Instance.new("TextButton", contentScroll); mm2Btn.Size = UDim2.new(0.95, 0, 0, 45); mm2Btn.BackgroundColor3 = Color3.fromRGB(55, 18, 6); mm2Btn.BorderSizePixel = 0
+				mm2Btn.Text = "MM2"; mm2Btn.TextColor3 = Color3.fromRGB(255, 255, 255); mm2Btn.TextSize = 15; mm2Btn.Font = Enum.Font.GothamBold; mm2Btn.Active = true; Instance.new("UICorner", mm2Btn).CornerRadius = UDim.new(0, 8)
+				mm2Btn.MouseButton1Click:Connect(function() mm2Btn.Text = "⏳ กำลังโหลด..."; mm2Btn.BackgroundColor3 = Color3.fromRGB(100, 100, 100); task.spawn(function() pcall(function() loadstring(game:HttpGet('https://raw.githubusercontent.com/M4VOWJ8IAKSR5WFRCCJ7AW5IW/ScrFr/refs/heads/main/MM2'))() end); task.wait(1.5); if mm2Btn and mm2Btn.Parent then mm2Btn.Text = "MM2"; mm2Btn.BackgroundColor3 = Color3.fromRGB(55, 18, 6) end end) end)
 				
-				local mm2Btn = Instance.new("TextButton", contentScroll)
-				mm2Btn.Size = UDim2.new(0.95, 0, 0, 45); mm2Btn.BackgroundColor3 = Color3.fromRGB(55, 18, 6); mm2Btn.BorderSizePixel = 0
-				mm2Btn.Text = "MM2"; mm2Btn.TextColor3 = Color3.fromRGB(255, 255, 255); mm2Btn.TextSize = 15; mm2Btn.Font = Enum.Font.GothamBold; mm2Btn.Active = true
-				Instance.new("UICorner", mm2Btn).CornerRadius = UDim.new(0, 8)
-				mm2Btn.MouseButton1Click:Connect(function()
-					mm2Btn.Text = "⏳ กำลังโหลด..."; mm2Btn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-					task.spawn(function()
-						pcall(function() loadstring(game:HttpGet('https://raw.githubusercontent.com/M4VOWJ8IAKSR5WFRCCJ7AW5IW/ScrFr/refs/heads/main/MM2'))() end)
-						task.wait(1.5)
-						if mm2Btn and mm2Btn.Parent then mm2Btn.Text = "MM2"; mm2Btn.BackgroundColor3 = Color3.fromRGB(55, 18, 6) end
-					end)
-				end)
+				local zombieBtn = Instance.new("TextButton", contentScroll); zombieBtn.Size = UDim2.new(0.95, 0, 0, 45); zombieBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6); zombieBtn.BorderSizePixel = 0
+				zombieBtn.Text = "Survive zombie arena"; zombieBtn.TextColor3 = Color3.fromRGB(255, 255, 255); zombieBtn.TextSize = 15; zombieBtn.Font = Enum.Font.GothamBold; zombieBtn.Active = true; Instance.new("UICorner", zombieBtn).CornerRadius = UDim.new(0, 8)
+				zombieBtn.MouseButton1Click:Connect(function() zombieBtn.Text = "⏳ กำลังโหลด..."; zombieBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100); task.spawn(function() pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/VoidDeveloper67/Void-Hub/refs/heads/main/VoidHub.lua", true))() end); task.wait(1.5); if zombieBtn and zombieBtn.Parent then zombieBtn.Text = "Survive zombie arena"; zombieBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6) end end) end)
 				
-				local zombieBtn = Instance.new("TextButton", contentScroll)
-				zombieBtn.Size = UDim2.new(0.95, 0, 0, 45); zombieBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6); zombieBtn.BorderSizePixel = 0
-				zombieBtn.Text = "Survive zombie arena"; zombieBtn.TextColor3 = Color3.fromRGB(255, 255, 255); zombieBtn.TextSize = 15; zombieBtn.Font = Enum.Font.GothamBold; zombieBtn.Active = true
-				Instance.new("UICorner", zombieBtn).CornerRadius = UDim.new(0, 8)
-				zombieBtn.MouseButton1Click:Connect(function()
-					zombieBtn.Text = "⏳ กำลังโหลด..."; zombieBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-					task.spawn(function()
-						pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/VoidDeveloper67/Void-Hub/refs/heads/main/VoidHub.lua", true))() end)
-						task.wait(1.5)
-						if zombieBtn and zombieBtn.Parent then zombieBtn.Text = "Survive zombie arena"; zombieBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6) end
-					end)
-				end)
+				local bfBtn = Instance.new("TextButton", contentScroll); bfBtn.Size = UDim2.new(0.95, 0, 0, 45); bfBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6); bfBtn.BorderSizePixel = 0
+				bfBtn.Text = "BloxFruits"; bfBtn.TextColor3 = Color3.fromRGB(255, 255, 255); bfBtn.TextSize = 15; bfBtn.Font = Enum.Font.GothamBold; bfBtn.Active = true; Instance.new("UICorner", bfBtn).CornerRadius = UDim.new(0, 8)
+				bfBtn.MouseButton1Click:Connect(function() bfBtn.Text = "⏳ กำลังโหลด..."; bfBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100); task.spawn(function() pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/flazhy/QuantumOnyx/refs/heads/main/QuantumOnyx.lua"))() end); task.wait(1.5); if bfBtn and bfBtn.Parent then bfBtn.Text = "BloxFruits"; bfBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6) end end) end)
 				
-				local bfBtn = Instance.new("TextButton", contentScroll)
-				bfBtn.Size = UDim2.new(0.95, 0, 0, 45); bfBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6); bfBtn.BorderSizePixel = 0
-				bfBtn.Text = "BloxFruits"; bfBtn.TextColor3 = Color3.fromRGB(255, 255, 255); bfBtn.TextSize = 15; bfBtn.Font = Enum.Font.GothamBold; bfBtn.Active = true
-				Instance.new("UICorner", bfBtn).CornerRadius = UDim.new(0, 8)
-				bfBtn.MouseButton1Click:Connect(function()
-					bfBtn.Text = "⏳ กำลังโหลด..."; bfBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-					task.spawn(function()
-						pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/flazhy/QuantumOnyx/refs/heads/main/QuantumOnyx.lua"))() end)
-						task.wait(1.5)
-						if bfBtn and bfBtn.Parent then bfBtn.Text = "BloxFruits"; bfBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6) end
-					end)
-				end)
+				local nightsBtn = Instance.new("TextButton", contentScroll); nightsBtn.Size = UDim2.new(0.95, 0, 0, 45); nightsBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6); nightsBtn.BorderSizePixel = 0
+				nightsBtn.Text = "99 nights"; nightsBtn.TextColor3 = Color3.fromRGB(255, 255, 255); nightsBtn.TextSize = 15; nightsBtn.Font = Enum.Font.GothamBold; nightsBtn.Active = true; Instance.new("UICorner", nightsBtn).CornerRadius = UDim.new(0, 8)
+				nightsBtn.MouseButton1Click:Connect(function() nightsBtn.Text = "⏳ กำลังโหลด..."; nightsBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100); task.spawn(function() pcall(function() loadstring(game:HttpGet("https://foxname.top/loader"))() end); task.wait(1.5); if nightsBtn and nightsBtn.Parent then nightsBtn.Text = "99 nights"; nightsBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6) end end) end)
 				
-				local nightsBtn = Instance.new("TextButton", contentScroll)
-				nightsBtn.Size = UDim2.new(0.95, 0, 0, 45); nightsBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6); nightsBtn.BorderSizePixel = 0
-				nightsBtn.Text = "99 nights"; nightsBtn.TextColor3 = Color3.fromRGB(255, 255, 255); nightsBtn.TextSize = 15; nightsBtn.Font = Enum.Font.GothamBold; nightsBtn.Active = true
-				Instance.new("UICorner", nightsBtn).CornerRadius = UDim.new(0, 8)
-				nightsBtn.MouseButton1Click:Connect(function()
-					nightsBtn.Text = "⏳ กำลังโหลด..."; nightsBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-					task.spawn(function()
-						pcall(function() loadstring(game:HttpGet("https://foxname.top/loader"))() end)
-						task.wait(1.5)
-						if nightsBtn and nightsBtn.Parent then nightsBtn.Text = "99 nights"; nightsBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6) end
-					end)
-				end)
-				
-				local note = Instance.new("TextLabel", contentScroll)
-				note.Size = UDim2.new(0.95, 0, 0, 65); note.BackgroundTransparency = 1
+				local note = Instance.new("TextLabel", contentScroll); note.Size = UDim2.new(0.95, 0, 0, 65); note.BackgroundTransparency = 1
 				note.Text = "⚠️ ใช้ในเกมที่เกี่ยวข้องเท่านั้น:\n• 99 Nights (FoxLoader)\n• BloxFruits (QuantumOnyx)\n• MM2 / Survive Zombie Arena\nหากกดแล้วไม่เกิดอะไรขึ้น อาจเป็นเพราะ:\n• ไม่ใช่เกมที่เหมาะสม\n• สคริปต์อัปเดตหรือล่ม"
 				note.TextColor3 = Color3.fromRGB(150, 150, 150); note.TextSize = 11; note.Font = Enum.Font.GothamSemibold
 				note.TextXAlignment = Enum.TextXAlignment.Left; note.TextWrapped = true
@@ -656,124 +614,66 @@ task.spawn(function()
 			mainFrame:TweenSize(UDim2.fromOffset(290, isMin and 40 or 300), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, 0.25, true)
 		end)
 		closeBtn.MouseButton1Click:Connect(function()
-			toggleESP(false); toggleShowHitbox(false); toggleAimlock(false); toggleNoclip(false); toggleInfJump(false); toggleKillAura(false)
+			toggleESP(false); toggleShowHitbox(false); toggleAimlock(false); toggleNoclip(false); toggleInfJump(false)
+			resetHitboxes()
 			screenGui:Destroy(); tpScreenGui:Destroy()
 		end)
 		screenGui:GetPropertyChangedSignal("Parent"):Connect(function()
-			if not screenGui.Parent then toggleESP(false); toggleShowHitbox(false); toggleAimlock(false); toggleNoclip(false); toggleInfJump(false); toggleKillAura(false) end
+			if not screenGui.Parent then toggleESP(false); toggleShowHitbox(false); toggleAimlock(false); toggleNoclip(false); toggleInfJump(false); resetHitboxes() end
 		end)
 
-		print("[Pumpkitz Hub 🎃 V0.8.7] โหลดสำเร็จ | Orange Theme + Kill Aura | Delta Optimized")
+		print("[Pumpkitz Hub 🎃 V0.8.8] โหลดสำเร็จ | Hitbox Expander + UI Fixed | Delta Optimized")
 	end
 
 	-- === LOADING SCREEN ===
 	local loadingGui = Instance.new("ScreenGui")
-	loadingGui.Name = "PumpkitzHub_Loading"
-	loadingGui.ResetOnSpawn = false
-	loadingGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	loadingGui.IgnoreGuiInset = true
-	loadingGui.DisplayOrder = 9999
-	loadingGui.Enabled = true
-	loadingGui.Parent = playerGui
+	loadingGui.Name = "PumpkitzHub_Loading"; loadingGui.ResetOnSpawn = false
+	loadingGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling; loadingGui.IgnoreGuiInset = true
+	loadingGui.DisplayOrder = 9999; loadingGui.Enabled = true; loadingGui.Parent = playerGui
 
-	local loadingFrame = Instance.new("Frame")
-	loadingFrame.Name = "LoadingFrame"
-	loadingFrame.Size = UDim2.fromScale(1, 1)
-	loadingFrame.BackgroundColor3 = Color3.fromRGB(20, 8, 2)
-	loadingFrame.BorderSizePixel = 0
-	loadingFrame.Parent = loadingGui
-
-	local loadingGradient = Instance.new("UIGradient", loadingFrame)
-	loadingGradient.Color = ColorSequence.new({
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(25, 10, 3)),
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(40, 15, 5))
-	})
+	local loadingFrame = Instance.new("Frame"); loadingFrame.Name = "LoadingFrame"
+	loadingFrame.Size = UDim2.fromScale(1, 1); loadingFrame.BackgroundColor3 = Color3.fromRGB(20, 8, 2)
+	loadingFrame.BorderSizePixel = 0; loadingFrame.Parent = loadingGui
+	Instance.new("UIGradient", loadingFrame).Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(25, 10, 3)), ColorSequenceKeypoint.new(1, Color3.fromRGB(40, 15, 5))})
 
 	local loadingLogo = Instance.new("TextLabel", loadingFrame)
-	loadingLogo.Size = UDim2.new(1, 0, 0, 80)
-	loadingLogo.Position = UDim2.fromScale(0.5, 0.3)
-	loadingLogo.AnchorPoint = Vector2.new(0.5, 0.5)
-	loadingLogo.BackgroundTransparency = 1
-	loadingLogo.Text = "Pumpkitz Hub 🎃"
-	loadingLogo.TextColor3 = Color3.fromRGB(255, 255, 255)
-	loadingLogo.TextSize = 32
-	loadingLogo.Font = Enum.Font.GothamBold
-	loadingLogo.TextXAlignment = Enum.TextXAlignment.Center
+	loadingLogo.Size = UDim2.new(1, 0, 0, 80); loadingLogo.Position = UDim2.fromScale(0.5, 0.3); loadingLogo.AnchorPoint = Vector2.new(0.5, 0.5)
+	loadingLogo.BackgroundTransparency = 1; loadingLogo.Text = "Pumpkitz Hub 🎃"; loadingLogo.TextColor3 = Color3.fromRGB(255, 255, 255)
+	loadingLogo.TextSize = 32; loadingLogo.Font = Enum.Font.GothamBold; loadingLogo.TextXAlignment = Enum.TextXAlignment.Center
 
 	local loadingVersion = Instance.new("TextLabel", loadingFrame)
-	loadingVersion.Size = UDim2.new(1, 0, 0, 30)
-	loadingVersion.Position = UDim2.fromScale(0.5, 0.42)
-	loadingVersion.AnchorPoint = Vector2.new(0.5, 0.5)
-	loadingVersion.BackgroundTransparency = 1
-	loadingVersion.Text = "V0.8.7 | Delta Optimized"
-	loadingVersion.TextColor3 = Color3.fromRGB(200, 200, 200)
-	loadingVersion.TextSize = 16
-	loadingVersion.Font = Enum.Font.GothamSemibold
-	loadingVersion.TextXAlignment = Enum.TextXAlignment.Center
+	loadingVersion.Size = UDim2.new(1, 0, 0, 30); loadingVersion.Position = UDim2.fromScale(0.5, 0.42); loadingVersion.AnchorPoint = Vector2.new(0.5, 0.5)
+	loadingVersion.BackgroundTransparency = 1; loadingVersion.Text = "V0.8.8 | Delta Optimized"; loadingVersion.TextColor3 = Color3.fromRGB(200, 200, 200)
+	loadingVersion.TextSize = 16; loadingVersion.Font = Enum.Font.GothamSemibold; loadingVersion.TextXAlignment = Enum.TextXAlignment.Center
 
-	local loadingBar = Instance.new("Frame", loadingFrame)
-	loadingBar.Name = "LoadingBar"
-	loadingBar.Size = UDim2.new(0.6, 0, 0, 8)
-	loadingBar.Position = UDim2.fromScale(0.5, 0.55)
-	loadingBar.AnchorPoint = Vector2.new(0.5, 0.5)
-	loadingBar.BackgroundColor3 = Color3.fromRGB(55, 18, 6)
-	loadingBar.BorderSizePixel = 0
-	Instance.new("UICorner", loadingBar).CornerRadius = UDim.new(0, 4)
+	local loadingBar = Instance.new("Frame", loadingFrame); loadingBar.Name = "LoadingBar"
+	loadingBar.Size = UDim2.new(0.6, 0, 0, 8); loadingBar.Position = UDim2.fromScale(0.5, 0.55); loadingBar.AnchorPoint = Vector2.new(0.5, 0.5)
+	loadingBar.BackgroundColor3 = Color3.fromRGB(55, 18, 6); loadingBar.BorderSizePixel = 0; Instance.new("UICorner", loadingBar).CornerRadius = UDim.new(0, 4)
 
-	local loadingBarFill = Instance.new("Frame", loadingBar)
-	loadingBarFill.Name = "LoadingBarFill"
-	loadingBarFill.Size = UDim2.new(0, 0, 1, 0)
-	loadingBarFill.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
-	loadingBarFill.BorderSizePixel = 0
-	Instance.new("UICorner", loadingBarFill).CornerRadius = UDim.new(0, 4)
+	local loadingBarFill = Instance.new("Frame", loadingBar); loadingBarFill.Name = "LoadingBarFill"
+	loadingBarFill.Size = UDim2.new(0, 0, 1, 0); loadingBarFill.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
+	loadingBarFill.BorderSizePixel = 0; Instance.new("UICorner", loadingBarFill).CornerRadius = UDim.new(0, 4)
 
 	local loadingStatus = Instance.new("TextLabel", loadingFrame)
-	loadingStatus.Size = UDim2.new(1, 0, 0, 25)
-	loadingStatus.Position = UDim2.fromScale(0.5, 0.65)
-	loadingStatus.AnchorPoint = Vector2.new(0.5, 0.5)
-	loadingStatus.BackgroundTransparency = 1
-	loadingStatus.Text = "กำลังโหลดทรัพยากร..."
-	loadingStatus.TextColor3 = Color3.fromRGB(180, 180, 180)
-	loadingStatus.TextSize = 14
-	loadingStatus.Font = Enum.Font.GothamSemibold
-	loadingStatus.TextXAlignment = Enum.TextXAlignment.Center
+	loadingStatus.Size = UDim2.new(1, 0, 0, 25); loadingStatus.Position = UDim2.fromScale(0.5, 0.65); loadingStatus.AnchorPoint = Vector2.new(0.5, 0.5)
+	loadingStatus.BackgroundTransparency = 1; loadingStatus.Text = "กำลังโหลดทรัพยากร..."; loadingStatus.TextColor3 = Color3.fromRGB(180, 180, 180)
+	loadingStatus.TextSize = 14; loadingStatus.Font = Enum.Font.GothamSemibold; loadingStatus.TextXAlignment = Enum.TextXAlignment.Center
 
 	local creditsFrame = Instance.new("Frame", loadingFrame)
-	creditsFrame.Size = UDim2.new(1, 0, 0, 70)
-	creditsFrame.Position = UDim2.fromScale(0.5, 0.85)
-	creditsFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-	creditsFrame.BackgroundTransparency = 1
+	creditsFrame.Size = UDim2.new(1, 0, 0, 70); creditsFrame.Position = UDim2.fromScale(0.5, 0.85); creditsFrame.AnchorPoint = Vector2.new(0.5, 0.5); creditsFrame.BackgroundTransparency = 1
 
 	local creditTitle = Instance.new("TextLabel", creditsFrame)
-	creditTitle.Size = UDim2.new(1, 0, 0, 25)
-	creditTitle.Position = UDim2.fromScale(0.5, 0.2)
-	creditTitle.AnchorPoint = Vector2.new(0.5, 0.5)
-	creditTitle.BackgroundTransparency = 1
-	creditTitle.Text = "ทำโดย:Winning"
-	creditTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-	creditTitle.TextSize = 15
-	creditTitle.Font = Enum.Font.GothamBold
-	creditTitle.TextXAlignment = Enum.TextXAlignment.Center
+	creditTitle.Size = UDim2.new(1, 0, 0, 25); creditTitle.Position = UDim2.fromScale(0.5, 0.2); creditTitle.AnchorPoint = Vector2.new(0.5, 0.5); creditTitle.BackgroundTransparency = 1
+	creditTitle.Text = "ทำโดย:Winning"; creditTitle.TextColor3 = Color3.fromRGB(255, 255, 255); creditTitle.TextSize = 15; creditTitle.Font = Enum.Font.GothamBold; creditTitle.TextXAlignment = Enum.TextXAlignment.Center
 
 	local creditAssistant = Instance.new("TextLabel", creditsFrame)
-	creditAssistant.Size = UDim2.new(1, 0, 0, 25)
-	creditAssistant.Position = UDim2.fromScale(0.5, 0.6)
-	creditAssistant.AnchorPoint = Vector2.new(0.5, 0.5)
-	creditAssistant.BackgroundTransparency = 1
-	creditAssistant.Text = "ผู้ช่วย:Qwen3.6-Plus"
-	creditAssistant.TextColor3 = Color3.fromRGB(200, 200, 200)
-	creditAssistant.TextSize = 13
-	creditAssistant.Font = Enum.Font.GothamSemibold
-	creditAssistant.TextXAlignment = Enum.TextXAlignment.Center
+	creditAssistant.Size = UDim2.new(1, 0, 0, 25); creditAssistant.Position = UDim2.fromScale(0.5, 0.6); creditAssistant.AnchorPoint = Vector2.new(0.5, 0.5); creditAssistant.BackgroundTransparency = 1
+	creditAssistant.Text = "ผู้ช่วย:Qwen3.6-Plus"; creditAssistant.TextColor3 = Color3.fromRGB(200, 200, 200); creditAssistant.TextSize = 13; creditAssistant.Font = Enum.Font.GothamSemibold; creditAssistant.TextXAlignment = Enum.TextXAlignment.Center
 
 	-- Loading Animation
 	task.spawn(function()
-		for i = 0, 1, 0.02 do
-			loadingBarFill.Size = UDim2.new(i, 0, 1, 0)
-			task.wait(0.03)
-		end
-		loadingStatus.Text = "เตรียมความพร้อม..."
-		task.wait(0.5)
+		for i = 0, 1, 0.02 do loadingBarFill.Size = UDim2.new(i, 0, 1, 0); task.wait(0.03) end
+		loadingStatus.Text = "เตรียมความพร้อม..."; task.wait(0.5)
 		if loadingGui and loadingGui.Parent then loadingGui:Destroy() end
 		loadMainGUI()
 	end)
