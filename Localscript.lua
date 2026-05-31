@@ -1,4 +1,4 @@
--- Pumpkitz Hub 🎃 V0.9.1 | Unanchor Part Puller + Delta Optimized
+-- Pumpkitz Hub 🎃 V0.9.2 | Kill Aura External Loader + Delta Optimized
 task.spawn(function()
 	repeat task.wait() until game:IsLoaded()
 
@@ -15,7 +15,7 @@ task.spawn(function()
 		if not playerGui or not playerGui.Parent then return end
 		
 		local screenGui = Instance.new("ScreenGui")
-		screenGui.Name = "PumpkitzHub_V09_1"
+		screenGui.Name = "PumpkitzHub_V09_2"
 		screenGui.ResetOnSpawn = false
 		screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 		screenGui.IgnoreGuiInset = true
@@ -63,7 +63,7 @@ task.spawn(function()
 		title.Size = UDim2.new(1, -85, 1, 0)
 		title.Position = UDim2.new(0, 12, 0, 0)
 		title.BackgroundTransparency = 1
-		title.Text = "Pumpkitz Hub 🎃 V0.9.1"
+		title.Text = "Pumpkitz Hub 🎃 V0.9.2"
 		title.TextColor3 = Color3.fromRGB(255, 255, 255)
 		title.TextSize = 18
 		title.Font = Enum.Font.GothamBold
@@ -162,7 +162,7 @@ task.spawn(function()
 
 		-- === INDEPENDENT TELEPORT GUI ===
 		local tpScreenGui = Instance.new("ScreenGui")
-		tpScreenGui.Name = "PumpkitzHub_TP_V09_1"
+		tpScreenGui.Name = "PumpkitzHub_TP_V09_2"
 		tpScreenGui.ResetOnSpawn = false
 		tpScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 		tpScreenGui.IgnoreGuiInset = true
@@ -463,6 +463,33 @@ task.spawn(function()
 					task.spawn(function() pcall(function() loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Hitbox-Expander-224681"))() end); task.wait(1.5); if hitboxExpBtn and hitboxExpBtn.Parent then hitboxExpBtn.Text = "ขยายhitbox"; hitboxExpBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6) end end)
 				end)
 				
+				-- === KILL AURA BUTTON ===
+				local killAuraBtn = Instance.new("TextButton", contentScroll)
+				killAuraBtn.Size = UDim2.new(0.95, 0, 0, 45)
+				killAuraBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6)
+				killAuraBtn.BorderSizePixel = 0
+				killAuraBtn.Text = "คิล ออร่า"
+				killAuraBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+				killAuraBtn.TextSize = 15
+				killAuraBtn.Font = Enum.Font.GothamBold
+				killAuraBtn.Active = true
+				Instance.new("UICorner", killAuraBtn).CornerRadius = UDim.new(0, 8)
+				
+				killAuraBtn.MouseButton1Click:Connect(function()
+					killAuraBtn.Text = "⏳ กำลังโหลด..."
+					killAuraBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+					task.spawn(function()
+						pcall(function()
+							loadstring(game:HttpGet('https://raw.githubusercontent.com/amdzy088/Kill-aura-slect-universal/refs/heads/main/Kill%20aura%20select%20universal'))()
+						end)
+						task.wait(1.5)
+						if killAuraBtn and killAuraBtn.Parent then
+							killAuraBtn.Text = "คิล ออร่า"
+							killAuraBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6)
+						end
+					end)
+				end)
+				
 			elseif name == "🤡 แกล้ง" then
 				btnJoke.BackgroundColor3 = Color3.fromRGB(65, 20, 6); btnJoke.TextColor3 = Color3.fromRGB(255, 180, 80)
 				
@@ -475,34 +502,16 @@ task.spawn(function()
 					task.spawn(function() pcall(function() loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Ultimate-fling-gui-228952"))() end); task.wait(1.5); if flingBtn and flingBtn.Parent then flingBtn.Text = "🚀 เปิด Fling GUI (ภายนอก)"; flingBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6) end end)
 				end)
 				
-				-- === UNANCHOR PART PULLER BUTTON ===
 				local unanchorBtn = Instance.new("TextButton", contentScroll)
-				unanchorBtn.Size = UDim2.new(0.95, 0, 0, 45)
-				unanchorBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6)
-				unanchorBtn.BorderSizePixel = 0
-				unanchorBtn.Text = "ดึงพาร์ทที่ไม่ Anchor"
-				unanchorBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-				unanchorBtn.TextSize = 15
-				unanchorBtn.Font = Enum.Font.GothamBold
-				unanchorBtn.Active = true
+				unanchorBtn.Size = UDim2.new(0.95, 0, 0, 45); unanchorBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6); unanchorBtn.BorderSizePixel = 0
+				unanchorBtn.Text = "ดึงพาร์ทที่ไม่ Anchor"; unanchorBtn.TextColor3 = Color3.fromRGB(255, 255, 255); unanchorBtn.TextSize = 15; unanchorBtn.Font = Enum.Font.GothamBold; unanchorBtn.Active = true
 				Instance.new("UICorner", unanchorBtn).CornerRadius = UDim.new(0, 8)
-				
 				unanchorBtn.MouseButton1Click:Connect(function()
-					unanchorBtn.Text = "⏳ กำลังโหลด..."
-					unanchorBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-					task.spawn(function()
-						pcall(function()
-							loadstring(game:HttpGet("https://rawscripts.net/raw/Natural-Disaster-Survival-Super-ring-V4-24296"))()
-						end)
-						task.wait(1.5)
-						if unanchorBtn and unanchorBtn.Parent then
-							unanchorBtn.Text = "ดึงพาร์ทที่ไม่ Anchor"
-							unanchorBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6)
-						end
-					end)
+					unanchorBtn.Text = "⏳ กำลังโหลด..."; unanchorBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+					task.spawn(function() pcall(function() loadstring(game:HttpGet("https://rawscripts.net/raw/Natural-Disaster-Survival-Super-ring-V4-24296"))() end); task.wait(1.5); if unanchorBtn and unanchorBtn.Parent then unanchorBtn.Text = "ดึงพาร์ทที่ไม่ Anchor"; unanchorBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6) end end)
 				end)
 				
-				local note = Instance.new("TextLabel", contentScroll); note.Size = UDim2.new(0.95, 0, 0, 30); note.BackgroundTransparency = 1
+				local note = Instance.new("TextLabel", contentScroll); note.Size = UDim2.new(0.95, 0, 0, 40); note.BackgroundTransparency = 1
 				note.Text = "⚠️ ใช้ในเกมที่เกี่ยวข้องเท่านั้น:\n• Natural Disaster Survival\n• เกมที่มีพาร์ทไม่ Anchor\nหากกดแล้วไม่เกิดอะไรขึ้น อาจเป็นเพราะ:\n• ไม่ใช่เกมที่เหมาะสม\n• สคริปต์อัปเดตหรือล่ม"
 				note.TextColor3 = Color3.fromRGB(150, 150, 150); note.TextSize = 11; note.Font = Enum.Font.GothamSemibold
 				note.TextXAlignment = Enum.TextXAlignment.Left; note.TextWrapped = true
@@ -584,7 +593,7 @@ task.spawn(function()
 			if not screenGui.Parent then toggleESP(false); toggleShowHitbox(false); toggleAimlock(false); toggleNoclip(false); toggleInfJump(false) end
 		end)
 
-		print("[Pumpkitz Hub 🎃 V0.9.1] โหลดสำเร็จ | Unanchor Part Puller Added | Delta Optimized")
+		print("[Pumpkitz Hub 🎃 V0.9.2] โหลดสำเร็จ | Kill Aura External Added | Delta Optimized")
 	end
 
 	-- === LOADING SCREEN ===
@@ -605,7 +614,7 @@ task.spawn(function()
 
 	local loadingVersion = Instance.new("TextLabel", loadingFrame)
 	loadingVersion.Size = UDim2.new(1, 0, 0, 30); loadingVersion.Position = UDim2.fromScale(0.5, 0.42); loadingVersion.AnchorPoint = Vector2.new(0.5, 0.5)
-	loadingVersion.BackgroundTransparency = 1; loadingVersion.Text = "V0.9.1 | Delta Optimized"; loadingVersion.TextColor3 = Color3.fromRGB(200, 200, 200)
+	loadingVersion.BackgroundTransparency = 1; loadingVersion.Text = "V0.9.2 | Delta Optimized"; loadingVersion.TextColor3 = Color3.fromRGB(200, 200, 200)
 	loadingVersion.TextSize = 16; loadingVersion.Font = Enum.Font.GothamSemibold; loadingVersion.TextXAlignment = Enum.TextXAlignment.Center
 
 	local loadingBar = Instance.new("Frame", loadingFrame); loadingBar.Name = "LoadingBar"
