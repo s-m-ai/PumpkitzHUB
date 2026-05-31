@@ -497,7 +497,7 @@ task.spawn(function()
 			zombieBtn.Size = UDim2.new(0.95, 0, 0, 45)
 			zombieBtn.BackgroundColor3 = Color3.fromRGB(50, 15, 15)
 			zombieBtn.BorderSizePixel = 0
-			zombieBtn.Text = "สคริปต์ Survive zombie arena"
+			zombieBtn.Text = "Survive zombie arena"
 			zombieBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 			zombieBtn.TextSize = 15
 			zombieBtn.Font = Enum.Font.GothamBold
@@ -513,7 +513,7 @@ task.spawn(function()
 					end)
 					task.wait(1.5)
 					if zombieBtn and zombieBtn.Parent then
-						zombieBtn.Text = "สคริปต์ Survive zombie arena"
+						zombieBtn.Text = "Survive zombie arena"
 						zombieBtn.BackgroundColor3 = Color3.fromRGB(50, 15, 15)
 					end
 				end)
