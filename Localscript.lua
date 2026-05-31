@@ -1,4 +1,6 @@
 -- Pumpkitz Hub 🎃 V0.9.3 | Key System + 5s Loading + Max Immortal | Delta Optimized
+-- 🔑 Key Updated: ข้าวมันไก่
+
 task.spawn(function()
 	repeat task.wait() until game:IsLoaded()
 
@@ -764,7 +766,8 @@ task.spawn(function()
 
 		local function verifyKey()
 			local input = keyBox.Text:gsub("^%s*(.-)%s*$", "%1")
-			if input == "ผมคือคนไทย" then
+			-- 🔑 คีย์ที่แก้ไข: ข้าวมันไก่
+			if input == "ข้าวมันไก่" then
 				statusLbl.Text = "✅ คีย์ถูกต้อง! กำลังเข้าระบบ..."
 				statusLbl.TextColor3 = Color3.fromRGB(50, 200, 50)
 				task.wait(0.8)
