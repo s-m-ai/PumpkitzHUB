@@ -1,4 +1,4 @@
--- ReaperHUB 💀 V0.8 | Multi-Game Script Hub + Zombie Arena Loader | Delta Optimized
+-- ReaperHUB 💀 V0.8.1 | Infinite Jump + Script Names Updated | Delta Optimized
 task.spawn(function()
 	repeat task.wait() until game:IsLoaded()
 
@@ -12,7 +12,7 @@ task.spawn(function()
 
 	-- === MAIN GUI CORE ===
 	local screenGui = Instance.new("ScreenGui")
-	screenGui.Name = "ReaperHUB_V08"
+	screenGui.Name = "ReaperHUB_V08_1"
 	screenGui.ResetOnSpawn = false
 	screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	screenGui.IgnoreGuiInset = true
@@ -61,7 +61,7 @@ task.spawn(function()
 	title.Size = UDim2.new(1, -85, 1, 0)
 	title.Position = UDim2.new(0, 12, 0, 0)
 	title.BackgroundTransparency = 1
-	title.Text = "ReaperHUB 💀 V0.8"
+	title.Text = "ReaperHUB 💀 V0.8.1"
 	title.TextColor3 = Color3.fromRGB(255, 255, 255)
 	title.TextSize = 18
 	title.Font = Enum.Font.GothamBold
@@ -161,7 +161,7 @@ task.spawn(function()
 
 	-- === INDEPENDENT TELEPORT GUI ===
 	local tpScreenGui = Instance.new("ScreenGui")
-	tpScreenGui.Name = "ReaperHUB_TP_V08"
+	tpScreenGui.Name = "ReaperHUB_TP_V08_1"
 	tpScreenGui.ResetOnSpawn = false
 	tpScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	tpScreenGui.IgnoreGuiInset = true
@@ -348,6 +348,53 @@ task.spawn(function()
 		end
 	end
 
+	-- === INFINITE JUMP SYSTEM (Hold to Spam + Height Scale) ===
+	local infJumpActive = false
+	local infJumpConn = nil
+	local jumpHeld = false
+	local originalJumpPower = 50
+	local jumpHoldTime = 0
+
+	local jumpBeganConn = UserInputService.InputBegan:Connect(function(input, gameProcessed)
+		if not gameProcessed and infJumpActive and (input.KeyCode == Enum.KeyCode.Space or input.UserInputType == Enum.UserInputType.Touch) then
+			jumpHeld = true
+		end
+	end)
+	local jumpEndedConn = UserInputService.InputEnded:Connect(function(input)
+		if input.KeyCode == Enum.KeyCode.Space or input.UserInputType == Enum.UserInputType.Touch then
+			jumpHeld = false
+			jumpHoldTime = 0
+			if localPlayer.Character and localPlayer.Character:FindFirstChild("Humanoid") then
+				localPlayer.Character.Humanoid.JumpPower = originalJumpPower
+			end
+		end
+	end)
+
+	local function toggleInfJump(state)
+		infJumpActive = state
+		if infJumpConn then infJumpConn:Disconnect(); infJumpConn = nil end
+		if state then
+			if localPlayer.Character and localPlayer.Character:FindFirstChild("Humanoid") then
+				originalJumpPower = localPlayer.Character.Humanoid.JumpPower
+			end
+			infJumpConn = RunService.Heartbeat:Connect(function()
+				if infJumpActive and jumpHeld and localPlayer.Character and localPlayer.Character:FindFirstChild("Humanoid") then
+					local hum = localPlayer.Character.Humanoid
+					hum.Jump = true
+					jumpHoldTime = jumpHoldTime + 0.016
+					-- เพิ่มความสูงต่อเนื่องขณะกดค้าง (สูงสุด 150)
+					hum.JumpPower = math.min(50 + (jumpHoldTime * 20), 150)
+				end
+			end)
+		else
+			jumpHeld = false
+			jumpHoldTime = 0
+			if localPlayer.Character and localPlayer.Character:FindFirstChild("Humanoid") then
+				localPlayer.Character.Humanoid.JumpPower = originalJumpPower
+			end
+		end
+	end
+
 	-- === UI MANAGEMENT ===
 	local function clearContent()
 		for _, child in pairs(contentScroll:GetChildren()) do if child:IsA("GuiObject") then child:Destroy() end end
@@ -421,6 +468,7 @@ task.spawn(function()
 			jumpBtn.MouseButton1Click:Connect(function() local v = tonumber(jumpBox.Text); if v and v > 0 and localPlayer.Character and localPlayer.Character:FindFirstChild("Humanoid") then local h = localPlayer.Character.Humanoid; h.UseJumpPower = true; h.JumpPower = v; jumpBtn.Text = "✅ สำเร็จ"; task.delay(1, function() if jumpBtn then jumpBtn.Text = "ตกลง" end end) else jumpBtn.Text = "❌ ผิดพลาด"; task.delay(1, function() if jumpBtn then jumpBtn.Text = "ตกลง" end end) end end)
 
 			createToggleBtn(contentScroll, "Noclip 🚶‍♂️", Color3.fromRGB(180, 30, 30), Color3.fromRGB(50, 15, 15), toggleNoclip)
+			createToggleBtn(contentScroll, "กระโดดไม่จำกัด 🔄", Color3.fromRGB(180, 30, 30), Color3.fromRGB(50, 15, 15), toggleInfJump)
 			
 			local tpBtn = Instance.new("TextButton", contentScroll); tpBtn.Size = UDim2.new(0.95, 0, 0, 45); tpBtn.BackgroundColor3 = Color3.fromRGB(45, 14, 14); tpBtn.BorderSizePixel = 0; tpBtn.Text = "📍 เปิดหน้าต่าง Teleport"; tpBtn.TextColor3 = Color3.fromRGB(255, 255, 255); tpBtn.TextSize = 16; tpBtn.Font = Enum.Font.GothamBold; tpBtn.Active = true; Instance.new("UICorner", tpBtn).CornerRadius = UDim.new(0, 8); tpBtn.MouseButton1Click:Connect(openTPGui)
 		elseif name == "🔫 ยิงปืน" then
@@ -465,12 +513,12 @@ task.spawn(function()
 		elseif name == "🌐 สคริปต์เกมอื่น" then
 			btnOther.BackgroundColor3 = Color3.fromRGB(60, 18, 18); btnOther.TextColor3 = Color3.fromRGB(255, 80, 80)
 			
-			-- MM2 Script Button (Somtank)
+			-- MM2 Script Button
 			local mm2Btn = Instance.new("TextButton", contentScroll)
 			mm2Btn.Size = UDim2.new(0.95, 0, 0, 45)
 			mm2Btn.BackgroundColor3 = Color3.fromRGB(50, 15, 15)
 			mm2Btn.BorderSizePixel = 0
-			mm2Btn.Text = "สคริปต์ MM2"
+			mm2Btn.Text = "สคริปต์MM2"
 			mm2Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
 			mm2Btn.TextSize = 15
 			mm2Btn.Font = Enum.Font.GothamBold
@@ -486,13 +534,13 @@ task.spawn(function()
 					end)
 					task.wait(1.5)
 					if mm2Btn and mm2Btn.Parent then
-						mm2Btn.Text = "สคริปต์ MM2"
+						mm2Btn.Text = "สคริปต์MM2"
 						mm2Btn.BackgroundColor3 = Color3.fromRGB(50, 15, 15)
 					end
 				end)
 			end)
 			
-			-- === ZOMBIE ARENA SCRIPT BUTTON ===
+			-- Zombie Arena Script Button
 			local zombieBtn = Instance.new("TextButton", contentScroll)
 			zombieBtn.Size = UDim2.new(0.95, 0, 0, 45)
 			zombieBtn.BackgroundColor3 = Color3.fromRGB(50, 15, 15)
@@ -572,13 +620,13 @@ task.spawn(function()
 		mainFrame:TweenSize(UDim2.fromOffset(290, isMin and 40 or 300), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, 0.25, true)
 	end)
 	closeBtn.MouseButton1Click:Connect(function()
-		toggleESP(false); toggleShowHitbox(false); toggleAimlock(false); toggleNoclip(false)
+		toggleESP(false); toggleShowHitbox(false); toggleAimlock(false); toggleNoclip(false); toggleInfJump(false)
 		screenGui:Destroy(); tpScreenGui:Destroy()
 	end)
 	screenGui:GetPropertyChangedSignal("Parent"):Connect(function()
-		if not screenGui.Parent then toggleESP(false); toggleShowHitbox(false); toggleAimlock(false); toggleNoclip(false) end
+		if not screenGui.Parent then toggleESP(false); toggleShowHitbox(false); toggleAimlock(false); toggleNoclip(false); toggleInfJump(false) end
 	end)
 
-	print("[ReaperHUB 💀 V0.8] โหลดสำเร็จ | Zombie Arena Script Added | Delta Optimized")
+	print("[ReaperHUB 💀 V0.8.1] โหลดสำเร็จ | Infinite Jump + Script Names Updated | Delta Optimized")
 end)
 
