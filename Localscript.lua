@@ -1,4 +1,4 @@
--- Pumpkitz Hub 🎃 V0.8.9 | Hitbox Expander Removed | Delta Optimized
+-- Pumpkitz Hub 🎃 V0.9.0 | External Hitbox Expander + Delta Optimized
 task.spawn(function()
 	repeat task.wait() until game:IsLoaded()
 
@@ -15,7 +15,7 @@ task.spawn(function()
 		if not playerGui or not playerGui.Parent then return end
 		
 		local screenGui = Instance.new("ScreenGui")
-		screenGui.Name = "PumpkitzHub_V08_9"
+		screenGui.Name = "PumpkitzHub_V09_0"
 		screenGui.ResetOnSpawn = false
 		screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 		screenGui.IgnoreGuiInset = true
@@ -63,7 +63,7 @@ task.spawn(function()
 		title.Size = UDim2.new(1, -85, 1, 0)
 		title.Position = UDim2.new(0, 12, 0, 0)
 		title.BackgroundTransparency = 1
-		title.Text = "Pumpkitz Hub 🎃 V0.8.9"
+		title.Text = "Pumpkitz Hub 🎃 V0.9.0"
 		title.TextColor3 = Color3.fromRGB(255, 255, 255)
 		title.TextSize = 18
 		title.Font = Enum.Font.GothamBold
@@ -162,7 +162,7 @@ task.spawn(function()
 
 		-- === INDEPENDENT TELEPORT GUI ===
 		local tpScreenGui = Instance.new("ScreenGui")
-		tpScreenGui.Name = "PumpkitzHub_TP_V08_9"
+		tpScreenGui.Name = "PumpkitzHub_TP_V09_0"
 		tpScreenGui.ResetOnSpawn = false
 		tpScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 		tpScreenGui.IgnoreGuiInset = true
@@ -454,6 +454,33 @@ task.spawn(function()
 				createToggleBtn(contentScroll, "แสดง Hitbox 👁️", Color3.fromRGB(230, 120, 20), Color3.fromRGB(55, 18, 6), toggleShowHitbox)
 				createToggleBtn(contentScroll, "ล็อกหัวใกล้สุด (LOS)", Color3.fromRGB(230, 120, 20), Color3.fromRGB(55, 18, 6), toggleAimlock)
 				
+				-- === EXTERNAL HITBOX EXPANDER BUTTON ===
+				local hitboxExpBtn = Instance.new("TextButton", contentScroll)
+				hitboxExpBtn.Size = UDim2.new(0.95, 0, 0, 45)
+				hitboxExpBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6)
+				hitboxExpBtn.BorderSizePixel = 0
+				hitboxExpBtn.Text = "ขยายhitbox"
+				hitboxExpBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+				hitboxExpBtn.TextSize = 15
+				hitboxExpBtn.Font = Enum.Font.GothamBold
+				hitboxExpBtn.Active = true
+				Instance.new("UICorner", hitboxExpBtn).CornerRadius = UDim.new(0, 8)
+				
+				hitboxExpBtn.MouseButton1Click:Connect(function()
+					hitboxExpBtn.Text = "⏳ กำลังโหลด..."
+					hitboxExpBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+					task.spawn(function()
+						pcall(function()
+							loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Hitbox-Expander-224681"))()
+						end)
+						task.wait(1.5)
+						if hitboxExpBtn and hitboxExpBtn.Parent then
+							hitboxExpBtn.Text = "ขยายhitbox"
+							hitboxExpBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6)
+						end
+					end)
+				end)
+				
 			elseif name == "🤡 แกล้ง" then
 				btnJoke.BackgroundColor3 = Color3.fromRGB(65, 20, 6); btnJoke.TextColor3 = Color3.fromRGB(255, 180, 80)
 				local flingBtn = Instance.new("TextButton", contentScroll)
@@ -545,7 +572,7 @@ task.spawn(function()
 			if not screenGui.Parent then toggleESP(false); toggleShowHitbox(false); toggleAimlock(false); toggleNoclip(false); toggleInfJump(false) end
 		end)
 
-		print("[Pumpkitz Hub 🎃 V0.8.9] โหลดสำเร็จ | Hitbox Expander Removed | Delta Optimized")
+		print("[Pumpkitz Hub 🎃 V0.9.0] โหลดสำเร็จ | External Hitbox Expander Added | Delta Optimized")
 	end
 
 	-- === LOADING SCREEN ===
@@ -566,7 +593,7 @@ task.spawn(function()
 
 	local loadingVersion = Instance.new("TextLabel", loadingFrame)
 	loadingVersion.Size = UDim2.new(1, 0, 0, 30); loadingVersion.Position = UDim2.fromScale(0.5, 0.42); loadingVersion.AnchorPoint = Vector2.new(0.5, 0.5)
-	loadingVersion.BackgroundTransparency = 1; loadingVersion.Text = "V0.8.9 | Delta Optimized"; loadingVersion.TextColor3 = Color3.fromRGB(200, 200, 200)
+	loadingVersion.BackgroundTransparency = 1; loadingVersion.Text = "V0.9.0 | Delta Optimized"; loadingVersion.TextColor3 = Color3.fromRGB(200, 200, 200)
 	loadingVersion.TextSize = 16; loadingVersion.Font = Enum.Font.GothamSemibold; loadingVersion.TextXAlignment = Enum.TextXAlignment.Center
 
 	local loadingBar = Instance.new("Frame", loadingFrame); loadingBar.Name = "LoadingBar"
