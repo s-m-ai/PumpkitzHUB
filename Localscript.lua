@@ -534,7 +534,7 @@ task.spawn(function()
 			mm2Btn.Size = UDim2.new(0.95, 0, 0, 45)
 			mm2Btn.BackgroundColor3 = Color3.fromRGB(50, 15, 15)
 			mm2Btn.BorderSizePixel = 0
-			mm2Btn.Text = "สคริปต์MM2"
+			mm2Btn.Text = "MM2"
 			mm2Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
 			mm2Btn.TextSize = 15
 			mm2Btn.Font = Enum.Font.GothamBold
@@ -550,7 +550,7 @@ task.spawn(function()
 					end)
 					task.wait(1.5)
 					if mm2Btn and mm2Btn.Parent then
-						mm2Btn.Text = "สคริปต์MM2"
+						mm2Btn.Text = "MM2"
 						mm2Btn.BackgroundColor3 = Color3.fromRGB(50, 15, 15)
 					end
 				end)
@@ -588,7 +588,7 @@ task.spawn(function()
 			bfBtn.Size = UDim2.new(0.95, 0, 0, 45)
 			bfBtn.BackgroundColor3 = Color3.fromRGB(50, 15, 15)
 			bfBtn.BorderSizePixel = 0
-			bfBtn.Text = "สคริปต์BloxFruits"
+			bfBtn.Text = "BloxFruits"
 			bfBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 			bfBtn.TextSize = 15
 			bfBtn.Font = Enum.Font.GothamBold
@@ -604,7 +604,7 @@ task.spawn(function()
 					end)
 					task.wait(1.5)
 					if bfBtn and bfBtn.Parent then
-						bfBtn.Text = "สคริปต์BloxFruits"
+						bfBtn.Text = "BloxFruits"
 						bfBtn.BackgroundColor3 = Color3.fromRGB(50, 15, 15)
 					end
 				end)
