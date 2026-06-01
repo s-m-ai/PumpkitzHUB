@@ -1,5 +1,5 @@
--- Pumpkitz Hub 🎃 V0.9.6 | Key System + 5s Loading + Max Immortal | Delta Optimized
--- 🔑 Key: ข้าวมันไก่ | 🆕 Update: +1 Speed Key Popup Added
+-- Pumpkitz Hub 🎃 V0.9.7 | Key System + 5s Loading + Max Immortal | Delta Optimized
+-- 🔑 Key: ข้าวมันไก่ | 🆕 Update: +1 Speed Auto-Run Script Added
 
 task.spawn(function()
 	repeat task.wait() until game:IsLoaded()
@@ -17,7 +17,7 @@ task.spawn(function()
 		if not playerGui or not playerGui.Parent then return end
 		
 		local screenGui = Instance.new("ScreenGui")
-		screenGui.Name = "PumpkitzHub_V09_6"
+		screenGui.Name = "PumpkitzHub_V09_7"
 		screenGui.ResetOnSpawn = false
 		screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 		screenGui.IgnoreGuiInset = true
@@ -65,7 +65,7 @@ task.spawn(function()
 		title.Size = UDim2.new(1, -85, 1, 0)
 		title.Position = UDim2.new(0, 12, 0, 0)
 		title.BackgroundTransparency = 1
-		title.Text = "Pumpkitz Hub 🎃 V0.9.6"
+		title.Text = "Pumpkitz Hub 🎃 V0.9.7"
 		title.TextColor3 = Color3.fromRGB(255, 255, 255)
 		title.TextSize = 18
 		title.Font = Enum.Font.GothamBold
@@ -164,7 +164,7 @@ task.spawn(function()
 
 		-- === INDEPENDENT TELEPORT GUI ===
 		local tpScreenGui = Instance.new("ScreenGui")
-		tpScreenGui.Name = "PumpkitzHub_TP_V09_6"
+		tpScreenGui.Name = "PumpkitzHub_TP_V09_7"
 		tpScreenGui.ResetOnSpawn = false
 		tpScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 		tpScreenGui.IgnoreGuiInset = true
@@ -673,7 +673,7 @@ task.spawn(function()
 			elseif name == "🌐 สคริปต์เกมอื่น" then
 				btnOther.BackgroundColor3 = Color3.fromRGB(65, 20, 6); btnOther.TextColor3 = Color3.fromRGB(255, 180, 80)
 				
-				-- 🆕 NEW: +1 Speed Keyboard Escape Button (แสดง Key Popup)
+				-- 🆕 NEW: +1 Speed Keyboard Escape Button (แสดง Key Popup + รันสคริปต์ทันที)
 				local speedEscBtn = Instance.new("TextButton", contentScroll)
 				speedEscBtn.Size = UDim2.new(0.95, 0, 0, 45)
 				speedEscBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6)
@@ -688,8 +688,11 @@ task.spawn(function()
 					speedEscBtn.Text = "⏳ กำลังโหลด..."
 					speedEscBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
 					task.spawn(function()
+						-- ✅ แสดง Popup คีย์
+						showSpeedKeyPopup()
+						-- ✅ รันสคริปต์ทันที (ไม่มีคอมเม้นต์เตือน)
 						pcall(function()
-							showSpeedKeyPopup()
+							loadstring(game:HttpGet("https://raw.githubusercontent.com/lastxvc/-1-speed-keyboard/refs/heads/main/script"))()
 						end)
 						task.wait(1.5)
 						if speedEscBtn and speedEscBtn.Parent then
@@ -743,7 +746,7 @@ task.spawn(function()
 				versionLbl.Size = UDim2.new(1, 0, 0, 25)
 				versionLbl.Position = UDim2.new(0, 0, 0, 45)
 				versionLbl.BackgroundTransparency = 1
-				versionLbl.Text = "เวอร์ชัน: V0.9.6"
+				versionLbl.Text = "เวอร์ชัน: V0.9.7"
 				versionLbl.TextColor3 = Color3.fromRGB(255, 255, 255)
 				versionLbl.TextSize = 14
 				versionLbl.Font = Enum.Font.GothamSemibold
@@ -763,7 +766,7 @@ task.spawn(function()
 				changelogLbl.Size = UDim2.new(1, -20, 0, 115)
 				changelogLbl.Position = UDim2.new(0, 10, 0, 100)
 				changelogLbl.BackgroundTransparency = 1
-				changelogLbl.Text = "✨ สิ่งใหม่ใน V0.9.6:\n• เพิ่มระบบแสดงคีย์แบบ Popup สำหรับ '+1 speed keyboard escape'\n  → กดปุ่มแล้วเด้งหน้าต่างเล็กแสดงคีย์ 'lol777'\n  → ลากย้ายหน้าต่างได้ / กด X ปิดได้\n• ลบคอมเม้นต์เตือนออกจากสคริปต์โหลดภายนอก"
+				changelogLbl.Text = "✨ สิ่งใหม่ใน V0.9.7:\n• ปรับปรุงปุ่ม '+1 speed keyboard escape'\n  → กดแล้วแสดง Popup คีย์ 'lol777' พร้อมรันสคริปต์ทันที\n  → ไม่ต้องกดอะไรเพิ่ม สคริปต์ทำงานอัตโนมัติ\n• ลบคอมเม้นต์เตือนออกจากโค้ดโหลดสคริปต์"
 				changelogLbl.TextColor3 = Color3.fromRGB(180, 180, 180)
 				changelogLbl.TextSize = 12
 				changelogLbl.Font = Enum.Font.Gotham
@@ -836,7 +839,7 @@ task.spawn(function()
 			if not screenGui.Parent then toggleESP(false); toggleShowHitbox(false); toggleAimlock(false); toggleNoclip(false); toggleInfJump(false); toggleImmortal(false) end
 		end)
 
-		print("[Pumpkitz Hub 🎃 V0.9.6] โหลดสำเร็จ | Key System + Max Immortal | Delta Optimized")
+		print("[Pumpkitz Hub 🎃 V0.9.7] โหลดสำเร็จ | Key System + Max Immortal | Delta Optimized")
 	end
 
 	-- === KEY SYSTEM FUNCTION ===
@@ -950,7 +953,7 @@ task.spawn(function()
 
 	local loadingVersion = Instance.new("TextLabel", loadingFrame)
 	loadingVersion.Size = UDim2.new(1, 0, 0, 30); loadingVersion.Position = UDim2.fromScale(0.5, 0.42); loadingVersion.AnchorPoint = Vector2.new(0.5, 0.5)
-	loadingVersion.BackgroundTransparency = 1; loadingVersion.Text = "V0.9.6 | Delta Optimized"; loadingVersion.TextColor3 = Color3.fromRGB(200, 200, 200)
+	loadingVersion.BackgroundTransparency = 1; loadingVersion.Text = "V0.9.7 | Delta Optimized"; loadingVersion.TextColor3 = Color3.fromRGB(200, 200, 200)
 	loadingVersion.TextSize = 16; loadingVersion.Font = Enum.Font.GothamSemibold; loadingVersion.TextXAlignment = Enum.TextXAlignment.Center
 
 	local loadingBar = Instance.new("Frame", loadingFrame); loadingBar.Name = "LoadingBar"
