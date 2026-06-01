@@ -1,5 +1,5 @@
--- Pumpkitz Hub 🎃 V1.0.0 | Key System + 5s Loading + Max Immortal | Delta Optimized
--- 🔑 Key: ข้าวมันไก่ | 🎉 Update: V1.0.0 Release + Fixed Empty Categories
+-- Pumpkitz Hub 🎃 V1.0.1 | Key System + 5s Loading + Max Immortal | Delta Optimized
+-- 🔑 Key: ข้าวมันไก่ | 🆕 Update: Catch and Tame Button Added
 
 task.spawn(function()
 	repeat task.wait() until game:IsLoaded()
@@ -17,7 +17,7 @@ task.spawn(function()
 		if not playerGui or not playerGui.Parent then return end
 		
 		local screenGui = Instance.new("ScreenGui")
-		screenGui.Name = "PumpkitzHub_V10_0"
+		screenGui.Name = "PumpkitzHub_V10_1"
 		screenGui.ResetOnSpawn = false
 		screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 		screenGui.IgnoreGuiInset = true
@@ -69,7 +69,7 @@ task.spawn(function()
 		title.Size = UDim2.new(1, -85, 1, 0)
 		title.Position = UDim2.new(0, 12, 0, 0)
 		title.BackgroundTransparency = 1
-		title.Text = "Pumpkitz Hub 🎃 V1.0.0"
+		title.Text = "Pumpkitz Hub 🎃 V1.0.1"
 		title.TextColor3 = Color3.fromRGB(255, 255, 255)
 		title.TextSize = 18
 		title.Font = Enum.Font.GothamBold
@@ -169,7 +169,7 @@ task.spawn(function()
 
 		-- === INDEPENDENT TELEPORT GUI ===
 		local tpScreenGui = Instance.new("ScreenGui")
-		tpScreenGui.Name = "PumpkitzHub_TP_V10_0"
+		tpScreenGui.Name = "PumpkitzHub_TP_V10_1"
 		tpScreenGui.ResetOnSpawn = false
 		tpScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 		tpScreenGui.IgnoreGuiInset = true
@@ -440,7 +440,7 @@ task.spawn(function()
 		end
 
 		local btnGen = createCatBtn(catScroll, "ทั่วไป")
-		local btnPlr = createCatBtn(catScroll, " player")
+		local btnPlr = createCatBtn(catScroll, "👤 player")
 		local btnCombat = createCatBtn(catScroll, "⚔️ ต่อสู้")
 		local btnJoke = createCatBtn(catScroll, "🤡 แกล้ง")
 		local btnOther = createCatBtn(catScroll, "🌐 สคริปต์เกมอื่น")
@@ -463,7 +463,7 @@ task.spawn(function()
 		btnUpdate.Active = true
 		Instance.new("UICorner", btnUpdate).CornerRadius = UDim.new(0, 6)
 
-		-- ===  KEY POPUP GUI FOR +1 SPEED ===
+		-- === 🆕 KEY POPUP GUI FOR +1 SPEED ===
 		local function showSpeedKeyPopup()
 			local keyPopupGui = Instance.new("ScreenGui")
 			keyPopupGui.Name = "Pumpkitz_SpeedKey_Popup"
@@ -635,7 +635,7 @@ task.spawn(function()
 				hitboxExpBtn.Text = "ขยายhitbox"; hitboxExpBtn.TextColor3 = Color3.fromRGB(255, 255, 255); hitboxExpBtn.TextSize = 15; hitboxExpBtn.Font = Enum.Font.GothamBold; hitboxExpBtn.Active = true
 				Instance.new("UICorner", hitboxExpBtn).CornerRadius = UDim.new(0, 8)
 				hitboxExpBtn.MouseButton1Click:Connect(function()
-					hitboxExpBtn.Text = " กำลังโหลด..."; hitboxExpBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+					hitboxExpBtn.Text = "⏳ กำลังโหลด..."; hitboxExpBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
 					task.spawn(function() pcall(function() loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Hitbox-Expander-224681"))() end); task.wait(1.5); if hitboxExpBtn and hitboxExpBtn.Parent then hitboxExpBtn.Text = "ขยายhitbox"; hitboxExpBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6) end end)
 				end)
 				
@@ -656,7 +656,7 @@ task.spawn(function()
 				flingBtn.Text = "🚀 เปิด Fling GUI (ภายนอก)"; flingBtn.TextColor3 = Color3.fromRGB(255, 255, 255); flingBtn.TextSize = 15; flingBtn.Font = Enum.Font.GothamBold; flingBtn.Active = true
 				Instance.new("UICorner", flingBtn).CornerRadius = UDim.new(0, 8)
 				flingBtn.MouseButton1Click:Connect(function()
-					flingBtn.Text = " กำลังโหลด..."; flingBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+					flingBtn.Text = "⏳ กำลังโหลด..."; flingBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
 					task.spawn(function() pcall(function() loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Ultimate-fling-gui-228952"))() end); task.wait(1.5); if flingBtn and flingBtn.Parent then flingBtn.Text = "🚀 เปิด Fling GUI (ภายนอก)"; flingBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6) end end)
 				end)
 				
@@ -676,6 +676,32 @@ task.spawn(function()
 				
 			elseif name == "🌐 สคริปต์เกมอื่น" then
 				btnOther.BackgroundColor3 = Color3.fromRGB(65, 20, 6); btnOther.TextColor3 = Color3.fromRGB(255, 180, 80)
+				
+				-- 🆕 NEW: Catch and Tame Button
+				local catchTameBtn = Instance.new("TextButton", contentScroll)
+				catchTameBtn.Size = UDim2.new(0.95, 0, 0, 45)
+				catchTameBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6)
+				catchTameBtn.BorderSizePixel = 0
+				catchTameBtn.Text = "Catch and Tame"
+				catchTameBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+				catchTameBtn.TextSize = 14
+				catchTameBtn.Font = Enum.Font.GothamBold
+				catchTameBtn.Active = true
+				Instance.new("UICorner", catchTameBtn).CornerRadius = UDim.new(0, 8)
+				catchTameBtn.MouseButton1Click:Connect(function()
+					catchTameBtn.Text = "⏳ กำลังโหลด..."
+					catchTameBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+					task.spawn(function()
+						pcall(function()
+							loadstring(game:HttpGet("https://script.vinzhub.com/loader"))()
+						end)
+						task.wait(1.5)
+						if catchTameBtn and catchTameBtn.Parent then
+							catchTameBtn.Text = "Catch and Tame"
+							catchTameBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6)
+						end
+					end)
+				end)
 				
 				local speedEscBtn = Instance.new("TextButton", contentScroll)
 				speedEscBtn.Size = UDim2.new(0.95, 0, 0, 45)
@@ -709,7 +735,7 @@ task.spawn(function()
 				
 				local zombieBtn = Instance.new("TextButton", contentScroll); zombieBtn.Size = UDim2.new(0.95, 0, 0, 45); zombieBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6); zombieBtn.BorderSizePixel = 0
 				zombieBtn.Text = "Survive zombie arena"; zombieBtn.TextColor3 = Color3.fromRGB(255, 255, 255); zombieBtn.TextSize = 15; zombieBtn.Font = Enum.Font.GothamBold; zombieBtn.Active = true; Instance.new("UICorner", zombieBtn).CornerRadius = UDim.new(0, 8)
-				zombieBtn.MouseButton1Click:Connect(function() zombieBtn.Text = " กำลังโหลด..."; zombieBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100); task.spawn(function() pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/VoidDeveloper67/Void-Hub/refs/heads/main/VoidHub.lua", true))() end); task.wait(1.5); if zombieBtn and zombieBtn.Parent then zombieBtn.Text = "Survive zombie arena"; zombieBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6) end end) end)
+				zombieBtn.MouseButton1Click:Connect(function() zombieBtn.Text = "⏳ กำลังโหลด..."; zombieBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100); task.spawn(function() pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/VoidDeveloper67/Void-Hub/refs/heads/main/VoidHub.lua", true))() end); task.wait(1.5); if zombieBtn and zombieBtn.Parent then zombieBtn.Text = "Survive zombie arena"; zombieBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6) end end) end)
 				
 				local bfBtn = Instance.new("TextButton", contentScroll); bfBtn.Size = UDim2.new(0.95, 0, 0, 45); bfBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6); bfBtn.BorderSizePixel = 0
 				bfBtn.Text = "BloxFruits"; bfBtn.TextColor3 = Color3.fromRGB(255, 255, 255); bfBtn.TextSize = 15; bfBtn.Font = Enum.Font.GothamBold; bfBtn.Active = true; Instance.new("UICorner", bfBtn).CornerRadius = UDim.new(0, 8)
@@ -720,7 +746,7 @@ task.spawn(function()
 				nightsBtn.MouseButton1Click:Connect(function() nightsBtn.Text = "⏳ กำลังโหลด..."; nightsBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100); task.spawn(function() pcall(function() loadstring(game:HttpGet("https://foxname.top/loader"))() end); task.wait(1.5); if nightsBtn and nightsBtn.Parent then nightsBtn.Text = "99 nights"; nightsBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6) end end) end)
 				
 				local note = Instance.new("TextLabel", contentScroll); note.Size = UDim2.new(0.95, 0, 0, 65); note.BackgroundTransparency = 1
-				note.Text = "⚠️ ใช้ในเกมที่เกี่ยวข้องเท่านั้น:\n• 99 Nights (FoxLoader)\n• BloxFruits (QuantumOnyx)\n• MM2 / Survive Zombie Arena\nหากกดแล้วไม่เกิดอะไรขึ้น อาจเป็นเพราะ:\n• ไม่ใช่เกมที่เหมาะสม\n• สคริปต์อัปเดตหรือล่ม"
+				note.Text = "⚠️ ใช้ในเกมที่เกี่ยวข้องเท่านั้น:\n• Catch and Tame (Vinzhub Loader)\n• 99 Nights (FoxLoader)\n• BloxFruits (QuantumOnyx)\n• MM2 / Survive Zombie Arena\nหากกดแล้วไม่เกิดอะไรขึ้น อาจเป็นเพราะ:\n• ไม่ใช่เกมที่เหมาะสม\n• สคริปต์อัปเดตหรือล่ม"
 				note.TextColor3 = Color3.fromRGB(150, 150, 150); note.TextSize = 11; note.Font = Enum.Font.GothamSemibold
 				note.TextXAlignment = Enum.TextXAlignment.Left; note.TextWrapped = true
 				
@@ -747,7 +773,7 @@ task.spawn(function()
 				versionLbl.Size = UDim2.new(1, 0, 0, 25)
 				versionLbl.Position = UDim2.new(0, 0, 0, 45)
 				versionLbl.BackgroundTransparency = 1
-				versionLbl.Text = "เวอร์ชัน: V1.0.0"
+				versionLbl.Text = "เวอร์ชัน: V1.0.1"
 				versionLbl.TextColor3 = Color3.fromRGB(255, 255, 255)
 				versionLbl.TextSize = 14
 				versionLbl.Font = Enum.Font.GothamSemibold
@@ -767,7 +793,7 @@ task.spawn(function()
 				changelogLbl.Size = UDim2.new(1, -20, 0, 115)
 				changelogLbl.Position = UDim2.new(0, 10, 0, 100)
 				changelogLbl.BackgroundTransparency = 1
-				changelogLbl.Text = "✨ สิ่งใหม่ใน V1.0.0:\n• 🎉 ออกเวอร์ชันทางการ V1.0.0!\n• แก้ไขปัญหาหมวด '🤡 แกล้ง' และ '🌐 สคริปต์เกมอื่น' เนื้อหาไม่แสดง\n• เพิ่มปุ่มทั้งหมดกลับเข้ามาครบถ้วน (Fling, MM2, BloxFruits ฯลฯ)\n• ปรับปรุงระบบย่อเมนูให้ Header คงที่ + Fade Out พื้นหลัง"
+				changelogLbl.Text = "✨ สิ่งใหม่ใน V1.0.1:\n• เพิ่มปุ่ม 'Catch and Tame' ในหมวด 🌐 สคริปต์เกมอื่น\n  → กดเพื่อโหลดสคริปต์จาก Vinzhub Loader\n  → ใช้สำหรับเกมแนวจับและฝึกสัตว์เลี้ยง\n• อัปเดตคำเตือนการใช้งานให้ครอบคลุมสคริปต์ใหม่"
 				changelogLbl.TextColor3 = Color3.fromRGB(180, 180, 180)
 				changelogLbl.TextSize = 12
 				changelogLbl.Font = Enum.Font.Gotham
@@ -865,7 +891,7 @@ task.spawn(function()
 			if not screenGui.Parent then toggleESP(false); toggleShowHitbox(false); toggleAimlock(false); toggleNoclip(false); toggleInfJump(false); toggleImmortal(false) end
 		end)
 
-		print("[Pumpkitz Hub 🎃 V1.0.0] โหลดสำเร็จ | Key System + Max Immortal | Delta Optimized")
+		print("[Pumpkitz Hub 🎃 V1.0.1] โหลดสำเร็จ | Key System + Max Immortal | Delta Optimized")
 	end
 
 	-- === KEY SYSTEM FUNCTION ===
@@ -979,7 +1005,7 @@ task.spawn(function()
 
 	local loadingVersion = Instance.new("TextLabel", loadingFrame)
 	loadingVersion.Size = UDim2.new(1, 0, 0, 30); loadingVersion.Position = UDim2.fromScale(0.5, 0.42); loadingVersion.AnchorPoint = Vector2.new(0.5, 0.5)
-	loadingVersion.BackgroundTransparency = 1; loadingVersion.Text = "V1.0.0 | Delta Optimized"; loadingVersion.TextColor3 = Color3.fromRGB(200, 200, 200)
+	loadingVersion.BackgroundTransparency = 1; loadingVersion.Text = "V1.0.1 | Delta Optimized"; loadingVersion.TextColor3 = Color3.fromRGB(200, 200, 200)
 	loadingVersion.TextSize = 16; loadingVersion.Font = Enum.Font.GothamSemibold; loadingVersion.TextXAlignment = Enum.TextXAlignment.Center
 
 	local loadingBar = Instance.new("Frame", loadingFrame); loadingBar.Name = "LoadingBar"
