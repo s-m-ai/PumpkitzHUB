@@ -1,5 +1,5 @@
--- Pumpkitz Hub 🎃 V0.9.7 | Key System + 5s Loading + Max Immortal | Delta Optimized
--- 🔑 Key: ข้าวมันไก่ | 🆕 Update: +1 Speed Auto-Run Script Added
+-- Pumpkitz Hub 🎃 V0.9.8 | Key System + 5s Loading + Max Immortal | Delta Optimized
+-- 🔑 Key: ข้าวมันไก่ | 🆕 Update: Smooth Slide Minimize Animation Added
 
 task.spawn(function()
 	repeat task.wait() until game:IsLoaded()
@@ -17,7 +17,7 @@ task.spawn(function()
 		if not playerGui or not playerGui.Parent then return end
 		
 		local screenGui = Instance.new("ScreenGui")
-		screenGui.Name = "PumpkitzHub_V09_7"
+		screenGui.Name = "PumpkitzHub_V09_8"
 		screenGui.ResetOnSpawn = false
 		screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 		screenGui.IgnoreGuiInset = true
@@ -65,7 +65,7 @@ task.spawn(function()
 		title.Size = UDim2.new(1, -85, 1, 0)
 		title.Position = UDim2.new(0, 12, 0, 0)
 		title.BackgroundTransparency = 1
-		title.Text = "Pumpkitz Hub 🎃 V0.9.7"
+		title.Text = "Pumpkitz Hub 🎃 V0.9.8"
 		title.TextColor3 = Color3.fromRGB(255, 255, 255)
 		title.TextSize = 18
 		title.Font = Enum.Font.GothamBold
@@ -164,7 +164,7 @@ task.spawn(function()
 
 		-- === INDEPENDENT TELEPORT GUI ===
 		local tpScreenGui = Instance.new("ScreenGui")
-		tpScreenGui.Name = "PumpkitzHub_TP_V09_7"
+		tpScreenGui.Name = "PumpkitzHub_TP_V09_8"
 		tpScreenGui.ResetOnSpawn = false
 		tpScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 		tpScreenGui.IgnoreGuiInset = true
@@ -688,9 +688,7 @@ task.spawn(function()
 					speedEscBtn.Text = "⏳ กำลังโหลด..."
 					speedEscBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
 					task.spawn(function()
-						-- ✅ แสดง Popup คีย์
 						showSpeedKeyPopup()
-						-- ✅ รันสคริปต์ทันที (ไม่มีคอมเม้นต์เตือน)
 						pcall(function()
 							loadstring(game:HttpGet("https://raw.githubusercontent.com/lastxvc/-1-speed-keyboard/refs/heads/main/script"))()
 						end)
@@ -746,7 +744,7 @@ task.spawn(function()
 				versionLbl.Size = UDim2.new(1, 0, 0, 25)
 				versionLbl.Position = UDim2.new(0, 0, 0, 45)
 				versionLbl.BackgroundTransparency = 1
-				versionLbl.Text = "เวอร์ชัน: V0.9.7"
+				versionLbl.Text = "เวอร์ชัน: V0.9.8"
 				versionLbl.TextColor3 = Color3.fromRGB(255, 255, 255)
 				versionLbl.TextSize = 14
 				versionLbl.Font = Enum.Font.GothamSemibold
@@ -766,7 +764,7 @@ task.spawn(function()
 				changelogLbl.Size = UDim2.new(1, -20, 0, 115)
 				changelogLbl.Position = UDim2.new(0, 10, 0, 100)
 				changelogLbl.BackgroundTransparency = 1
-				changelogLbl.Text = "✨ สิ่งใหม่ใน V0.9.7:\n• ปรับปรุงปุ่ม '+1 speed keyboard escape'\n  → กดแล้วแสดง Popup คีย์ 'lol777' พร้อมรันสคริปต์ทันที\n  → ไม่ต้องกดอะไรเพิ่ม สคริปต์ทำงานอัตโนมัติ\n• ลบคอมเม้นต์เตือนออกจากโค้ดโหลดสคริปต์"
+				changelogLbl.Text = "✨ สิ่งใหม่ใน V0.9.8:\n• ปรับปรุงแอนิเมชันปุ่มย่อ/ขยาย (-)\n  → ย่อ: เมนูเลื่อนขึ้นไปหา Header อย่างนุ่มนวล\n  → ขยาย: เมนูเลื่อนลงมาจาก Header อย่างนุ่มนวล\n• ใช้ TweenService แทนการซ่อนทันทีเพื่อ UX ที่ลื่นไหล"
 				changelogLbl.TextColor3 = Color3.fromRGB(180, 180, 180)
 				changelogLbl.TextSize = 12
 				changelogLbl.Font = Enum.Font.Gotham
@@ -825,12 +823,33 @@ task.spawn(function()
 			end
 		end)
 
-		-- === MINIMIZE & CLOSE ===
+		-- === 🆕 SMOOTH MINIMIZE & CLOSE ===
 		local isMin = false
+		local minimizeTweenInfo = TweenInfo.new(0.35, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+
 		minBtn.MouseButton1Click:Connect(function()
-			isMin = not isMin; splitContainer.Visible = not isMin
-			mainFrame:TweenSize(UDim2.fromOffset(290, isMin and 40 or 300), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, 0.25, true)
+			isMin = not isMin
+			splitContainer.Visible = true -- เปิด Visibility ให้ Tween ทำงานได้เต็ม
+
+			if isMin then
+				-- ย่อ: เมนูเลื่อนขึ้นไปหา Header
+				TweenService:Create(splitContainer, minimizeTweenInfo, {
+					Position = UDim2.new(0, 0, 0, -260)
+				}):Play()
+				TweenService:Create(mainFrame, minimizeTweenInfo, {
+					Size = UDim2.fromOffset(290, 40)
+				}):Play()
+			else
+				-- ขยาย: เมนูเลื่อนลงมาจาก Header
+				TweenService:Create(splitContainer, minimizeTweenInfo, {
+					Position = UDim2.new(0, 0, 0, 40)
+				}):Play()
+				TweenService:Create(mainFrame, minimizeTweenInfo, {
+					Size = UDim2.fromOffset(290, 300)
+				}):Play()
+			end
 		end)
+
 		closeBtn.MouseButton1Click:Connect(function()
 			toggleESP(false); toggleShowHitbox(false); toggleAimlock(false); toggleNoclip(false); toggleInfJump(false); toggleImmortal(false)
 			screenGui:Destroy(); tpScreenGui:Destroy()
@@ -839,7 +858,7 @@ task.spawn(function()
 			if not screenGui.Parent then toggleESP(false); toggleShowHitbox(false); toggleAimlock(false); toggleNoclip(false); toggleInfJump(false); toggleImmortal(false) end
 		end)
 
-		print("[Pumpkitz Hub 🎃 V0.9.7] โหลดสำเร็จ | Key System + Max Immortal | Delta Optimized")
+		print("[Pumpkitz Hub 🎃 V0.9.8] โหลดสำเร็จ | Key System + Max Immortal | Delta Optimized")
 	end
 
 	-- === KEY SYSTEM FUNCTION ===
@@ -953,7 +972,7 @@ task.spawn(function()
 
 	local loadingVersion = Instance.new("TextLabel", loadingFrame)
 	loadingVersion.Size = UDim2.new(1, 0, 0, 30); loadingVersion.Position = UDim2.fromScale(0.5, 0.42); loadingVersion.AnchorPoint = Vector2.new(0.5, 0.5)
-	loadingVersion.BackgroundTransparency = 1; loadingVersion.Text = "V0.9.7 | Delta Optimized"; loadingVersion.TextColor3 = Color3.fromRGB(200, 200, 200)
+	loadingVersion.BackgroundTransparency = 1; loadingVersion.Text = "V0.9.8 | Delta Optimized"; loadingVersion.TextColor3 = Color3.fromRGB(200, 200, 200)
 	loadingVersion.TextSize = 16; loadingVersion.Font = Enum.Font.GothamSemibold; loadingVersion.TextXAlignment = Enum.TextXAlignment.Center
 
 	local loadingBar = Instance.new("Frame", loadingFrame); loadingBar.Name = "LoadingBar"
