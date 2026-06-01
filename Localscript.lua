@@ -1,5 +1,5 @@
--- Pumpkitz Hub 🎃 V1.0.2 | Key System + 5s Loading + Max Immortal | Delta Optimized
--- 🔑 Key: ข้าวมันไก่ | 🆕 Update: Camera View Buttons Added
+-- Pumpkitz Hub 🎃 V1.0.3 | Key System + 5s Loading + Max Immortal | Delta Optimized
+-- 🔑 Key: ข้าวมันไก่ | 🆕 Update: Fixed First Person Camera Shake
 
 task.spawn(function()
 	repeat task.wait() until game:IsLoaded()
@@ -17,7 +17,7 @@ task.spawn(function()
 		if not playerGui or not playerGui.Parent then return end
 		
 		local screenGui = Instance.new("ScreenGui")
-		screenGui.Name = "PumpkitzHub_V10_2"
+		screenGui.Name = "PumpkitzHub_V10_3"
 		screenGui.ResetOnSpawn = false
 		screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 		screenGui.IgnoreGuiInset = true
@@ -69,7 +69,7 @@ task.spawn(function()
 		title.Size = UDim2.new(1, -85, 1, 0)
 		title.Position = UDim2.new(0, 12, 0, 0)
 		title.BackgroundTransparency = 1
-		title.Text = "Pumpkitz Hub 🎃 V1.0.2"
+		title.Text = "Pumpkitz Hub 🎃 V1.0.3"
 		title.TextColor3 = Color3.fromRGB(255, 255, 255)
 		title.TextSize = 18
 		title.Font = Enum.Font.GothamBold
@@ -169,7 +169,7 @@ task.spawn(function()
 
 		-- === INDEPENDENT TELEPORT GUI ===
 		local tpScreenGui = Instance.new("ScreenGui")
-		tpScreenGui.Name = "PumpkitzHub_TP_V10_2"
+		tpScreenGui.Name = "PumpkitzHub_TP_V10_3"
 		tpScreenGui.ResetOnSpawn = false
 		tpScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 		tpScreenGui.IgnoreGuiInset = true
@@ -411,32 +411,47 @@ task.spawn(function()
 			end
 		end
 
-		-- === 🆕 CAMERA VIEW FUNCTIONS ===
+		-- === 🆕 CAMERA VIEW FUNCTIONS (Fixed Shake) ===
 		local firstPersonActive = false
 		local thirdPersonActive = false
 		local originalZoomMin = 0.5
 		local originalZoomMax = 20
 		local cameraConn = nil
+		local lastHeadCFrame = nil
 
 		local function setFirstPersonView(state)
 			firstPersonActive = state
 			thirdPersonActive = not state
 			
 			if state then
-				-- ตั้งค่ากล้องบุคคลที่ 1
+				-- ตั้งค่ากล้องบุคคลที่ 1 (Fixed Shake)
 				localPlayer.CameraMinZoomDistance = 0.5
 				localPlayer.CameraMaxZoomDistance = 0.5
 				
 				if cameraConn then cameraConn:Disconnect() end
-				cameraConn = RunService.RenderStepped:Connect(function()
+				
+				-- ใช้ Heartbeat แทน RenderStepped เพื่อความเสถียร
+				cameraConn = RunService.Heartbeat:Connect(function()
 					if localPlayer.Character and localPlayer.Character:FindFirstChild("Head") and camera then
 						local head = localPlayer.Character.Head
-						camera.CFrame = CFrame.new(head.Position, head.Position + head.CFrame.LookVector * 10)
+						
+						-- คำนวณ CFrame ใหม่โดยมีการทำให้เรียบขึ้น
+						local targetCFrame = CFrame.new(head.Position, head.Position + head.CFrame.LookVector * 10)
+						
+						-- ใช้ Lerp เพื่อทำให้การเคลื่อนไหวเรียบขึ้น (ลดการสั่น)
+						if lastHeadCFrame then
+							camera.CFrame = lastHeadCFrame:Lerp(targetCFrame, 0.5)
+						else
+							camera.CFrame = targetCFrame
+						end
+						
+						lastHeadCFrame = targetCFrame
 					end
 				end)
 			else
 				-- คืนค่ากล้องปกติ
 				if cameraConn then cameraConn:Disconnect(); cameraConn = nil end
+				lastHeadCFrame = nil
 				localPlayer.CameraMinZoomDistance = originalZoomMin
 				localPlayer.CameraMaxZoomDistance = originalZoomMax
 				if camera then
@@ -458,6 +473,7 @@ task.spawn(function()
 				localPlayer.CameraMaxZoomDistance = originalZoomMax
 				
 				if cameraConn then cameraConn:Disconnect(); cameraConn = nil end
+				lastHeadCFrame = nil
 				if camera then
 					camera.CameraType = Enum.CameraType.Custom
 					if localPlayer.Character and localPlayer.Character:FindFirstChild("Humanoid") then
@@ -676,7 +692,7 @@ task.spawn(function()
 				local jumpBtn = Instance.new("TextButton", jumpRow); jumpBtn.Size = UDim2.new(0.35, 0, 1, 0); jumpBtn.BackgroundColor3 = Color3.fromRGB(200, 90, 15); jumpBtn.BorderSizePixel = 0; jumpBtn.Text = "ตกลง"; jumpBtn.TextColor3 = Color3.fromRGB(255, 255, 255); jumpBtn.TextSize = 14; jumpBtn.Font = Enum.Font.GothamBold; jumpBtn.Active = true; Instance.new("UICorner", jumpBtn).CornerRadius = UDim.new(0, 6)
 				jumpBtn.MouseButton1Click:Connect(function() local v = tonumber(jumpBox.Text); if v and v > 0 and localPlayer.Character and localPlayer.Character:FindFirstChild("Humanoid") then local h = localPlayer.Character.Humanoid; h.UseJumpPower = true; h.JumpPower = v; jumpBtn.Text = "✅ สำเร็จ"; task.delay(1, function() if jumpBtn then jumpBtn.Text = "ตกลง" end end) else jumpBtn.Text = "❌ ผิดพลาด"; task.delay(1, function() if jumpBtn then jumpBtn.Text = "ตกลง" end end) end end)
 
-				createToggleBtn(contentScroll, "Noclip 🚶‍♂️", Color3.fromRGB(230, 120, 20), Color3.fromRGB(55, 18, 6), toggleNoclip)
+				createToggleBtn(contentScroll, "Noclip 🚶‍️", Color3.fromRGB(230, 120, 20), Color3.fromRGB(55, 18, 6), toggleNoclip)
 				createToggleBtn(contentScroll, "กระโดดไม่จำกัด 🔄", Color3.fromRGB(230, 120, 20), Color3.fromRGB(55, 18, 6), toggleInfJump)
 				createToggleBtn(contentScroll, "อมตะ 💀", Color3.fromRGB(230, 120, 20), Color3.fromRGB(55, 18, 6), toggleImmortal)
 				
@@ -863,7 +879,7 @@ task.spawn(function()
 				versionLbl.Size = UDim2.new(1, 0, 0, 25)
 				versionLbl.Position = UDim2.new(0, 0, 0, 45)
 				versionLbl.BackgroundTransparency = 1
-				versionLbl.Text = "เวอร์ชัน: V1.0.2"
+				versionLbl.Text = "เวอร์ชัน: V1.0.3"
 				versionLbl.TextColor3 = Color3.fromRGB(255, 255, 255)
 				versionLbl.TextSize = 14
 				versionLbl.Font = Enum.Font.GothamSemibold
@@ -883,7 +899,7 @@ task.spawn(function()
 				changelogLbl.Size = UDim2.new(1, -20, 0, 115)
 				changelogLbl.Position = UDim2.new(0, 10, 0, 100)
 				changelogLbl.BackgroundTransparency = 1
-				changelogLbl.Text = "✨ สิ่งใหม่ใน V1.0.2:\n• เพิ่มปุ่มปรับกล้องในหมวด 'ทั่วไป':\n  → 'ปรับกล้องมุมมองบุคคลที่1': กล้องติดหัวตัวละคร เหมาะสำหรับการยิงปืนหรือเกมแนว FPS\n  → 'ปรับกล้องมุมมองบุคคลที่3': กล้องมาตรฐานของ Roblox เหมาะสำหรับการสำรวจทั่วไป\n• ปุ่มจะเปลี่ยนสีเมื่อใช้งานเพื่อแสดงสถานะปัจจุบัน"
+				changelogLbl.Text = "✨ สิ่งใหม่ใน V1.0.3:\n• แก้ไขปัญหากล้องบุคคลที่1สั่น:\n  → เปลี่ยนจาก RenderStepped เป็น Heartbeat (เสถียรกว่า)\n  → เพิ่มระบบ Lerp เพื่อทำให้การเคลื่อนไหวเรียบขึ้น\n  → บันทึก CFrame ก่อนหน้าเพื่อลดการกระตุก\n• ปรับปรุงประสิทธิภาพการทำงานของกล้อง"
 				changelogLbl.TextColor3 = Color3.fromRGB(180, 180, 180)
 				changelogLbl.TextSize = 12
 				changelogLbl.Font = Enum.Font.Gotham
@@ -981,7 +997,7 @@ task.spawn(function()
 			if not screenGui.Parent then toggleESP(false); toggleShowHitbox(false); toggleAimlock(false); toggleNoclip(false); toggleInfJump(false); toggleImmortal(false) end
 		end)
 
-		print("[Pumpkitz Hub 🎃 V1.0.2] โหลดสำเร็จ | Key System + Max Immortal | Delta Optimized")
+		print("[Pumpkitz Hub 🎃 V1.0.3] โหลดสำเร็จ | Key System + Max Immortal | Delta Optimized")
 	end
 
 	-- === KEY SYSTEM FUNCTION ===
@@ -1095,7 +1111,7 @@ task.spawn(function()
 
 	local loadingVersion = Instance.new("TextLabel", loadingFrame)
 	loadingVersion.Size = UDim2.new(1, 0, 0, 30); loadingVersion.Position = UDim2.fromScale(0.5, 0.42); loadingVersion.AnchorPoint = Vector2.new(0.5, 0.5)
-	loadingVersion.BackgroundTransparency = 1; loadingVersion.Text = "V1.0.2 | Delta Optimized"; loadingVersion.TextColor3 = Color3.fromRGB(200, 200, 200)
+	loadingVersion.BackgroundTransparency = 1; loadingVersion.Text = "V1.0.3 | Delta Optimized"; loadingVersion.TextColor3 = Color3.fromRGB(200, 200, 200)
 	loadingVersion.TextSize = 16; loadingVersion.Font = Enum.Font.GothamSemibold; loadingVersion.TextXAlignment = Enum.TextXAlignment.Center
 
 	local loadingBar = Instance.new("Frame", loadingFrame); loadingBar.Name = "LoadingBar"
@@ -1134,3 +1150,4 @@ task.spawn(function()
 		showKeySystem()
 	end)
 end)
+
