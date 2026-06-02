@@ -579,7 +579,7 @@ task.spawn(function()
 			keyContent.Size = UDim2.new(0.9, 0, 0, 40)
 			keyContent.Position = UDim2.new(0.05, 0, 0, 40)
 			keyContent.BackgroundTransparency = 1
-			keyContent.Text = "lol777"
+			keyContent.Text = "https://pastebin.com/4Mb2gEKV"
 			keyContent.TextColor3 = Color3.fromRGB(255, 200, 100)
 			keyContent.TextSize = 16
 			keyContent.Font = Enum.Font.GothamBold
