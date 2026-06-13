@@ -7,12 +7,11 @@ if not success or not Rayfield then
     return
 end
 
--- ใส่ไอดีโลโก้ที่มึงยืนยันมาเป๊ะๆ
 local LogoID = 75519083960535
 
 local Window = Rayfield:CreateWindow({
    Name = "Pumpkitz HUB V0.0.1",
-   Icon = LogoID, -- โลโก้ตรง Header
+   Icon = LogoID,
    LoadingTitle = "Pumpkitz HUB V0.0.1",
    LoadingSubtitle = "by Winning",
    ShowText = "Pumpkitz HUB V0.0.1",
@@ -31,7 +30,7 @@ local function SafeNotify(title, content, duration)
             Title = title, 
             Content = content, 
             Duration = duration or 3,
-            Icon = LogoID -- โลโก้ตรงแจ้งเตือน
+            Icon = LogoID
         })
     end)
 end
@@ -67,6 +66,32 @@ PlayersTab:CreateSlider({
     Callback = function(Value)
         local char = game.Players.LocalPlayer.Character
         if char and char:FindFirstChildOfClass("Humanoid") then char:FindFirstChildOfClass("Humanoid").JumpPower = Value end
+    end,
+})
+
+-- Toggle: Infinite Jump (ใหม่!)
+local infiniteJumpConn = nil
+PlayersTab:CreateToggle({
+    Name = "Infinite Jump",
+    CurrentValue = false,
+    Flag = "InfiniteJumpToggle",
+    Callback = function(Value)
+        if Value then
+            infiniteJumpConn = game:GetService("UserInputService").JumpRequest:Connect(function()
+                local char = game.Players.LocalPlayer.Character
+                if char and char:FindFirstChildOfClass("Humanoid") then
+                    -- บังคับเปลี่ยนสถานะเป็นกระโดดทุกครั้งที่กด
+                    char:FindFirstChildOfClass("Humanoid"):ChangeState(Enum.HumanoidStateType.Jumping)
+                end
+            end)
+            SafeNotify("Infinite Jump", "เปิดใช้งาน Infinite Jump แล้ว!", 2)
+        else
+            if infiniteJumpConn then
+                infiniteJumpConn:Disconnect()
+                infiniteJumpConn = nil
+            end
+            SafeNotify("Infinite Jump", "ปิดใช้งาน Infinite Jump แล้ว", 2)
+        end
     end,
 })
 
@@ -290,4 +315,3 @@ FPSTab:CreateSlider({
 })
 
 SafeNotify("Pumpkitz HUB", "โหลดครบ! ระบบพร้อมใช้งาน", 4)
-
