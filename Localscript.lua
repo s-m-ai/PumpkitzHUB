@@ -1,1141 +1,293 @@
--- Pumpkitz Hub 🎃 V1.0.4 | Key System + 5s Loading + Max Immortal | Delta Optimized
--- 🔑 Key: ข้าวมันไก่ | 🆕 Update: Fixed First Person Camera Auto-Rotation
-
-task.spawn(function()
-	repeat task.wait() until game:IsLoaded()
-
-	local Players = game:GetService("Players")
-	local UserInputService = game:GetService("UserInputService")
-	local TweenService = game:GetService("TweenService")
-	local RunService = game:GetService("RunService")
-	local localPlayer = Players.LocalPlayer
-	local playerGui = localPlayer:WaitForChild("PlayerGui", 10)
-	if not playerGui then error("[Pumpkitz Hub] PlayerGui ไม่พบ หรือถูกบล็อก") end
-
-	-- === MAIN GUI FUNCTION ===
-	local function loadMainGUI()
-		if not playerGui or not playerGui.Parent then return end
-		
-		local screenGui = Instance.new("ScreenGui")
-		screenGui.Name = "PumpkitzHub_V10_4"
-		screenGui.ResetOnSpawn = false
-		screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-		screenGui.IgnoreGuiInset = true
-		screenGui.DisplayOrder = 999
-		screenGui.Enabled = true
-		screenGui.Parent = playerGui
-
-		local mainFrame = Instance.new("Frame")
-		mainFrame.Name = "MainFrame"
-		mainFrame.Size = UDim2.fromOffset(290, 300)
-		mainFrame.Position = UDim2.fromScale(0.5, 0.5)
-		mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-		mainFrame.BackgroundColor3 = Color3.fromRGB(20, 8, 2)
-		mainFrame.BorderSizePixel = 0
-		mainFrame.ClipsDescendants = true
-		mainFrame.Parent = screenGui
-
-		local shadow = Instance.new("Frame", mainFrame)
-		shadow.Size = UDim2.new(1, 4, 1, 6)
-		shadow.Position = UDim2.new(0, -2, 0, 0)
-		shadow.BackgroundColor3 = Color3.new(0, 0, 0)
-		shadow.BackgroundTransparency = 0.65
-		shadow.BorderSizePixel = 0
-		Instance.new("UICorner", shadow).CornerRadius = UDim.new(0, 12)
-
-		Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 12)
-		
-		local mainStroke = Instance.new("UIStroke", mainFrame)
-		mainStroke.Color = Color3.fromRGB(255, 140, 0)
-		
-		Instance.new("UIGradient", mainFrame).Color = ColorSequence.new({
-			ColorSequenceKeypoint.new(0, Color3.fromRGB(25, 10, 3)),
-			ColorSequenceKeypoint.new(1, Color3.fromRGB(40, 15, 5))
-		})
-
-		local header = Instance.new("Frame", mainFrame)
-		header.Name = "Header"
-		header.Size = UDim2.new(1, 0, 0, 40)
-		header.BackgroundColor3 = Color3.fromRGB(35, 12, 4)
-		header.BorderSizePixel = 0
-		header.ZIndex = 10
-		Instance.new("UICorner", header).CornerRadius = UDim.new(0, 12)
-		Instance.new("UIGradient", header).Color = ColorSequence.new({
-			ColorSequenceKeypoint.new(0, Color3.fromRGB(60, 20, 6)),
-			ColorSequenceKeypoint.new(1, Color3.fromRGB(30, 10, 3))
-		})
-
-		local title = Instance.new("TextLabel", header)
-		title.Size = UDim2.new(1, -85, 1, 0)
-		title.Position = UDim2.new(0, 12, 0, 0)
-		title.BackgroundTransparency = 1
-		title.Text = "Pumpkitz Hub 🎃 V1.0.4"
-		title.TextColor3 = Color3.fromRGB(255, 255, 255)
-		title.TextSize = 18
-		title.Font = Enum.Font.GothamBold
-		title.TextXAlignment = Enum.TextXAlignment.Left
-
-		local minBtn = Instance.new("TextButton", header)
-		minBtn.Size = UDim2.fromOffset(32, 28)
-		minBtn.Position = UDim2.new(1, -75, 0, 6)
-		minBtn.BackgroundColor3 = Color3.fromRGB(60, 20, 6)
-		minBtn.BorderSizePixel = 0
-		minBtn.Text = "-"
-		minBtn.TextColor3 = Color3.fromRGB(230, 230, 230)
-		minBtn.TextSize = 22
-		minBtn.Font = Enum.Font.GothamBold
-		Instance.new("UICorner", minBtn).CornerRadius = UDim.new(0, 5)
-		minBtn.Active = true
-
-		local closeBtn = Instance.new("TextButton", header)
-		closeBtn.Size = UDim2.fromOffset(32, 28)
-		closeBtn.Position = UDim2.new(1, -38, 0, 6)
-		closeBtn.BackgroundColor3 = Color3.fromRGB(240, 120, 20)
-		closeBtn.BorderSizePixel = 0
-		closeBtn.Text = "X"
-		closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-		closeBtn.TextSize = 20
-		closeBtn.Font = Enum.Font.GothamBold
-		Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 5)
-		closeBtn.Active = true
-
-		local splitContainer = Instance.new("Frame", mainFrame)
-		splitContainer.Name = "SplitContainer"
-		splitContainer.Size = UDim2.new(1, 0, 1, -40)
-		splitContainer.Position = UDim2.new(0, 0, 0, 40)
-		splitContainer.BackgroundColor3 = Color3.fromRGB(20, 8, 2)
-		splitContainer.BorderSizePixel = 0
-		splitContainer.Active = true
-		splitContainer.ZIndex = 5
-
-		local catScroll = Instance.new("ScrollingFrame", splitContainer)
-		catScroll.Name = "CategoryList"
-		catScroll.Size = UDim2.new(0, 100, 1, 0)
-		catScroll.BackgroundTransparency = 1
-		catScroll.BorderSizePixel = 0
-		catScroll.ScrollBarThickness = 3
-		catScroll.ScrollBarImageColor3 = Color3.fromRGB(255, 140, 0)
-		catScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
-		catScroll.VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar
-		catScroll.Active = true
-		local catLayout = Instance.new("UIListLayout", catScroll)
-		catLayout.Padding = UDim.new(0, 6)
-		catLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-
-		local contentScroll = Instance.new("ScrollingFrame", splitContainer)
-		contentScroll.Name = "ContentArea"
-		contentScroll.Size = UDim2.new(1, -105, 1, 0)
-		contentScroll.Position = UDim2.new(0, 105, 0, 0)
-		contentScroll.BackgroundTransparency = 1
-		contentScroll.BorderSizePixel = 0
-		contentScroll.ScrollBarThickness = 3
-		contentScroll.ScrollBarImageColor3 = Color3.fromRGB(255, 140, 0)
-		contentScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
-		contentScroll.VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar
-		contentScroll.Active = true
-		local conLayout = Instance.new("UIListLayout", contentScroll)
-		conLayout.Padding = UDim.new(0, 8)
-		conLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-
-		-- === ESP SYSTEM ===
-		local espHighlights = {}
-		local espActive = false
-		local function toggleESP(state)
-			espActive = state
-			if state then
-				for _, p in ipairs(Players:GetPlayers()) do
-					if p ~= localPlayer and p.Character then
-						local hl = Instance.new("Highlight")
-						hl.Adornee = p.Character; hl.FillColor = Color3.fromRGB(255, 140, 0)
-						hl.FillTransparency = 0; hl.OutlineTransparency = 1
-						hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop; hl.Parent = p.Character
-						espHighlights[p] = hl
-					end
-					p.CharacterAdded:Connect(function(char)
-						task.wait(0.2)
-						if espActive then
-							local hl = Instance.new("Highlight")
-							hl.Adornee = char; hl.FillColor = Color3.fromRGB(255, 140, 0)
-							hl.FillTransparency = 0; hl.OutlineTransparency = 1
-							hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop; hl.Parent = char
-							espHighlights[p] = hl
-						end
-					end)
-				end
-			else
-				for _, hl in pairs(espHighlights) do hl:Destroy() end; espHighlights = {}
-			end
-		end
-
-		-- === INDEPENDENT TELEPORT GUI ===
-		local tpScreenGui = Instance.new("ScreenGui")
-		tpScreenGui.Name = "PumpkitzHub_TP_V10_4"
-		tpScreenGui.ResetOnSpawn = false
-		tpScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-		tpScreenGui.IgnoreGuiInset = true
-		tpScreenGui.DisplayOrder = 1000
-		tpScreenGui.Enabled = true
-		tpScreenGui.Parent = playerGui
-
-		local tpMainFrame = Instance.new("Frame")
-		tpMainFrame.Name = "TPMainFrame"
-		tpMainFrame.Size = UDim2.fromOffset(260, 320)
-		tpMainFrame.Position = UDim2.fromScale(0.5, 0.6)
-		tpMainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-		tpMainFrame.BackgroundColor3 = Color3.fromRGB(25, 10, 3)
-		tpMainFrame.BorderSizePixel = 0
-		tpMainFrame.Visible = false
-		tpMainFrame.Parent = tpScreenGui
-		Instance.new("UICorner", tpMainFrame).CornerRadius = UDim.new(0, 10)
-		Instance.new("UIStroke", tpMainFrame).Color = Color3.fromRGB(255, 140, 0)
-		Instance.new("UIGradient", tpMainFrame).Color = ColorSequence.new({
-			ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 12, 4)),
-			ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 8, 2))
-		})
-
-		local tpHeader = Instance.new("Frame", tpMainFrame)
-		tpHeader.Size = UDim2.new(1, 0, 0, 35)
-		tpHeader.BackgroundColor3 = Color3.fromRGB(40, 14, 5)
-		tpHeader.BorderSizePixel = 0
-		tpHeader.Active = true
-		Instance.new("UICorner", tpHeader).CornerRadius = UDim.new(0, 10)
-
-		local tpTitle = Instance.new("TextLabel", tpHeader)
-		tpTitle.Size = UDim2.new(0.85, 0, 1, 0)
-		tpTitle.Position = UDim2.new(0.075, 0, 0, 0)
-		tpTitle.BackgroundTransparency = 1
-		tpTitle.Text = "📍 เลือกผู้เล่น"
-		tpTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-		tpTitle.TextSize = 15
-		tpTitle.Font = Enum.Font.GothamBold
-		tpTitle.TextXAlignment = Enum.TextXAlignment.Center
-
-		local tpClose = Instance.new("TextButton", tpHeader)
-		tpClose.Size = UDim2.fromOffset(26, 22)
-		tpClose.Position = UDim2.new(0.92, -18, 0, 6)
-		tpClose.BackgroundColor3 = Color3.fromRGB(220, 100, 20)
-		tpClose.BorderSizePixel = 0
-		tpClose.Text = "X"
-		tpClose.TextColor3 = Color3.fromRGB(255, 255, 255)
-		tpClose.TextSize = 14
-		tpClose.Font = Enum.Font.GothamBold
-		tpClose.Active = true
-		Instance.new("UICorner", tpClose).CornerRadius = UDim.new(0, 4)
-		tpClose.MouseButton1Click:Connect(function() tpMainFrame.Visible = false end)
-
-		local tpScroll = Instance.new("ScrollingFrame", tpMainFrame)
-		tpScroll.Size = UDim2.new(1, -10, 1, -85)
-		tpScroll.Position = UDim2.new(0, 5, 0, 40)
-		tpScroll.BackgroundTransparency = 1
-		tpScroll.BorderSizePixel = 0
-		tpScroll.ScrollBarThickness = 4
-		tpScroll.ScrollBarImageColor3 = Color3.fromRGB(255, 140, 0)
-		tpScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
-		tpScroll.VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar
-		tpScroll.Active = true
-		local tpListLayout = Instance.new("UIListLayout", tpScroll)
-		tpListLayout.Padding = UDim.new(0, 6)
-		tpListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-
-		local tpConfirm = Instance.new("TextButton", tpMainFrame)
-		tpConfirm.Size = UDim2.new(0.9, 0, 0, 38)
-		tpConfirm.Position = UDim2.new(0.05, 0, 1, -45)
-		tpConfirm.BackgroundColor3 = Color3.fromRGB(200, 90, 15)
-		tpConfirm.BorderSizePixel = 0
-		tpConfirm.Text = "ตกลง (Teleport)"
-		tpConfirm.TextColor3 = Color3.fromRGB(255, 255, 255)
-		tpConfirm.TextSize = 15
-		tpConfirm.Font = Enum.Font.GothamBold
-		tpConfirm.Active = true
-		Instance.new("UICorner", tpConfirm).CornerRadius = UDim.new(0, 7)
-
-		local selectedTarget = nil
-		local function openTPGui()
-			tpMainFrame.Visible = true; selectedTarget = nil
-			for _, c in pairs(tpScroll:GetChildren()) do if c:IsA("GuiObject") then c:Destroy() end end
-			for _, p in ipairs(Players:GetPlayers()) do
-				if p ~= localPlayer then
-					local btn = Instance.new("TextButton", tpScroll)
-					btn.Size = UDim2.new(0.95, 0, 0, 32); btn.BackgroundColor3 = Color3.fromRGB(45, 15, 5)
-					btn.BorderSizePixel = 0; btn.Text = p.Name; btn.TextColor3 = Color3.fromRGB(210, 210, 210)
-					btn.TextSize = 14; btn.Font = Enum.Font.GothamSemibold; btn.Active = true
-					Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
-					btn.MouseButton1Click:Connect(function()
-						selectedTarget = p
-						for _, b in pairs(tpScroll:GetChildren()) do if b:IsA("TextButton") then b.BackgroundColor3 = Color3.fromRGB(45, 15, 5); b.TextColor3 = Color3.fromRGB(210, 210, 210) end end
-						btn.BackgroundColor3 = Color3.fromRGB(255, 140, 0); btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-					end)
-				end
-			end
-		end
-
-		tpConfirm.MouseButton1Click:Connect(function()
-			if selectedTarget and selectedTarget.Character and selectedTarget.Character:FindFirstChild("HumanoidRootPart") and localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart") then
-				localPlayer.Character.HumanoidRootPart.CFrame = selectedTarget.Character.HumanoidRootPart.CFrame * CFrame.new(0, 2.5, -2)
-			end
-			tpMainFrame.Visible = false
-		end)
-
-		-- === SHOW HITBOX SYSTEM (Orange) ===
-		local hitboxActive = false
-		local hitboxHighlights = {}
-		local function toggleShowHitbox(state)
-			hitboxActive = state
-			local function applyVisualHitbox(char, state)
-				if not char then return end
-				if state then
-					if not hitboxHighlights[char] then
-						local hl = Instance.new("Highlight")
-						hl.Adornee = char; hl.FillColor = Color3.fromRGB(255, 165, 0)
-						hl.FillTransparency = 0.65; hl.OutlineColor = Color3.fromRGB(255, 255, 255)
-						hl.OutlineTransparency = 0; hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-						hl.Parent = char; hitboxHighlights[char] = hl
-					end
-				else
-					if hitboxHighlights[char] then hitboxHighlights[char]:Destroy(); hitboxHighlights[char] = nil end
-				end
-			end
-			if state then
-				for _, p in ipairs(Players:GetPlayers()) do
-					if p ~= localPlayer and p.Character then applyVisualHitbox(p.Character, true) end
-					p.CharacterAdded:Connect(function(char) applyVisualHitbox(char, hitboxActive) end)
-				end
-			else
-				for _, hl in pairs(hitboxHighlights) do hl:Destroy() end; hitboxHighlights = {}
-			end
-		end
-
-		-- === AIMLOCK SYSTEM ===
-		local aimlockActive = false
-		local aimlockConn = nil
-		local camera = workspace.CurrentCamera
-		local function toggleAimlock(state)
-			aimlockActive = state
-			if aimlockConn then aimlockConn:Disconnect(); aimlockConn = nil end
-			if state then
-				aimlockConn = RunService.RenderStepped:Connect(function()
-					if not localPlayer.Character or not localPlayer.Character:FindFirstChild("HumanoidRootPart") or not camera then return end
-					local params = RaycastParams.new()
-					params.FilterDescendantsInstances = {localPlayer.Character}
-					params.FilterType = Enum.RaycastFilterType.Exclude
-					local closestDist, closestHead = math.huge, nil
-					for _, p in ipairs(Players:GetPlayers()) do
-						if p ~= localPlayer and p.Character and p.Character:FindFirstChild("Head") then
-							local headPos = p.Character.Head.Position
-							local dist = (localPlayer.Character.HumanoidRootPart.Position - headPos).Magnitude
-							if dist < closestDist and dist < 150 then
-								local dir = (headPos - camera.CFrame.Position).Unit * (dist + 5)
-								local result = workspace:Raycast(camera.CFrame.Position, dir, params)
-								if not result or result.Instance:IsDescendantOf(p.Character) then closestDist = dist; closestHead = headPos end
-							end
-						end
-					end
-					if closestHead then camera.CFrame = camera.CFrame:Lerp(CFrame.new(camera.CFrame.Position, closestHead), 0.35) end
-				end)
-			else
-				camera.CameraType = Enum.CameraType.Custom
-			end
-		end
-
-		-- === NOCLIP SYSTEM ===
-		local noclipActive = false
-		local noclipConn = nil
-		local function toggleNoclip(state)
-			noclipActive = state
-			if noclipConn then noclipConn:Disconnect(); noclipConn = nil end
-			if state then
-				noclipConn = RunService.Stepped:Connect(function()
-					if localPlayer.Character then
-						for _, part in ipairs(localPlayer.Character:GetDescendants()) do if part:IsA("BasePart") then part.CanCollide = false end end
-					end
-				end)
-			else
-				if localPlayer.Character then
-					for _, part in ipairs(localPlayer.Character:GetDescendants()) do if part:IsA("BasePart") then part.CanCollide = true end end
-				end
-			end
-		end
-
-		-- === INFINITE MULTI-JUMP ===
-		local infJumpActive = false
-		local infJumpConn = nil
-		local jumpCount = 0
-		local jumpDebounce = false
-		local function toggleInfJump(state)
-			infJumpActive = state; jumpCount = 0
-			if infJumpConn then infJumpConn:Disconnect(); infJumpConn = nil end
-			if state then
-				infJumpConn = UserInputService.InputBegan:Connect(function(input, gameProcessed)
-					if infJumpActive and (input.KeyCode == Enum.KeyCode.Space or input.UserInputType == Enum.UserInputType.Touch) then
-						if jumpDebounce then return end; jumpDebounce = true
-						task.delay(0.15, function() jumpDebounce = false end)
-						if localPlayer.Character and localPlayer.Character:FindFirstChild("Humanoid") and localPlayer.Character:FindFirstChild("HumanoidRootPart") then
-							local hum = localPlayer.Character.Humanoid; local hrp = localPlayer.Character.HumanoidRootPart
-							if hum:GetState() == Enum.HumanoidStateType.Freefall then jumpCount = jumpCount + 1; hrp.Velocity = Vector3.new(hrp.Velocity.X, math.min(50 + (jumpCount * 12), 180), hrp.Velocity.Z) else jumpCount = 0 end
-						end
-					end
-				end)
-			else jumpDebounce = false end
-		end
-
-		-- === IMMORTAL SYSTEM (God Mode - MAX HEALTH) ===
-		local immortalActive = false
-		local immortalConn = nil
-		local originalMaxHealth = 100
-		local MAX_HEALTH = 9999999999999999999999
-
-		local function toggleImmortal(state)
-			immortalActive = state
-			if immortalConn then immortalConn:Disconnect(); immortalConn = nil end
-			
-			if state then
-				if localPlayer.Character and localPlayer.Character:FindFirstChild("Humanoid") then
-					local hum = localPlayer.Character.Humanoid
-					originalMaxHealth = hum.MaxHealth
-					hum.MaxHealth = MAX_HEALTH
-					hum.Health = hum.MaxHealth
-				end
-				immortalConn = RunService.Heartbeat:Connect(function()
-					if localPlayer.Character and localPlayer.Character:FindFirstChild("Humanoid") then
-						local hum = localPlayer.Character.Humanoid
-						if hum.Health < hum.MaxHealth then hum.Health = hum.MaxHealth end
-						if hum.MaxHealth < MAX_HEALTH then hum.MaxHealth = MAX_HEALTH end
-					end
-				end)
-			else
-				if localPlayer.Character and localPlayer.Character:FindFirstChild("Humanoid") then
-					local hum = localPlayer.Character.Humanoid
-					hum.MaxHealth = originalMaxHealth
-					hum.Health = math.min(hum.Health, originalMaxHealth)
-				end
-			end
-		end
-
-		-- === 🆕 CAMERA VIEW FUNCTIONS (Fixed Auto-Rotation) ===
-		local firstPersonActive = false
-		local thirdPersonActive = false
-		local originalZoomMin = 0.5
-		local originalZoomMax = 20
-		local cameraConn = nil
-
-		local function setFirstPersonView(state)
-			firstPersonActive = state
-			thirdPersonActive = not state
-			
-			if state then
-				-- ตั้งค่ากล้องบุคคลที่ 1 (Fixed Auto-Turn)
-				localPlayer.CameraMinZoomDistance = 0
-				localPlayer.CameraMaxZoomDistance = 0
-				
-				if cameraConn then cameraConn:Disconnect() end
-				
-				-- ล็อกเฉพาะตำแหน่ง (Position) ไว้ที่หัวตัวละคร
-				-- รักษาการหมุน (Rotation) ตามนิ้ว/เมาส์ของผู้ใช้ ไม่ให้หันเอง
-				cameraConn = RunService.RenderStepped:Connect(function()
-					if localPlayer.Character and localPlayer.Character:FindFirstChild("Head") and camera then
-						local head = localPlayer.Character.Head
-						-- ตรึงตำแหน่งกล้องไว้ที่หัว + ใช้ทิศทางการมองปัจจุบันของผู้เล่น
-						camera.CFrame = CFrame.new(head.Position) * camera.CFrame.Rotation
-					end
-				end)
-			else
-				-- คืนค่ากล้องปกติ
-				if cameraConn then cameraConn:Disconnect(); cameraConn = nil end
-				localPlayer.CameraMinZoomDistance = originalZoomMin
-				localPlayer.CameraMaxZoomDistance = originalZoomMax
-				if camera then
-					camera.CameraType = Enum.CameraType.Custom
-					if localPlayer.Character and localPlayer.Character:FindFirstChild("Humanoid") then
-						camera.CameraSubject = localPlayer.Character.Humanoid
-					end
-				end
-			end
-		end
-
-		local function setThirdPersonView(state)
-			thirdPersonActive = state
-			firstPersonActive = not state
-			
-			if state then
-				-- ตั้งค่ากล้องบุคคลที่ 3 (ค่าเริ่มต้นของ Roblox)
-				localPlayer.CameraMinZoomDistance = originalZoomMin
-				localPlayer.CameraMaxZoomDistance = originalZoomMax
-				
-				if cameraConn then cameraConn:Disconnect(); cameraConn = nil end
-				if camera then
-					camera.CameraType = Enum.CameraType.Custom
-					if localPlayer.Character and localPlayer.Character:FindFirstChild("Humanoid") then
-						camera.CameraSubject = localPlayer.Character.Humanoid
-					end
-				end
-			end
-		end
-
-		-- === UI MANAGEMENT ===
-		local function clearContent()
-			for _, child in pairs(contentScroll:GetChildren()) do if child:IsA("GuiObject") then child:Destroy() end end
-		end
-
-		local function createToggleBtn(parent, text, onCol, offCol, callback)
-			local btn = Instance.new("TextButton", parent)
-			btn.Size = UDim2.new(0.95, 0, 0, 45); btn.BackgroundColor3 = offCol; btn.BorderSizePixel = 0
-			btn.Text = text; btn.TextColor3 = Color3.fromRGB(255, 255, 255); btn.TextSize = 16; btn.Font = Enum.Font.GothamBold; btn.Active = true
-			Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
-			local active = false
-			btn.MouseButton1Click:Connect(function()
-				active = not active
-				btn.Text = text:gsub("OFF", ""):gsub("ON", "") .. " " .. (active and "ON" or "OFF")
-				TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = active and onCol or offCol}):Play()
-				callback(active)
-			end)
-			return btn
-		end
-
-		local function createCatBtn(parent, text)
-			local btn = Instance.new("TextButton", parent)
-			btn.Size = UDim2.new(0.9, 0, 0, 38); btn.BackgroundColor3 = Color3.fromRGB(45, 15, 5); btn.BorderSizePixel = 0
-			btn.Text = text; btn.TextColor3 = Color3.fromRGB(200, 200, 200); btn.TextSize = 14; btn.Font = Enum.Font.GothamBold; btn.Active = true
-			Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
-			return btn
-		end
-
-		local btnGen = createCatBtn(catScroll, "ทั่วไป")
-		local btnPlr = createCatBtn(catScroll, " player")
-		local btnCombat = createCatBtn(catScroll, "⚔️ ต่อสู้")
-		local btnJoke = createCatBtn(catScroll, "🤡 แกล้ง")
-		local btnOther = createCatBtn(catScroll, " สคริปต์เกมอื่น")
-
-		local updateDivider = Instance.new("Frame", catScroll)
-		updateDivider.Size = UDim2.new(0.9, 0, 0, 2)
-		updateDivider.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
-		updateDivider.BackgroundTransparency = 0.5
-		updateDivider.BorderSizePixel = 0
-		Instance.new("UICorner", updateDivider).CornerRadius = UDim.new(0, 1)
-
-		local btnUpdate = Instance.new("TextButton", catScroll)
-		btnUpdate.Size = UDim2.new(0.9, 0, 0, 38)
-		btnUpdate.BackgroundColor3 = Color3.fromRGB(30, 10, 3)
-		btnUpdate.BorderSizePixel = 0
-		btnUpdate.Text = "🔄 อัปเดต"
-		btnUpdate.TextColor3 = Color3.fromRGB(255, 200, 100)
-		btnUpdate.TextSize = 14
-		btnUpdate.Font = Enum.Font.GothamBold
-		btnUpdate.Active = true
-		Instance.new("UICorner", btnUpdate).CornerRadius = UDim.new(0, 6)
-
-		-- === 🆕 KEY POPUP GUI FOR +1 SPEED ===
-		local function showSpeedKeyPopup()
-			local keyPopupGui = Instance.new("ScreenGui")
-			keyPopupGui.Name = "Pumpkitz_SpeedKey_Popup"
-			keyPopupGui.ResetOnSpawn = false
-			keyPopupGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-			keyPopupGui.IgnoreGuiInset = true
-			keyPopupGui.DisplayOrder = 1001
-			keyPopupGui.Enabled = true
-			keyPopupGui.Parent = playerGui
-
-			local keyPopupFrame = Instance.new("Frame")
-			keyPopupFrame.Name = "KeyPopupFrame"
-			keyPopupFrame.Size = UDim2.fromOffset(200, 120)
-			keyPopupFrame.Position = UDim2.fromScale(0.5, 0.5)
-			keyPopupFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-			keyPopupFrame.BackgroundColor3 = Color3.fromRGB(20, 8, 2)
-			keyPopupFrame.BorderSizePixel = 0
-			keyPopupFrame.Parent = keyPopupGui
-			Instance.new("UICorner", keyPopupFrame).CornerRadius = UDim.new(0, 10)
-			Instance.new("UIStroke", keyPopupFrame).Color = Color3.fromRGB(255, 140, 0)
-
-			local keyPopupHeader = Instance.new("Frame", keyPopupFrame)
-			keyPopupHeader.Size = UDim2.new(1, 0, 0, 30)
-			keyPopupHeader.BackgroundColor3 = Color3.fromRGB(40, 14, 5)
-			keyPopupHeader.BorderSizePixel = 0
-			keyPopupHeader.Active = true
-			Instance.new("UICorner", keyPopupHeader).CornerRadius = UDim.new(0, 10)
-
-			local keyPopupTitle = Instance.new("TextLabel", keyPopupHeader)
-			keyPopupTitle.Size = UDim2.new(0.8, 0, 1, 0)
-			keyPopupTitle.Position = UDim2.new(0.1, 0, 0, 0)
-			keyPopupTitle.BackgroundTransparency = 1
-			keyPopupTitle.Text = "key(คีย์)"
-			keyPopupTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-			keyPopupTitle.TextSize = 14
-			keyPopupTitle.Font = Enum.Font.GothamBold
-			keyPopupTitle.TextXAlignment = Enum.TextXAlignment.Center
-
-			local keyPopupClose = Instance.new("TextButton", keyPopupHeader)
-			keyPopupClose.Size = UDim2.fromOffset(22, 20)
-			keyPopupClose.Position = UDim2.new(0.92, -15, 0, 5)
-			keyPopupClose.BackgroundColor3 = Color3.fromRGB(220, 100, 20)
-			keyPopupClose.BorderSizePixel = 0
-			keyPopupClose.Text = "X"
-			keyPopupClose.TextColor3 = Color3.fromRGB(255, 255, 255)
-			keyPopupClose.TextSize = 13
-			keyPopupClose.Font = Enum.Font.GothamBold
-			keyPopupClose.Active = true
-			Instance.new("UICorner", keyPopupClose).CornerRadius = UDim.new(0, 4)
-			keyPopupClose.MouseButton1Click:Connect(function() keyPopupGui:Destroy() end)
-
-			local keyContent = Instance.new("TextLabel", keyPopupFrame)
-			keyContent.Size = UDim2.new(0.9, 0, 0, 40)
-			keyContent.Position = UDim2.new(0.05, 0, 0, 40)
-			keyContent.BackgroundTransparency = 1
-			keyContent.Text = "https://pastebin.com/4Mb2gEKV"
-			keyContent.TextColor3 = Color3.fromRGB(255, 200, 100)
-			keyContent.TextSize = 16
-			keyContent.Font = Enum.Font.GothamBold
-			keyContent.TextXAlignment = Enum.TextXAlignment.Center
-
-			local keyCopyBtn = Instance.new("TextButton", keyPopupFrame)
-			keyCopyBtn.Size = UDim2.new(0.8, 0, 0, 30)
-			keyCopyBtn.Position = UDim2.new(0.1, 0, 1, -40)
-			keyCopyBtn.BackgroundColor3 = Color3.fromRGB(230, 120, 20)
-			keyCopyBtn.BorderSizePixel = 0
-			keyCopyBtn.Text = "คัดลอก"
-			keyCopyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-			keyCopyBtn.TextSize = 13
-			keyCopyBtn.Font = Enum.Font.GothamBold
-			keyCopyBtn.Active = true
-			Instance.new("UICorner", keyCopyBtn).CornerRadius = UDim.new(0, 6)
-
-			-- Drag logic for popup
-			local popupDragging, popupDragStart, popupStartPos = false, Vector2.new(), UDim2.new()
-			keyPopupHeader.InputBegan:Connect(function(input)
-				if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-					popupDragging = true; popupDragStart = input.Position; popupStartPos = keyPopupFrame.Position
-					local connMove = UserInputService.InputChanged:Connect(function(inp)
-						if (inp.UserInputType == Enum.UserInputType.MouseMovement or inp.UserInputType == Enum.UserInputType.Touch) and popupDragging then
-							keyPopupFrame.Position = UDim2.new(popupStartPos.X.Scale, popupStartPos.X.Offset + (inp.Position.X - popupDragStart.X), popupStartPos.Y.Scale, popupStartPos.Y.Offset + (inp.Position.Y - popupDragStart.Y))
-						end
-					end)
-					local connEnd = UserInputService.InputEnded:Connect(function(inp)
-						if inp.UserInputType == Enum.UserInputType.MouseButton1 or inp.UserInputType == Enum.UserInputType.Touch then popupDragging = false; connMove:Disconnect(); connEnd:Disconnect() end
-					end)
-				end
-			end)
-		end
-
-		local function loadCategory(name)
-			clearContent()
-			for _, b in ipairs({btnGen, btnPlr, btnCombat, btnJoke, btnOther}) do
-				b.BackgroundColor3 = Color3.fromRGB(45, 15, 5); b.TextColor3 = Color3.fromRGB(200, 200, 200)
-			end
-			btnUpdate.BackgroundColor3 = Color3.fromRGB(30, 10, 3); btnUpdate.TextColor3 = Color3.fromRGB(255, 200, 100)
-			
-			if name == "ทั่วไป" then
-				btnGen.BackgroundColor3 = Color3.fromRGB(65, 20, 6); btnGen.TextColor3 = Color3.fromRGB(255, 180, 80)
-				
-				-- 🆕 NEW: Camera View Buttons
-				local cam1Btn = Instance.new("TextButton", contentScroll)
-				cam1Btn.Size = UDim2.new(0.95, 0, 0, 45)
-				cam1Btn.BackgroundColor3 = Color3.fromRGB(55, 18, 6)
-				cam1Btn.BorderSizePixel = 0
-				cam1Btn.Text = "ปรับกล้องมุมมองบุคคลที่1"
-				cam1Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-				cam1Btn.TextSize = 14
-				cam1Btn.Font = Enum.Font.GothamBold
-				cam1Btn.Active = true
-				Instance.new("UICorner", cam1Btn).CornerRadius = UDim.new(0, 8)
-				cam1Btn.MouseButton1Click:Connect(function()
-					setFirstPersonView(true)
-					cam1Btn.BackgroundColor3 = Color3.fromRGB(230, 120, 20)
-					cam3Btn.BackgroundColor3 = Color3.fromRGB(55, 18, 6)
-				end)
-				
-				local cam3Btn = Instance.new("TextButton", contentScroll)
-				cam3Btn.Size = UDim2.new(0.95, 0, 0, 45)
-				cam3Btn.BackgroundColor3 = Color3.fromRGB(55, 18, 6)
-				cam3Btn.BorderSizePixel = 0
-				cam3Btn.Text = "ปรับกล้องมุมมองบุคคลที่3"
-				cam3Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-				cam3Btn.TextSize = 14
-				cam3Btn.Font = Enum.Font.GothamBold
-				cam3Btn.Active = true
-				Instance.new("UICorner", cam3Btn).CornerRadius = UDim.new(0, 8)
-				cam3Btn.MouseButton1Click:Connect(function()
-					setThirdPersonView(true)
-					cam3Btn.BackgroundColor3 = Color3.fromRGB(230, 120, 20)
-					cam1Btn.BackgroundColor3 = Color3.fromRGB(55, 18, 6)
-				end)
-				
-				local lbl = Instance.new("TextLabel", contentScroll)
-				lbl.Size = UDim2.new(0.9, 0, 0, 60); lbl.BackgroundTransparency = 1
-				lbl.Text = "หมวดหมู่ทั่วไป\n(กำลังพัฒนา)"
-				lbl.TextColor3 = Color3.fromRGB(180, 180, 180); lbl.TextSize = 15; lbl.Font = Enum.Font.GothamSemibold; lbl.TextXAlignment = Enum.TextXAlignment.Center
-				
-			elseif name == "👤 player" then
-				btnPlr.BackgroundColor3 = Color3.fromRGB(65, 20, 6); btnPlr.TextColor3 = Color3.fromRGB(255, 180, 80)
-				createToggleBtn(contentScroll, "ESP 🟠 ", Color3.fromRGB(230, 120, 20), Color3.fromRGB(55, 18, 6), toggleESP)
-				
-				local speedRow = Instance.new("Frame", contentScroll); speedRow.Size = UDim2.new(0.95, 0, 0, 42); speedRow.BackgroundTransparency = 1
-				local sL = Instance.new("UIListLayout", speedRow); sL.FillDirection = Enum.FillDirection.Horizontal; sL.HorizontalAlignment = Enum.HorizontalAlignment.Center; sL.VerticalAlignment = Enum.VerticalAlignment.Center; sL.Padding = UDim.new(0, 8)
-				local speedBox = Instance.new("TextBox", speedRow); speedBox.Size = UDim2.new(0.6, 0, 1, 0); speedBox.BackgroundColor3 = Color3.fromRGB(35, 12, 4); speedBox.BorderSizePixel = 0; speedBox.Text = "16"; speedBox.TextColor3 = Color3.fromRGB(255, 255, 255); speedBox.TextSize = 14; speedBox.Font = Enum.Font.GothamBold; speedBox.PlaceholderText = "WalkSpeed"; speedBox.ClearTextOnFocus = false; speedBox.Active = true; Instance.new("UICorner", speedBox).CornerRadius = UDim.new(0, 6)
-				speedBox:GetPropertyChangedSignal("Text"):Connect(function() local c = string.gsub(speedBox.Text, "%D", ""); if speedBox.Text ~= c then local p = speedBox.CursorPosition; speedBox.Text = c; speedBox.CursorPosition = math.min(p, #c + 1) end end)
-				local speedBtn = Instance.new("TextButton", speedRow); speedBtn.Size = UDim2.new(0.35, 0, 1, 0); speedBtn.BackgroundColor3 = Color3.fromRGB(200, 90, 15); speedBtn.BorderSizePixel = 0; speedBtn.Text = "ตกลง"; speedBtn.TextColor3 = Color3.fromRGB(255, 255, 255); speedBtn.TextSize = 14; speedBtn.Font = Enum.Font.GothamBold; speedBtn.Active = true; Instance.new("UICorner", speedBtn).CornerRadius = UDim.new(0, 6)
-				speedBtn.MouseButton1Click:Connect(function() local v = tonumber(speedBox.Text); if v and v > 0 and localPlayer.Character and localPlayer.Character:FindFirstChild("Humanoid") then localPlayer.Character.Humanoid.WalkSpeed = v; speedBtn.Text = "✅ สำเร็จ"; task.delay(1, function() if speedBtn then speedBtn.Text = "ตกลง" end end) else speedBtn.Text = "❌ ผิดพลาด"; task.delay(1, function() if speedBtn then speedBtn.Text = "ตกลง" end end) end end)
-
-				local jumpRow = Instance.new("Frame", contentScroll); jumpRow.Size = UDim2.new(0.95, 0, 0, 42); jumpRow.BackgroundTransparency = 1
-				local jL = Instance.new("UIListLayout", jumpRow); jL.FillDirection = Enum.FillDirection.Horizontal; jL.HorizontalAlignment = Enum.HorizontalAlignment.Center; jL.VerticalAlignment = Enum.VerticalAlignment.Center; jL.Padding = UDim.new(0, 8)
-				local jumpBox = Instance.new("TextBox", jumpRow); jumpBox.Size = UDim2.new(0.6, 0, 1, 0); jumpBox.BackgroundColor3 = Color3.fromRGB(35, 12, 4); jumpBox.BorderSizePixel = 0; jumpBox.Text = "50"; jumpBox.TextColor3 = Color3.fromRGB(255, 255, 255); jumpBox.TextSize = 14; jumpBox.Font = Enum.Font.GothamBold; jumpBox.PlaceholderText = "JumpPower"; jumpBox.ClearTextOnFocus = false; jumpBox.Active = true; Instance.new("UICorner", jumpBox).CornerRadius = UDim.new(0, 6)
-				jumpBox:GetPropertyChangedSignal("Text"):Connect(function() local c = string.gsub(jumpBox.Text, "%D", ""); if jumpBox.Text ~= c then local p = jumpBox.CursorPosition; jumpBox.Text = c; jumpBox.CursorPosition = math.min(p, #c + 1) end end)
-				local jumpBtn = Instance.new("TextButton", jumpRow); jumpBtn.Size = UDim2.new(0.35, 0, 1, 0); jumpBtn.BackgroundColor3 = Color3.fromRGB(200, 90, 15); jumpBtn.BorderSizePixel = 0; jumpBtn.Text = "ตกลง"; jumpBtn.TextColor3 = Color3.fromRGB(255, 255, 255); jumpBtn.TextSize = 14; jumpBtn.Font = Enum.Font.GothamBold; jumpBtn.Active = true; Instance.new("UICorner", jumpBtn).CornerRadius = UDim.new(0, 6)
-				jumpBtn.MouseButton1Click:Connect(function() local v = tonumber(jumpBox.Text); if v and v > 0 and localPlayer.Character and localPlayer.Character:FindFirstChild("Humanoid") then local h = localPlayer.Character.Humanoid; h.UseJumpPower = true; h.JumpPower = v; jumpBtn.Text = "✅ สำเร็จ"; task.delay(1, function() if jumpBtn then jumpBtn.Text = "ตกลง" end end) else jumpBtn.Text = "❌ ผิดพลาด"; task.delay(1, function() if jumpBtn then jumpBtn.Text = "ตกลง" end end) end end)
-
-				createToggleBtn(contentScroll, "Noclip 🚶♂️", Color3.fromRGB(230, 120, 20), Color3.fromRGB(55, 18, 6), toggleNoclip)
-				createToggleBtn(contentScroll, "กระโดดไม่จำกัด 🔄", Color3.fromRGB(230, 120, 20), Color3.fromRGB(55, 18, 6), toggleInfJump)
-				createToggleBtn(contentScroll, "อมตะ ", Color3.fromRGB(230, 120, 20), Color3.fromRGB(55, 18, 6), toggleImmortal)
-				
-				local invisibleBtn = Instance.new("TextButton", contentScroll)
-				invisibleBtn.Size = UDim2.new(0.95, 0, 0, 45)
-				invisibleBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6)
-				invisibleBtn.BorderSizePixel = 0
-				invisibleBtn.Text = "ล่องหน"
-				invisibleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-				invisibleBtn.TextSize = 15
-				invisibleBtn.Font = Enum.Font.GothamBold
-				invisibleBtn.Active = true
-				Instance.new("UICorner", invisibleBtn).CornerRadius = UDim.new(0, 8)
-				invisibleBtn.MouseButton1Click:Connect(function()
-					invisibleBtn.Text = "⏳ กำลังโหลด..."
-					invisibleBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-					task.spawn(function()
-						pcall(function()
-							loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Invisible-GUI-128871"))()
-						end)
-						task.wait(1.5)
-						if invisibleBtn and invisibleBtn.Parent then
-							invisibleBtn.Text = "ล่องหน"
-							invisibleBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6)
-						end
-					end)
-				end)
-				
-				local flyBtn = Instance.new("TextButton", contentScroll)
-				flyBtn.Size = UDim2.new(0.95, 0, 0, 45); flyBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6); flyBtn.BorderSizePixel = 0
-				flyBtn.Text = "Fly (บิน)"; flyBtn.TextColor3 = Color3.fromRGB(255, 255, 255); flyBtn.TextSize = 15; flyBtn.Font = Enum.Font.GothamBold; flyBtn.Active = true
-				Instance.new("UICorner", flyBtn).CornerRadius = UDim.new(0, 8)
-				flyBtn.MouseButton1Click:Connect(function()
-					flyBtn.Text = " กำลังโหลด..."; flyBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-					task.spawn(function() pcall(function() loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-universal-fly-111281"))() end); task.wait(1.5); if flyBtn and flyBtn.Parent then flyBtn.Text = "Fly (บิน)"; flyBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6) end end)
-				end)
-				
-				local tpBtn = Instance.new("TextButton", contentScroll); tpBtn.Size = UDim2.new(0.95, 0, 0, 45); tpBtn.BackgroundColor3 = Color3.fromRGB(45, 15, 5); tpBtn.BorderSizePixel = 0; tpBtn.Text = "📍 เปิดหน้าต่าง Teleport"; tpBtn.TextColor3 = Color3.fromRGB(255, 255, 255); tpBtn.TextSize = 16; tpBtn.Font = Enum.Font.GothamBold; tpBtn.Active = true; Instance.new("UICorner", tpBtn).CornerRadius = UDim.new(0, 8); tpBtn.MouseButton1Click:Connect(openTPGui)
-				
-			elseif name == "⚔️ ต่อสู้" then
-				btnCombat.BackgroundColor3 = Color3.fromRGB(65, 20, 6); btnCombat.TextColor3 = Color3.fromRGB(255, 180, 80)
-				createToggleBtn(contentScroll, "แสดง Hitbox 👁️", Color3.fromRGB(230, 120, 20), Color3.fromRGB(55, 18, 6), toggleShowHitbox)
-				createToggleBtn(contentScroll, "ล็อกหัวใกล้สุด (LOS)", Color3.fromRGB(230, 120, 20), Color3.fromRGB(55, 18, 6), toggleAimlock)
-				
-				local hitboxExpBtn = Instance.new("TextButton", contentScroll)
-				hitboxExpBtn.Size = UDim2.new(0.95, 0, 0, 45); hitboxExpBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6); hitboxExpBtn.BorderSizePixel = 0
-				hitboxExpBtn.Text = "ขยายhitbox"; hitboxExpBtn.TextColor3 = Color3.fromRGB(255, 255, 255); hitboxExpBtn.TextSize = 15; hitboxExpBtn.Font = Enum.Font.GothamBold; hitboxExpBtn.Active = true
-				Instance.new("UICorner", hitboxExpBtn).CornerRadius = UDim.new(0, 8)
-				hitboxExpBtn.MouseButton1Click:Connect(function()
-					hitboxExpBtn.Text = "⏳ กำลังโหลด..."; hitboxExpBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-					task.spawn(function() pcall(function() loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Hitbox-Expander-224681"))() end); task.wait(1.5); if hitboxExpBtn and hitboxExpBtn.Parent then hitboxExpBtn.Text = "ขยายhitbox"; hitboxExpBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6) end end)
-				end)
-				
-				local killAuraBtn = Instance.new("TextButton", contentScroll)
-				killAuraBtn.Size = UDim2.new(0.95, 0, 0, 45); killAuraBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6); killAuraBtn.BorderSizePixel = 0
-				killAuraBtn.Text = "คิล ออร่า"; killAuraBtn.TextColor3 = Color3.fromRGB(255, 255, 255); killAuraBtn.TextSize = 15; killAuraBtn.Font = Enum.Font.GothamBold; killAuraBtn.Active = true
-				Instance.new("UICorner", killAuraBtn).CornerRadius = UDim.new(0, 8)
-				killAuraBtn.MouseButton1Click:Connect(function()
-					killAuraBtn.Text = "⏳ กำลังโหลด..."; killAuraBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-					task.spawn(function() pcall(function() loadstring(game:HttpGet('https://raw.githubusercontent.com/amdzy088/Kill-aura-slect-universal/refs/heads/main/Kill%20aura%20select%20universal'))() end); task.wait(1.5); if killAuraBtn and killAuraBtn.Parent then killAuraBtn.Text = "คิล ออร่า"; killAuraBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6) end end)
-				end)
-				
-			elseif name == "🤡 แกล้ง" then
-				btnJoke.BackgroundColor3 = Color3.fromRGB(65, 20, 6); btnJoke.TextColor3 = Color3.fromRGB(255, 180, 80)
-				
-				local flingBtn = Instance.new("TextButton", contentScroll)
-				flingBtn.Size = UDim2.new(0.95, 0, 0, 45); flingBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6); flingBtn.BorderSizePixel = 0
-				flingBtn.Text = "🚀 เปิด Fling GUI (ภายนอก)"; flingBtn.TextColor3 = Color3.fromRGB(255, 255, 255); flingBtn.TextSize = 15; flingBtn.Font = Enum.Font.GothamBold; flingBtn.Active = true
-				Instance.new("UICorner", flingBtn).CornerRadius = UDim.new(0, 8)
-				flingBtn.MouseButton1Click:Connect(function()
-					flingBtn.Text = "⏳ กำลังโหลด..."; flingBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-					task.spawn(function() pcall(function() loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Ultimate-fling-gui-228952"))() end); task.wait(1.5); if flingBtn and flingBtn.Parent then flingBtn.Text = " เปิด Fling GUI (ภายนอก)"; flingBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6) end end)
-				end)
-				
-				local unanchorBtn = Instance.new("TextButton", contentScroll)
-				unanchorBtn.Size = UDim2.new(0.95, 0, 0, 45); unanchorBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6); unanchorBtn.BorderSizePixel = 0
-				unanchorBtn.Text = "ดึงพาร์ทที่ไม่ Anchor"; unanchorBtn.TextColor3 = Color3.fromRGB(255, 255, 255); unanchorBtn.TextSize = 15; unanchorBtn.Font = Enum.Font.GothamBold; unanchorBtn.Active = true
-				Instance.new("UICorner", unanchorBtn).CornerRadius = UDim.new(0, 8)
-				unanchorBtn.MouseButton1Click:Connect(function()
-					unanchorBtn.Text = " กำลังโหลด..."; unanchorBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-					task.spawn(function() pcall(function() loadstring(game:HttpGet("https://rawscripts.net/raw/Natural-Disaster-Survival-Super-ring-V4-24296"))() end); task.wait(1.5); if unanchorBtn and unanchorBtn.Parent then unanchorBtn.Text = "ดึงพาร์ทที่ไม่ Anchor"; unanchorBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6) end end)
-				end)
-				
-				local note = Instance.new("TextLabel", contentScroll); note.Size = UDim2.new(0.95, 0, 0, 40); note.BackgroundTransparency = 1
-				note.Text = "⚠️ ใช้ในเกมที่เกี่ยวข้องเท่านั้น:\n• Natural Disaster Survival\n• เกมที่มีพาร์ทไม่ Anchor\nหากกดแล้วไม่เกิดอะไรขึ้น อาจเป็นเพราะ:\n• ไม่ใช่เกมที่เหมาะสม\n• สคริปต์อัปเดตหรือล่ม"
-				note.TextColor3 = Color3.fromRGB(150, 150, 150); note.TextSize = 11; note.Font = Enum.Font.GothamSemibold
-				note.TextXAlignment = Enum.TextXAlignment.Left; note.TextWrapped = true
-				
-			elseif name == "🌐 สคริปต์เกมอื่น" then
-				btnOther.BackgroundColor3 = Color3.fromRGB(65, 20, 6); btnOther.TextColor3 = Color3.fromRGB(255, 180, 80)
-				
-				local catchTameBtn = Instance.new("TextButton", contentScroll)
-				catchTameBtn.Size = UDim2.new(0.95, 0, 0, 45)
-				catchTameBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6)
-				catchTameBtn.BorderSizePixel = 0
-				catchTameBtn.Text = "Catch and Tame"
-				catchTameBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-				catchTameBtn.TextSize = 14
-				catchTameBtn.Font = Enum.Font.GothamBold
-				catchTameBtn.Active = true
-				Instance.new("UICorner", catchTameBtn).CornerRadius = UDim.new(0, 8)
-				catchTameBtn.MouseButton1Click:Connect(function()
-					catchTameBtn.Text = " กำลังโหลด..."
-					catchTameBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-					task.spawn(function()
-						pcall(function()
-							loadstring(game:HttpGet("https://script.vinzhub.com/loader"))()
-						end)
-						task.wait(1.5)
-						if catchTameBtn and catchTameBtn.Parent then
-							catchTameBtn.Text = "Catch and Tame"
-							catchTameBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6)
-						end
-					end)
-				end)
-				
-				local speedEscBtn = Instance.new("TextButton", contentScroll)
-				speedEscBtn.Size = UDim2.new(0.95, 0, 0, 45)
-				speedEscBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6)
-				speedEscBtn.BorderSizePixel = 0
-				speedEscBtn.Text = "+1 speed keyboard escape"
-				speedEscBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-				speedEscBtn.TextSize = 14
-				speedEscBtn.Font = Enum.Font.GothamBold
-				speedEscBtn.Active = true
-				Instance.new("UICorner", speedEscBtn).CornerRadius = UDim.new(0, 8)
-				speedEscBtn.MouseButton1Click:Connect(function()
-					speedEscBtn.Text = "⏳ กำลังโหลด..."
-					speedEscBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-					task.spawn(function()
-						showSpeedKeyPopup()
-						pcall(function()
-							loadstring(game:HttpGet("https://raw.githubusercontent.com/lastxvc/-1-speed-keyboard/refs/heads/main/script"))()
-						end)
-						task.wait(1.5)
-						if speedEscBtn and speedEscBtn.Parent then
-							speedEscBtn.Text = "+1 speed keyboard escape"
-							speedEscBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6)
-						end
-					end)
-				end)
-				
-				local mm2Btn = Instance.new("TextButton", contentScroll); mm2Btn.Size = UDim2.new(0.95, 0, 0, 45); mm2Btn.BackgroundColor3 = Color3.fromRGB(55, 18, 6); mm2Btn.BorderSizePixel = 0
-				mm2Btn.Text = "MM2"; mm2Btn.TextColor3 = Color3.fromRGB(255, 255, 255); mm2Btn.TextSize = 15; mm2Btn.Font = Enum.Font.GothamBold; mm2Btn.Active = true; Instance.new("UICorner", mm2Btn).CornerRadius = UDim.new(0, 8)
-				mm2Btn.MouseButton1Click:Connect(function() mm2Btn.Text = "⏳ กำลังโหลด..."; mm2Btn.BackgroundColor3 = Color3.fromRGB(100, 100, 100); task.spawn(function() pcall(function() loadstring(game:HttpGet('https://raw.githubusercontent.com/M4VOWJ8IAKSR5WFRCCJ7AW5IW/ScrFr/refs/heads/main/MM2'))() end); task.wait(1.5); if mm2Btn and mm2Btn.Parent then mm2Btn.Text = "MM2"; mm2Btn.BackgroundColor3 = Color3.fromRGB(55, 18, 6) end end) end)
-				
-				local zombieBtn = Instance.new("TextButton", contentScroll); zombieBtn.Size = UDim2.new(0.95, 0, 0, 45); zombieBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6); zombieBtn.BorderSizePixel = 0
-				zombieBtn.Text = "Survive zombie arena"; zombieBtn.TextColor3 = Color3.fromRGB(255, 255, 255); zombieBtn.TextSize = 15; zombieBtn.Font = Enum.Font.GothamBold; zombieBtn.Active = true; Instance.new("UICorner", zombieBtn).CornerRadius = UDim.new(0, 8)
-				zombieBtn.MouseButton1Click:Connect(function() zombieBtn.Text = "⏳ กำลังโหลด..."; zombieBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100); task.spawn(function() pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/VoidDeveloper67/Void-Hub/refs/heads/main/VoidHub.lua", true))() end); task.wait(1.5); if zombieBtn and zombieBtn.Parent then zombieBtn.Text = "Survive zombie arena"; zombieBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6) end end) end)
-				
-				local bfBtn = Instance.new("TextButton", contentScroll); bfBtn.Size = UDim2.new(0.95, 0, 0, 45); bfBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6); bfBtn.BorderSizePixel = 0
-				bfBtn.Text = "BloxFruits"; bfBtn.TextColor3 = Color3.fromRGB(255, 255, 255); bfBtn.TextSize = 15; bfBtn.Font = Enum.Font.GothamBold; bfBtn.Active = true; Instance.new("UICorner", bfBtn).CornerRadius = UDim.new(0, 8)
-				bfBtn.MouseButton1Click:Connect(function() bfBtn.Text = "⏳ กำลังโหลด..."; bfBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100); task.spawn(function() pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/flazhy/QuantumOnyx/refs/heads/main/QuantumOnyx.lua"))() end); task.wait(1.5); if bfBtn and bfBtn.Parent then bfBtn.Text = "BloxFruits"; bfBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6) end end) end)
-				
-				local nightsBtn = Instance.new("TextButton", contentScroll); nightsBtn.Size = UDim2.new(0.95, 0, 0, 45); nightsBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6); nightsBtn.BorderSizePixel = 0
-				nightsBtn.Text = "99 nights"; nightsBtn.TextColor3 = Color3.fromRGB(255, 255, 255); nightsBtn.TextSize = 15; nightsBtn.Font = Enum.Font.GothamBold; nightsBtn.Active = true; Instance.new("UICorner", nightsBtn).CornerRadius = UDim.new(0, 8)
-				nightsBtn.MouseButton1Click:Connect(function() nightsBtn.Text = "⏳ กำลังโหลด..."; nightsBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100); task.spawn(function() pcall(function() loadstring(game:HttpGet("https://foxname.top/loader"))() end); task.wait(1.5); if nightsBtn and nightsBtn.Parent then nightsBtn.Text = "99 nights"; nightsBtn.BackgroundColor3 = Color3.fromRGB(55, 18, 6) end end) end)
-				
-				local note = Instance.new("TextLabel", contentScroll); note.Size = UDim2.new(0.95, 0, 0, 65); note.BackgroundTransparency = 1
-				note.Text = "⚠️ ใช้ในเกมที่เกี่ยวข้องเท่านั้น:\n• Catch and Tame (Vinzhub Loader)\n• 99 Nights (FoxLoader)\n• BloxFruits (QuantumOnyx)\n• MM2 / Survive Zombie Arena\nหากกดแล้วไม่เกิดอะไรขึ้น อาจเป็นเพราะ:\n• ไม่ใช่เกมที่เหมาะสม\n• สคริปต์อัปเดตหรือล่ม"
-				note.TextColor3 = Color3.fromRGB(150, 150, 150); note.TextSize = 11; note.Font = Enum.Font.GothamSemibold
-				note.TextXAlignment = Enum.TextXAlignment.Left; note.TextWrapped = true
-				
-			elseif name == "update" then
-				btnUpdate.BackgroundColor3 = Color3.fromRGB(50, 15, 5); btnUpdate.TextColor3 = Color3.fromRGB(255, 220, 150)
-				
-				local updateFrame = Instance.new("Frame", contentScroll)
-				updateFrame.Size = UDim2.new(0.95, 0, 0, 240)
-				updateFrame.BackgroundColor3 = Color3.fromRGB(30, 10, 3)
-				updateFrame.BorderSizePixel = 0
-				Instance.new("UICorner", updateFrame).CornerRadius = UDim.new(0, 8)
-				
-				local updateTitle = Instance.new("TextLabel", updateFrame)
-				updateTitle.Size = UDim2.new(1, 0, 0, 30)
-				updateTitle.Position = UDim2.new(0, 0, 0, 10)
-				updateTitle.BackgroundTransparency = 1
-				updateTitle.Text = "📋 รายการอัปเดต"
-				updateTitle.TextColor3 = Color3.fromRGB(255, 200, 100)
-				updateTitle.TextSize = 16
-				updateTitle.Font = Enum.Font.GothamBold
-				updateTitle.TextXAlignment = Enum.TextXAlignment.Center
-				
-				local versionLbl = Instance.new("TextLabel", updateFrame)
-				versionLbl.Size = UDim2.new(1, 0, 0, 25)
-				versionLbl.Position = UDim2.new(0, 0, 0, 45)
-				versionLbl.BackgroundTransparency = 1
-				versionLbl.Text = "เวอร์ชัน: V1.0.4"
-				versionLbl.TextColor3 = Color3.fromRGB(255, 255, 255)
-				versionLbl.TextSize = 14
-				versionLbl.Font = Enum.Font.GothamSemibold
-				versionLbl.TextXAlignment = Enum.TextXAlignment.Left
-				
-				local dateLbl = Instance.new("TextLabel", updateFrame)
-				dateLbl.Size = UDim2.new(1, 0, 0, 25)
-				dateLbl.Position = UDim2.new(0, 0, 0, 70)
-				dateLbl.BackgroundTransparency = 1
-				dateLbl.Text = "วันที่อัปเดต: 31 พฤษภาคม 2026"
-				dateLbl.TextColor3 = Color3.fromRGB(200, 200, 200)
-				dateLbl.TextSize = 13
-				dateLbl.Font = Enum.Font.Gotham
-				dateLbl.TextXAlignment = Enum.TextXAlignment.Left
-				
-				local changelogLbl = Instance.new("TextLabel", updateFrame)
-				changelogLbl.Size = UDim2.new(1, -20, 0, 115)
-				changelogLbl.Position = UDim2.new(0, 10, 0, 100)
-				changelogLbl.BackgroundTransparency = 1
-				changelogLbl.Text = "✨ สิ่งใหม่ใน V1.0.4:\n• แก้ไขปัญหากล้องบุคคลที่1หันเอง:\n  → เปลี่ยนระบบล็อกกล้อง: ตรึงเฉพาะตำแหน่ง(Position)ไว้ที่หัว\n  → รักษาการหมุน(Rotation)ตามการควบคุมของผู้เล่น 100%\n  → ตัดการติดตามทิศทางหัวตัวละครที่ gâyอาการหันเอง\n• ปรับปรุงความเสถียรและลดการใช้ทรัพยากร"
-				changelogLbl.TextColor3 = Color3.fromRGB(180, 180, 180)
-				changelogLbl.TextSize = 12
-				changelogLbl.Font = Enum.Font.Gotham
-				changelogLbl.TextXAlignment = Enum.TextXAlignment.Left
-				changelogLbl.TextYAlignment = Enum.TextYAlignment.Top
-				changelogLbl.TextWrapped = true
-				
-				local creditsLbl = Instance.new("TextLabel", updateFrame)
-				creditsLbl.Size = UDim2.new(1, 0, 0, 25)
-				creditsLbl.Position = UDim2.new(0, 0, 1, -35)
-				creditsLbl.BackgroundTransparency = 1
-				creditsLbl.Text = "👤 สร้างโดย: Winning"
-				creditsLbl.TextColor3 = Color3.fromRGB(255, 180, 80)
-				creditsLbl.TextSize = 14
-				creditsLbl.Font = Enum.Font.GothamBold
-				creditsLbl.TextXAlignment = Enum.TextXAlignment.Center
-			end
-		end
-
-		btnGen.MouseButton1Click:Connect(function() loadCategory("ทั่วไป") end)
-		btnPlr.MouseButton1Click:Connect(function() loadCategory("👤 player") end)
-		btnCombat.MouseButton1Click:Connect(function() loadCategory("⚔️ ต่อสู้") end)
-		btnJoke.MouseButton1Click:Connect(function() loadCategory("🤡 แกล้ง") end)
-		btnOther.MouseButton1Click:Connect(function() loadCategory("🌐 สคริปต์เกมอื่น") end)
-		btnUpdate.MouseButton1Click:Connect(function() loadCategory("update") end)
-		loadCategory("ทั่วไป")
-
-		-- === DRAG LOGIC ===
-		local dragging, dragStart, startPos = false, Vector2.new(), UDim2.new()
-		header.InputBegan:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-				dragging = true; dragStart = input.Position; startPos = mainFrame.Position
-				local connMove = UserInputService.InputChanged:Connect(function(inp)
-					if (inp.UserInputType == Enum.UserInputType.MouseMovement or inp.UserInputType == Enum.UserInputType.Touch) and dragging then
-						mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + (inp.Position.X - dragStart.X), startPos.Y.Scale, startPos.Y.Offset + (inp.Position.Y - dragStart.Y))
-					end
-				end)
-				local connEnd = UserInputService.InputEnded:Connect(function(inp)
-					if inp.UserInputType == Enum.UserInputType.MouseButton1 or inp.UserInputType == Enum.UserInputType.Touch then dragging = false; connMove:Disconnect(); connEnd:Disconnect() end
-				end)
-			end
-		end)
-
-		local tpDragging, tpDragStart, tpStartPos = false, Vector2.new(), UDim2.new()
-		tpHeader.InputBegan:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-				tpDragging = true; tpDragStart = input.Position; tpStartPos = tpMainFrame.Position
-				local connMove = UserInputService.InputChanged:Connect(function(inp)
-					if (inp.UserInputType == Enum.UserInputType.MouseMovement or inp.UserInputType == Enum.UserInputType.Touch) and tpDragging then
-						tpMainFrame.Position = UDim2.new(tpStartPos.X.Scale, tpStartPos.X.Offset + (inp.Position.X - tpDragStart.X), tpStartPos.Y.Scale, tpStartPos.Y.Offset + (inp.Position.Y - tpDragStart.Y))
-					end
-				end)
-				local connEnd = UserInputService.InputEnded:Connect(function(inp)
-					if inp.UserInputType == Enum.UserInputType.MouseButton1 or inp.UserInputType == Enum.UserInputType.Touch then tpDragging = false; connMove:Disconnect(); connEnd:Disconnect() end
-				end)
-			end
-		end)
-
-		-- === 🆕 FIXED HEADER SMOOTH SLIDE + FADE OUT ===
-		local isMin = false
-		local slideTweenInfo = TweenInfo.new(0.35, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
-
-		minBtn.MouseButton1Click:Connect(function()
-			isMin = not isMin
-			splitContainer.Visible = true -- ต้องเปิดไว้เพื่อให้ Tween ทำงาน
-
-			if isMin then
-				-- ย่อ: เนื้อหาเลื่อนขึ้นไปซ่อนเหนือ Header + Fade Out พื้นหลัง
-				TweenService:Create(splitContainer, slideTweenInfo, {
-					Position = UDim2.new(0, 0, 0, -220)
-				}):Play()
-				
-				-- Fade out พื้นหลังหลัก, เงา, และขอบ
-				TweenService:Create(mainFrame, slideTweenInfo, {BackgroundTransparency = 1}):Play()
-				TweenService:Create(shadow, slideTweenInfo, {BackgroundTransparency = 1}):Play()
-				TweenService:Create(mainStroke, slideTweenInfo, {Transparency = 1}):Play()
-			else
-				-- ขยาย: เนื้อหาเลื่อนลงมาจาก Header + Fade In พื้นหลัง
-				TweenService:Create(splitContainer, slideTweenInfo, {
-					Position = UDim2.new(0, 0, 0, 40)
-				}):Play()
-				
-				-- Fade in พื้นหลังหลัก, เงา, และขอบ
-				TweenService:Create(mainFrame, slideTweenInfo, {BackgroundTransparency = 0}):Play()
-				TweenService:Create(shadow, slideTweenInfo, {BackgroundTransparency = 0.65}):Play()
-				TweenService:Create(mainStroke, slideTweenInfo, {Transparency = 0}):Play()
-			end
-		end)
-
-		closeBtn.MouseButton1Click:Connect(function()
-			toggleESP(false); toggleShowHitbox(false); toggleAimlock(false); toggleNoclip(false); toggleInfJump(false); toggleImmortal(false)
-			screenGui:Destroy(); tpScreenGui:Destroy()
-		end)
-		screenGui:GetPropertyChangedSignal("Parent"):Connect(function()
-			if not screenGui.Parent then toggleESP(false); toggleShowHitbox(false); toggleAimlock(false); toggleNoclip(false); toggleInfJump(false); toggleImmortal(false) end
-		end)
-
-		print("[Pumpkitz Hub 🎃 V1.0.4] โหลดสำเร็จ | Key System + Max Immortal | Delta Optimized")
-	end
-
-	-- === KEY SYSTEM FUNCTION ===
-	local function showKeySystem()
-		if not playerGui or not playerGui.Parent then return end
-
-		local keyGui = Instance.new("ScreenGui")
-		keyGui.Name = "Pumpkitz_KeySystem"
-		keyGui.ResetOnSpawn = false
-		keyGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-		keyGui.IgnoreGuiInset = true
-		keyGui.DisplayOrder = 9999
-		keyGui.Enabled = true
-		keyGui.Parent = playerGui
-
-		local keyFrame = Instance.new("Frame", keyGui)
-		keyFrame.Name = "KeyFrame"
-		keyFrame.Size = UDim2.fromOffset(280, 220)
-		keyFrame.Position = UDim2.fromScale(0.5, 0.5)
-		keyFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-		keyFrame.BackgroundColor3 = Color3.fromRGB(20, 8, 2)
-		keyFrame.BorderSizePixel = 0
-		Instance.new("UICorner", keyFrame).CornerRadius = UDim.new(0, 12)
-		Instance.new("UIStroke", keyFrame).Color = Color3.fromRGB(255, 140, 0)
-
-		local title = Instance.new("TextLabel", keyFrame)
-		title.Size = UDim2.new(1, 0, 0, 40)
-		title.Position = UDim2.new(0, 0, 0, 20)
-		title.BackgroundTransparency = 1
-		title.Text = "🔑 ใส่คีย์เพื่อปลดล็อก"
-		title.TextColor3 = Color3.fromRGB(255, 255, 255)
-		title.TextSize = 18
-		title.Font = Enum.Font.GothamBold
-		title.TextXAlignment = Enum.TextXAlignment.Center
-
-		local keyBox = Instance.new("TextBox", keyFrame)
-		keyBox.Size = UDim2.new(0.85, 0, 0, 40)
-		keyBox.Position = UDim2.new(0.075, 0, 0, 70)
-		keyBox.BackgroundColor3 = Color3.fromRGB(35, 12, 4)
-		keyBox.BorderSizePixel = 0
-		keyBox.Text = ""
-		keyBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-		keyBox.TextSize = 16
-		keyBox.Font = Enum.Font.GothamBold
-		keyBox.PlaceholderText = "กรอกคีย์ที่นี่..."
-		keyBox.ClearTextOnFocus = true
-		keyBox.Active = true
-		Instance.new("UICorner", keyBox).CornerRadius = UDim.new(0, 8)
-
-		local submitBtn = Instance.new("TextButton", keyFrame)
-		submitBtn.Size = UDim2.new(0.85, 0, 0, 40)
-		submitBtn.Position = UDim2.new(0.075, 0, 0, 125)
-		submitBtn.BackgroundColor3 = Color3.fromRGB(230, 120, 20)
-		submitBtn.BorderSizePixel = 0
-		submitBtn.Text = "ยืนยัน"
-		submitBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-		submitBtn.TextSize = 16
-		submitBtn.Font = Enum.Font.GothamBold
-		submitBtn.Active = true
-		Instance.new("UICorner", submitBtn).CornerRadius = UDim.new(0, 8)
-
-		local statusLbl = Instance.new("TextLabel", keyFrame)
-		statusLbl.Size = UDim2.new(1, 0, 0, 25)
-		statusLbl.Position = UDim2.new(0, 0, 1, -35)
-		statusLbl.BackgroundTransparency = 1
-		statusLbl.Text = ""
-		statusLbl.TextColor3 = Color3.fromRGB(255, 80, 80)
-		statusLbl.TextSize = 13
-		statusLbl.Font = Enum.Font.GothamSemibold
-		statusLbl.TextXAlignment = Enum.TextXAlignment.Center
-
-		local function verifyKey()
-			local input = keyBox.Text:gsub("^%s*(.-)%s*$", "%1")
-			-- 🔑 คีย์: ข้าวมันไก่
-			if input == "ข้าวมันไก่" then
-				statusLbl.Text = "✅ คีย์ถูกต้อง! กำลังเข้าระบบ..."
-				statusLbl.TextColor3 = Color3.fromRGB(50, 200, 50)
-				task.wait(0.8)
-				keyGui:Destroy()
-				loadMainGUI()
-			else
-				statusLbl.Text = "❌ คีย์ไม่ถูกต้อง กรุณาลองใหม่"
-				statusLbl.TextColor3 = Color3.fromRGB(255, 80, 80)
-				keyBox.Text = ""
-				task.wait(1)
-				statusLbl.Text = ""
-			end
-		end
-
-		submitBtn.MouseButton1Click:Connect(verifyKey)
-		keyBox.FocusLost:Connect(function(enterPressed)
-			if enterPressed then verifyKey() end
-		end)
-	end
-
-	-- === LOADING SCREEN (5 SECONDS) ===
-	local loadingGui = Instance.new("ScreenGui")
-	loadingGui.Name = "PumpkitzHub_Loading"; loadingGui.ResetOnSpawn = false
-	loadingGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling; loadingGui.IgnoreGuiInset = true
-	loadingGui.DisplayOrder = 9999; loadingGui.Enabled = true; loadingGui.Parent = playerGui
-
-	local loadingFrame = Instance.new("Frame"); loadingFrame.Name = "LoadingFrame"
-	loadingFrame.Size = UDim2.fromScale(1, 1); loadingFrame.BackgroundColor3 = Color3.fromRGB(20, 8, 2)
-	loadingFrame.BorderSizePixel = 0; loadingFrame.Parent = loadingGui
-	Instance.new("UIGradient", loadingFrame).Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(25, 10, 3)), ColorSequenceKeypoint.new(1, Color3.fromRGB(40, 15, 5))})
-
-	local loadingLogo = Instance.new("TextLabel", loadingFrame)
-	loadingLogo.Size = UDim2.new(1, 0, 0, 80); loadingLogo.Position = UDim2.fromScale(0.5, 0.3); loadingLogo.AnchorPoint = Vector2.new(0.5, 0.5)
-	loadingLogo.BackgroundTransparency = 1; loadingLogo.Text = "Pumpkitz Hub 🎃"; loadingLogo.TextColor3 = Color3.fromRGB(255, 255, 255)
-	loadingLogo.TextSize = 32; loadingLogo.Font = Enum.Font.GothamBold; loadingLogo.TextXAlignment = Enum.TextXAlignment.Center
-
-	local loadingVersion = Instance.new("TextLabel", loadingFrame)
-	loadingVersion.Size = UDim2.new(1, 0, 0, 30); loadingVersion.Position = UDim2.fromScale(0.5, 0.42); loadingVersion.AnchorPoint = Vector2.new(0.5, 0.5)
-	loadingVersion.BackgroundTransparency = 1; loadingVersion.Text = "V1.0.4 | Delta Optimized"; loadingVersion.TextColor3 = Color3.fromRGB(200, 200, 200)
-	loadingVersion.TextSize = 16; loadingVersion.Font = Enum.Font.GothamSemibold; loadingVersion.TextXAlignment = Enum.TextXAlignment.Center
-
-	local loadingBar = Instance.new("Frame", loadingFrame); loadingBar.Name = "LoadingBar"
-	loadingBar.Size = UDim2.new(0.6, 0, 0, 8); loadingBar.Position = UDim2.fromScale(0.5, 0.55); loadingBar.AnchorPoint = Vector2.new(0.5, 0.5)
-	loadingBar.BackgroundColor3 = Color3.fromRGB(55, 18, 6); loadingBar.BorderSizePixel = 0; Instance.new("UICorner", loadingBar).CornerRadius = UDim.new(0, 4)
-
-	local loadingBarFill = Instance.new("Frame", loadingBar); loadingBarFill.Name = "LoadingBarFill"
-	loadingBarFill.Size = UDim2.new(0, 0, 1, 0); loadingBarFill.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
-	loadingBarFill.BorderSizePixel = 0; Instance.new("UICorner", loadingBarFill).CornerRadius = UDim.new(0, 4)
-
-	local loadingStatus = Instance.new("TextLabel", loadingFrame)
-	loadingStatus.Size = UDim2.new(1, 0, 0, 25); loadingStatus.Position = UDim2.fromScale(0.5, 0.65); loadingStatus.AnchorPoint = Vector2.new(0.5, 0.5)
-	loadingStatus.BackgroundTransparency = 1; loadingStatus.Text = "กำลังโหลดทรัพยากร..."; loadingStatus.TextColor3 = Color3.fromRGB(180, 180, 180)
-	loadingStatus.TextSize = 14; loadingStatus.Font = Enum.Font.GothamSemibold; loadingStatus.TextXAlignment = Enum.TextXAlignment.Center
-
-	local creditsFrame = Instance.new("Frame", loadingFrame)
-	creditsFrame.Size = UDim2.new(1, 0, 0, 70); creditsFrame.Position = UDim2.fromScale(0.5, 0.85); creditsFrame.AnchorPoint = Vector2.new(0.5, 0.5); creditsFrame.BackgroundTransparency = 1
-
-	local creditTitle = Instance.new("TextLabel", creditsFrame)
-	creditTitle.Size = UDim2.new(1, 0, 0, 25); creditTitle.Position = UDim2.fromScale(0.5, 0.2); creditTitle.AnchorPoint = Vector2.new(0.5, 0.5); creditTitle.BackgroundTransparency = 1
-	creditTitle.Text = "ทำโดย:Winning"; creditTitle.TextColor3 = Color3.fromRGB(255, 255, 255); creditTitle.TextSize = 15; creditTitle.Font = Enum.Font.GothamBold; creditTitle.TextXAlignment = Enum.TextXAlignment.Center
-
-	local creditAssistant = Instance.new("TextLabel", creditsFrame)
-	creditAssistant.Size = UDim2.new(1, 0, 0, 25); creditAssistant.Position = UDim2.fromScale(0.5, 0.6); creditAssistant.AnchorPoint = Vector2.new(0.5, 0.5); creditAssistant.BackgroundTransparency = 1
-	creditAssistant.Text = "ผู้ช่วย:Qwen3.6-Plus"; creditAssistant.TextColor3 = Color3.fromRGB(200, 200, 200); creditAssistant.TextSize = 13; creditAssistant.Font = Enum.Font.GothamSemibold; creditAssistant.TextXAlignment = Enum.TextXAlignment.Center
-
-	-- Loading Animation (5 SECONDS) + KEY SYSTEM TRIGGER
-	task.spawn(function()
-		for i = 0, 1, 0.01 do 
-			loadingBarFill.Size = UDim2.new(i, 0, 1, 0)
-			task.wait(0.05) 
-		end
-		loadingStatus.Text = "เตรียมความพร้อม..."
-		task.wait(0.5)
-		if loadingGui and loadingGui.Parent then loadingGui:Destroy() end
-		showKeySystem()
-	end)
+local success, Rayfield = pcall(function()
+    return loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
 end)
+
+if not success or not Rayfield then
+    warn("🔴 [Pumpkitz HUB] ล้มเหลวในการโหลด Rayfield!")
+    return
+end
+
+-- ใส่ไอดีโลโก้ที่มึงยืนยันมาเป๊ะๆ
+local LogoID = 75519083960535
+
+local Window = Rayfield:CreateWindow({
+   Name = "Pumpkitz HUB V0.0.1",
+   Icon = LogoID, -- โลโก้ตรง Header
+   LoadingTitle = "Pumpkitz HUB V0.0.1",
+   LoadingSubtitle = "by Winning",
+   ShowText = "Pumpkitz HUB V0.0.1",
+   Theme = "AmberGlow",
+   ToggleUIKeybind = "K",
+   DisableRayfieldPrompts = false,
+   DisableBuildWarnings = false,
+   ConfigurationSaving = { Enabled = false, FolderName = nil, FileName = "PumpkitzHub_V001" },
+   Discord = { Enabled = false, Invite = "noinvitelink", RememberJoins = true },
+   KeySystem = false,
+})
+
+local function SafeNotify(title, content, duration)
+    pcall(function()
+        Rayfield:Notify({ 
+            Title = title, 
+            Content = content, 
+            Duration = duration or 3,
+            Icon = LogoID -- โลโก้ตรงแจ้งเตือน
+        })
+    end)
+end
+
+SafeNotify("Pumpkitz HUB", "กำลังโหลดระบบ...", 3)
+
+-- =====================================================================
+-- 📂 TAB: Main
+-- =====================================================================
+local MainTab = Window:CreateTab("Main", 7539983780) 
+MainTab:CreateSection("Welcome")
+MainTab:CreateParagraph({
+    Title = "Pumpkitz HUB V0.0.1",
+    Content = "ยินดีต้อนรับสู่ Hub ส่วนตัวของคุณ!\nพัฒนาโดย Winning\nระบบกัน Error 100% พร้อมใช้งาน"
+})
+
+-- =====================================================================
+-- 📂 TAB: Player Customize
+-- =====================================================================
+local PlayersTab = Window:CreateTab("Player Customize", 7992557371) 
+PlayersTab:CreateSection("Players")
+
+PlayersTab:CreateSlider({
+    Name = "WalkSpeed", Range = {0, 500}, Increment = 1, Suffix = "", CurrentValue = 16, Flag = "WalkSpeedSlider",
+    Callback = function(Value)
+        local char = game.Players.LocalPlayer.Character
+        if char and char:FindFirstChildOfClass("Humanoid") then char:FindFirstChildOfClass("Humanoid").WalkSpeed = Value end
+    end,
+})
+
+PlayersTab:CreateSlider({
+    Name = "JumpHeight", Range = {0, 200}, Increment = 1, Suffix = "", CurrentValue = 50, Flag = "JumpHeightSlider",
+    Callback = function(Value)
+        local char = game.Players.LocalPlayer.Character
+        if char and char:FindFirstChildOfClass("Humanoid") then char:FindFirstChildOfClass("Humanoid").JumpPower = Value end
+    end,
+})
+
+local NoclipConnection = nil
+PlayersTab:CreateToggle({
+    Name = "Noclip", CurrentValue = false, Flag = "NoclipToggle",
+    Callback = function(Value)
+        if Value then
+            NoclipConnection = game:GetService("RunService").Stepped:Connect(function()
+                local char = game.Players.LocalPlayer.Character
+                if char then
+                    for _, part in ipairs(char:GetDescendants()) do
+                        if part:IsA("BasePart") then part.CanCollide = false end
+                    end
+                end
+            end)
+        else
+            if NoclipConnection then NoclipConnection:Disconnect(); NoclipConnection = nil end
+            local char = game.Players.LocalPlayer.Character
+            if char then
+                for _, part in ipairs(char:GetDescendants()) do
+                    if part:IsA("BasePart") then part.CanCollide = true end
+                end
+            end
+        end
+    end,
+})
+
+local espHighlights, espCharAddedConns = {}, {}
+local espPlayerAddedConn, espPlayerRemovingConn = nil, nil
+local function createHighlight(character)
+    if not character or espHighlights[character] then return end
+    local h = Instance.new("Highlight")
+    h.FillColor = Color3.fromRGB(255, 136, 0)
+    h.OutlineColor = Color3.fromRGB(255, 165, 0)
+    h.FillTransparency = 0.6
+    h.OutlineTransparency = 0
+    h.Parent = character
+    espHighlights[character] = h
+end
+local function removeHighlight(character)
+    if espHighlights[character] then espHighlights[character]:Destroy(); espHighlights[character] = nil end
+end
+
+PlayersTab:CreateToggle({
+    Name = "ESP", CurrentValue = false, Flag = "ESPToggle",
+    Callback = function(Value)
+        if Value then
+            for _, p in ipairs(game.Players:GetPlayers()) do
+                if p.Character then createHighlight(p.Character) end
+                if not espCharAddedConns[p] then espCharAddedConns[p] = p.CharacterAdded:Connect(function(c) createHighlight(c) end) end
+            end
+            espPlayerAddedConn = game.Players.PlayerAdded:Connect(function(p)
+                if not espCharAddedConns[p] then espCharAddedConns[p] = p.CharacterAdded:Connect(function(c) createHighlight(c) end) end
+                if p.Character then createHighlight(p.Character) end
+            end)
+            espPlayerRemovingConn = game.Players.PlayerRemoving:Connect(function(p)
+                if espCharAddedConns[p] then espCharAddedConns[p]:Disconnect(); espCharAddedConns[p] = nil end
+                if p.Character then removeHighlight(p.Character) end
+            end)
+        else
+            if espPlayerAddedConn then espPlayerAddedConn:Disconnect(); espPlayerAddedConn = nil end
+            if espPlayerRemovingConn then espPlayerRemovingConn:Disconnect(); espPlayerRemovingConn = nil end
+            for _, c in pairs(espCharAddedConns) do c:Disconnect() end
+            espCharAddedConns = {}
+            for _, h in pairs(espHighlights) do h:Destroy() end
+            espHighlights = {}
+        end
+    end,
+})
+
+local antiFlingConn = nil
+PlayersTab:CreateToggle({
+    Name = "Anti-Fling", CurrentValue = false, Flag = "AntiFlingToggle",
+    Callback = function(Value)
+        if Value then
+            antiFlingConn = game:GetService("RunService").Heartbeat:Connect(function()
+                local char = game.Players.LocalPlayer.Character
+                if char and char:FindFirstChild("HumanoidRootPart") then
+                    local v = char.HumanoidRootPart.AssemblyLinearVelocity
+                    if v.Magnitude > 100 then char.HumanoidRootPart.AssemblyLinearVelocity = v.Unit * 50 end
+                end
+            end)
+        else
+            if antiFlingConn then antiFlingConn:Disconnect(); antiFlingConn = nil end
+        end
+    end,
+})
+
+-- =====================================================================
+-- 📂 TAB: FPS
+-- =====================================================================
+local FPSTab = Window:CreateTab("FPS", 13612969960) 
+FPSTab:CreateSection("Combat")
+
+local fovCircle = nil
+pcall(function()
+    if Drawing then
+        fovCircle = Drawing.new("Circle")
+        fovCircle.Visible = false
+        fovCircle.Thickness = 2
+        fovCircle.Color = Color3.fromRGB(255, 136, 0)
+        fovCircle.Filled = false
+        fovCircle.Radius = 150
+        fovCircle.NumSides = 60
+    else
+        local gui = Instance.new("ScreenGui")
+        gui.Name = "Pumpkitz_FOV"
+        gui.ResetOnSpawn = false
+        gui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+        local frame = Instance.new("Frame")
+        frame.Size = UDim2.new(0, 300, 0, 300)
+        frame.Position = UDim2.new(0.5, -150, 0.5, -150)
+        frame.BackgroundTransparency = 1
+        frame.Parent = gui
+        local stroke = Instance.new("UIStroke")
+        stroke.Color = Color3.fromRGB(255, 136, 0)
+        stroke.Thickness = 2
+        stroke.Parent = frame
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(1, 0)
+        corner.Parent = frame
+        fovCircle = frame
+    end
+end)
+
+local aimbotConn = nil
+local aimbotStrength = 0.5
+local maxDistance = 10000
+
+FPSTab:CreateToggle({
+    Name = "Aimbot (Camera Lerp + WallCheck)",
+    CurrentValue = false,
+    Flag = "AdvancedAimbotToggle",
+    Callback = function(Value)
+        if Value then
+            SafeNotify("Aimbot", "เปิดใช้งาน Camera Lerp แล้ว!", 2)
+            pcall(function()
+                if type(fovCircle) == "table" and fovCircle.Visible ~= nil then fovCircle.Visible = true
+                elseif type(fovCircle) == "userdata" then fovCircle.Enabled = true end
+            end)
+            
+            aimbotConn = game:GetService("RunService").RenderStepped:Connect(function()
+                local plr = game.Players.LocalPlayer
+                local char = plr.Character
+                local camera = workspace.CurrentCamera
+                if not char or not char:FindFirstChild("HumanoidRootPart") or not camera then return end
+                
+                local closestPlr = nil
+                local shortestDist = math.huge
+                local cameraPos = camera.CFrame.Position
+                local raycastParams = RaycastParams.new()
+                raycastParams.FilterDescendantsInstances = {char}
+                raycastParams.FilterType = Enum.RaycastFilterType.Exclude
+
+                for _, target in ipairs(game.Players:GetPlayers()) do
+                    if target ~= plr and target.Character then
+                        local head = target.Character:FindFirstChild("Head") or target.Character:FindFirstChild("HumanoidRootPart")
+                        local humanoid = target.Character:FindFirstChild("Humanoid")
+                        
+                        if head and humanoid and humanoid.Health > 0 then
+                            local screenPos, onScreen = camera:WorldToViewportPoint(head.Position)
+                            if onScreen then
+                                local dist = (cameraPos - head.Position).Magnitude
+                                if dist < maxDistance and dist < shortestDist then
+                                    local origin = cameraPos
+                                    local direction = (head.Position - origin).Unit * dist
+                                    local raycastResult = workspace:Raycast(origin, direction, raycastParams)
+                                    
+                                    if not raycastResult or (raycastResult.Instance and raycastResult.Instance:IsDescendantOf(target.Character)) then
+                                        shortestDist = dist
+                                        closestPlr = target
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+                
+                if closestPlr and closestPlr.Character then
+                    local targetHead = closestPlr.Character:FindFirstChild("Head") or closestPlr.Character:FindFirstChild("HumanoidRootPart")
+                    if targetHead then
+                        local targetCFrame = CFrame.new(cameraPos, targetHead.Position)
+                        camera.CFrame = camera.CFrame:Lerp(targetCFrame, aimbotStrength)
+                    end
+                end
+            end)
+        else
+            if aimbotConn then aimbotConn:Disconnect(); aimbotConn = nil end
+            pcall(function()
+                if type(fovCircle) == "table" and fovCircle.Visible ~= nil then fovCircle.Visible = false
+                elseif type(fovCircle) == "userdata" then fovCircle.Enabled = false end
+            end)
+            SafeNotify("Aimbot", "ปิดใช้งาน Aimbot แล้ว", 2)
+        end
+    end,
+})
+
+FPSTab:CreateSlider({
+    Name = "Aimbot Strength (ความแรง)",
+    Range = {0.1, 1.0},
+    Increment = 0.1,
+    Suffix = "x",
+    CurrentValue = 0.5,
+    Flag = "AimbotStrengthSlider",
+    Callback = function(Value)
+        aimbotStrength = Value
+    end,
+})
+
+FPSTab:CreateSlider({
+    Name = "Max Distance (ระยะไกลสุด)",
+    Range = {100, 10000},
+    Increment = 100,
+    Suffix = " studs",
+    CurrentValue = 10000,
+    Flag = "AimbotDistanceSlider",
+    Callback = function(Value)
+        maxDistance = Value
+    end,
+})
+
+SafeNotify("Pumpkitz HUB", "โหลดครบ! ระบบพร้อมใช้งาน", 4)
 
