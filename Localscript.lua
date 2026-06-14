@@ -4,6 +4,7 @@ local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local RunService = game:GetService("RunService")
 local player = game.Players.LocalPlayer
 local Lighting = game:GetService("Lighting")
+local camera = workspace.CurrentCamera
 
 local Window = Rayfield:CreateWindow({
    Name = "Pumpkitz V0.0.2",
@@ -31,11 +32,14 @@ local Window = Rayfield:CreateWindow({
 -- ตัวแปรสถานะ Global เพื่อให้คงอยู่ตลอด
 _G.NoclipEnabled = false
 _G.ESPEnabled = false
+_G.AimbotEnabled = false
+_G.AimbotStrength = 0.5 -- เปลี่ยนชื่อจาก Smoothness เป็น Strength
 
 local noclipConnection = nil
 local espHighlights = {}
 local playerAddedConn = nil
 local playerRemovingConn = nil
+local aimbotConnection = nil
 
 -- ฟังก์ชันช่วยใส่ Noclip ให้ตัวละครทันที
 local function applyNoclipToCharacter()
@@ -50,6 +54,43 @@ end
 
 -- ดักจับการเกิดใหม่ของตัวละครมึง เพื่อให้ Noclip ติดทันที 0 วิ
 player.CharacterAdded:Connect(applyNoclipToCharacter)
+
+-- ฟังก์ชันหาผู้เล่นที่ใกล้ที่สุด
+local function getClosestPlayer()
+    local closestPlayer = nil
+    local closestDistance = 100000
+    
+    for _, plr in ipairs(game.Players:GetPlayers()) do
+        if plr ~= player and plr.Character and plr.Character:FindFirstChild("Head") and plr.Character:FindFirstChild("HumanoidRootPart") then
+            if plr.Character.Humanoid.Health > 0 then
+                local distance = (plr.Character.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).Magnitude
+                if distance < closestDistance then
+                    closestDistance = distance
+                    closestPlayer = plr
+                end
+            end
+        end
+    end
+    
+    return closestPlayer
+end
+
+-- ฟังก์ชันเช็คว่ามีกำแพงกั้นไหม
+local function hasWallBetween(target)
+    if not player.Character or not player.Character:FindFirstChild("Head") then return true end
+    
+    local origin = camera.CFrame.Position
+    local targetPos = target.Character.Head.Position
+    local direction = (targetPos - origin).Unit * (targetPos - origin).Magnitude
+    
+    local raycastParams = RaycastParams.new()
+    raycastParams.FilterDescendantsInstances = {player.Character, target.Character}
+    raycastParams.FilterType = Enum.RaycastFilterType.Exclude
+    
+    local result = workspace:Raycast(origin, direction, raycastParams)
+    
+    return result ~= nil
+end
 
 -- Tab 1: หน้าหลัก
 local HomeTab = Window:CreateTab("หน้าหลัก", 4483362458)
@@ -228,7 +269,55 @@ ServerTab:CreateToggle({
    end,
 })
 
--- Tab 4: สคริปต์อื่นๆ
+-- Tab 4: FPS
+local FPSTab = Window:CreateTab("FPS", 4483362458)
+
+FPSTab:CreateToggle({
+   Name = "ล็อกหัว (Aimbot)",
+   CurrentValue = false,
+   Flag = "AimbotToggle",
+   Callback = function(Value)
+      _G.AimbotEnabled = Value
+      
+      if Value then
+         aimbotConnection = RunService.RenderStepped:Connect(function()
+            if not _G.AimbotEnabled then return end
+            if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then return end
+            
+            local target = getClosestPlayer()
+            if target and not hasWallBetween(target) then
+               local targetHead = target.Character.Head
+               local targetPos = targetHead.Position
+               local currentCF = camera.CFrame
+               local targetCF = CFrame.new(currentCF.Position, targetPos)
+               
+               -- แก้แล้ว! strength = 1 คือดูดแรงสุด, strength = 0 คือไม่ขยับ
+               local strength = _G.AimbotStrength
+               camera.CFrame = currentCF:Lerp(targetCF, strength)
+            end
+         end)
+      else
+         if aimbotConnection then
+            aimbotConnection:Disconnect()
+            aimbotConnection = nil
+         end
+      end
+   end,
+})
+
+FPSTab:CreateSlider({
+   Name = "ความแรงล็อกหัว",
+   Range = {0, 1},
+   Increment = 0.01,
+   Suffix = "",
+   CurrentValue = 0.5,
+   Flag = "AimbotStrength",
+   Callback = function(Value)
+      _G.AimbotStrength = Value
+   end,
+})
+
+-- Tab 5: สคริปต์อื่นๆ
 local ScriptsTab = Window:CreateTab("สคริปต์อื่นๆ", 4483362458)
 
 ScriptsTab:CreateButton({
@@ -240,7 +329,7 @@ ScriptsTab:CreateButton({
 
 Rayfield:Notify({
    Title = "Pumpkitz V0.0.2",
-   Content = "โหลดสำเร็จ! พร้อมใช้งานแล้วเพื่อน",
+   Content = "แก้ความแรงล็อกหัวแล้ว! 1 = ดูดแรงสุด 0 = นุ่มสุด",
    Duration = 5,
    Image = "home",
 })
