@@ -34,6 +34,7 @@ _G.NoclipEnabled = false
 _G.ESPEnabled = false
 _G.AimbotEnabled = false
 _G.AimbotStrength = 0.5
+_G.AimbotCheckTeam = true -- เพิ่มตัวแปรเช็คทีม (เปิดเป็นค่าเริ่มต้นเพื่อความปลอดภัย)
 
 local noclipConnection = nil
 local espHighlights = {}
@@ -55,20 +56,26 @@ end
 -- ดักจับการเกิดใหม่ของตัวละครมึง เพื่อให้ Noclip ติดทันที 0 วิ
 player.CharacterAdded:Connect(applyNoclipToCharacter)
 
--- ฟังก์ชันหาผู้เล่นที่ใกล้ที่สุด (แก้แล้ว: เช็กทีมด้วย!)
+-- ฟังก์ชันหาผู้เล่นที่ใกล้ที่สุด (อัปเดต: เช็กทีมตามการตั้งค่า)
 local function getClosestPlayer()
     local closestPlayer = nil
     local closestDistance = 100000
-    local localTeam = player.Team -- เก็บทีมของตัวเองไว้เช็ก
+    local localTeam = player.Team
     
     for _, plr in ipairs(game.Players:GetPlayers()) do
-        -- เพิ่มเงื่อนไข: plr.Team ~= localTeam (ต้องไม่อยู่ทีมเดียวกัน)
-        if plr ~= player and plr.Team ~= localTeam and plr.Character and plr.Character:FindFirstChild("Head") and plr.Character:FindFirstChild("HumanoidRootPart") then
+        if plr ~= player and plr.Character and plr.Character:FindFirstChild("Head") and plr.Character:FindFirstChild("HumanoidRootPart") then
             if plr.Character.Humanoid.Health > 0 then
-                local distance = (plr.Character.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).Magnitude
-                if distance < closestDistance then
-                    closestDistance = distance
-                    closestPlayer = plr
+                local isTeammate = (localTeam ~= nil and plr.Team == localTeam)
+                
+                -- ถ้าเปิดเช็คทีม และเป็นเพื่อนร่วมทีม ให้ข้ามไป
+                if _G.AimbotCheckTeam and isTeammate then
+                    -- ข้ามเพื่อนร่วมทีม
+                else
+                    local distance = (plr.Character.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).Magnitude
+                    if distance < closestDistance then
+                        closestDistance = distance
+                        closestPlayer = plr
+                    end
                 end
             end
         end
@@ -275,7 +282,7 @@ ServerTab:CreateToggle({
 local FPSTab = Window:CreateTab("FPS", 4483362458)
 
 FPSTab:CreateToggle({
-   Name = "ล็อกหัว (Aimbot แยกทีม)",
+   Name = "ล็อกหัว (Aimbot)",
    CurrentValue = false,
    Flag = "AimbotToggle",
    Callback = function(Value)
@@ -306,6 +313,16 @@ FPSTab:CreateToggle({
    end,
 })
 
+-- ปุ่มใหม่: เปิด/ปิด การตรวจสอบทีม
+FPSTab:CreateToggle({
+   Name = "ตรวจสอบทีม (ไม่ล็อกเพื่อน)",
+   CurrentValue = true, -- เปิดเป็นค่าเริ่มต้นเพื่อความปลอดภัย
+   Flag = "AimbotCheckTeam",
+   Callback = function(Value)
+      _G.AimbotCheckTeam = Value
+   end,
+})
+
 FPSTab:CreateSlider({
    Name = "ความแรงล็อกหัว",
    Range = {0, 1},
@@ -330,7 +347,7 @@ ScriptsTab:CreateButton({
 
 Rayfield:Notify({
    Title = "Pumpkitz V0.0.2",
-   Content = "อัปเดต Aimbot แล้ว! ตอนนี้มันแยกแยะทีมเพื่อนร่วมก๊วนได้แน่นอน",
+   Content = "เพิ่มปุ่มเช็คทีมแล้ว! เปิดไว้ปลอดภัย ปิดไว้โหดร้าย",
    Duration = 5,
    Image = "home",
 })
