@@ -234,7 +234,7 @@ local ScriptsTab = Window:CreateTab("สคริปต์อื่นๆ", 4483
 ScriptsTab:CreateButton({
    Name = "เสกของ",
    Callback = function()
-      loadstring(game:HttpGet("https://raw.githubusercontent.com/s-m-ai/Sekloso/refs/heads/main/Sekloso.lua"))()
+      loadstring(game:HttpGet("https://raw.githubusercontent.com/s-m-ai/PumpkitzHUB/refs/heads/main/Localscript.lua"))()
    end,
 })
 
