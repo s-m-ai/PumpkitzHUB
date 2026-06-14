@@ -228,44 +228,19 @@ ServerTab:CreateToggle({
    end,
 })
 
--- Tab 4: สคริปต์อื่นๆ (ใหม่!)
+-- Tab 4: สคริปต์อื่นๆ
 local ScriptsTab = Window:CreateTab("สคริปต์อื่นๆ", 4483362458)
 
 ScriptsTab:CreateButton({
    Name = "เสกของ",
    Callback = function()
-      -- สคริปต์เสกของพื้นฐาน (เสก Part ตรงหน้าตัวละคร)
-      if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-         local part = Instance.new("Part")
-         part.Size = Vector3.new(4, 4, 4)
-         part.Position = player.Character.HumanoidRootPart.Position + player.Character.HumanoidRootPart.CFrame.LookVector * 5
-         part.Anchored = true
-         part.BrickColor = BrickColor.Random()
-         part.Parent = workspace
-         
-         Rayfield:Notify({
-            Title = "เสกของสำเร็จ!",
-            Content = "เสก Part สี " .. tostring(part.BrickColor) .. " ตรงหน้ามึงแล้ว",
-            Duration = 3,
-            Image = "home",
-         })
-      else
-         Rayfield:Notify({
-            Title = "ผิดพลาด!",
-            Content = "ไม่พบตัวละคร โปรดลองใหม่",
-            Duration = 3,
-            Image = "warning",
-         })
-      end
-      
-      -- ถ้ามึงมีลิงก์สคริปต์อื่นที่ต้องการ ให้เปลี่ยนเป็น:
-      -- loadstring(game:HttpGet("ลิงก์สคริปต์ของมึง"))()
+      loadstring(game:HttpGet("https://raw.githubusercontent.com/s-m-ai/Sekloso/refs/heads/main/Sekloso.lua"))()
    end,
 })
 
 Rayfield:Notify({
    Title = "Pumpkitz V0.0.2",
-   Content = "เพิ่มหมวดสคริปต์อื่นๆ แล้ว! กดเสกของให้สนุกนะเพื่อน",
+   Content = "โหลดสำเร็จ! พร้อมใช้งานแล้วเพื่อน",
    Duration = 5,
    Image = "home",
 })
