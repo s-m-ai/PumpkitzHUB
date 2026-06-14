@@ -33,7 +33,7 @@ local Window = Rayfield:CreateWindow({
 _G.NoclipEnabled = false
 _G.ESPEnabled = false
 _G.AimbotEnabled = false
-_G.AimbotStrength = 0.5 -- เปลี่ยนชื่อจาก Smoothness เป็น Strength
+_G.AimbotStrength = 0.5
 
 local noclipConnection = nil
 local espHighlights = {}
@@ -55,13 +55,15 @@ end
 -- ดักจับการเกิดใหม่ของตัวละครมึง เพื่อให้ Noclip ติดทันที 0 วิ
 player.CharacterAdded:Connect(applyNoclipToCharacter)
 
--- ฟังก์ชันหาผู้เล่นที่ใกล้ที่สุด
+-- ฟังก์ชันหาผู้เล่นที่ใกล้ที่สุด (แก้แล้ว: เช็กทีมด้วย!)
 local function getClosestPlayer()
     local closestPlayer = nil
     local closestDistance = 100000
+    local localTeam = player.Team -- เก็บทีมของตัวเองไว้เช็ก
     
     for _, plr in ipairs(game.Players:GetPlayers()) do
-        if plr ~= player and plr.Character and plr.Character:FindFirstChild("Head") and plr.Character:FindFirstChild("HumanoidRootPart") then
+        -- เพิ่มเงื่อนไข: plr.Team ~= localTeam (ต้องไม่อยู่ทีมเดียวกัน)
+        if plr ~= player and plr.Team ~= localTeam and plr.Character and plr.Character:FindFirstChild("Head") and plr.Character:FindFirstChild("HumanoidRootPart") then
             if plr.Character.Humanoid.Health > 0 then
                 local distance = (plr.Character.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).Magnitude
                 if distance < closestDistance then
@@ -273,7 +275,7 @@ ServerTab:CreateToggle({
 local FPSTab = Window:CreateTab("FPS", 4483362458)
 
 FPSTab:CreateToggle({
-   Name = "ล็อกหัว (Aimbot)",
+   Name = "ล็อกหัว (Aimbot แยกทีม)",
    CurrentValue = false,
    Flag = "AimbotToggle",
    Callback = function(Value)
@@ -291,7 +293,6 @@ FPSTab:CreateToggle({
                local currentCF = camera.CFrame
                local targetCF = CFrame.new(currentCF.Position, targetPos)
                
-               -- แก้แล้ว! strength = 1 คือดูดแรงสุด, strength = 0 คือไม่ขยับ
                local strength = _G.AimbotStrength
                camera.CFrame = currentCF:Lerp(targetCF, strength)
             end
@@ -329,7 +330,7 @@ ScriptsTab:CreateButton({
 
 Rayfield:Notify({
    Title = "Pumpkitz V0.0.2",
-   Content = "แก้ความแรงล็อกหัวแล้ว! 1 = ดูดแรงสุด 0 = นุ่มสุด",
+   Content = "อัปเดต Aimbot แล้ว! ตอนนี้มันแยกแยะทีมเพื่อนร่วมก๊วนได้แน่นอน",
    Duration = 5,
    Image = "home",
 })
