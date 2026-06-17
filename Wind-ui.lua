@@ -82,6 +82,7 @@ local Green  = Color3.fromHex("#10C550")
 local Grey   = Color3.fromHex("#83889E")
 local Blue   = Color3.fromHex("#257AF7")
 local Red    = Color3.fromHex("#EF4F1D")
+local Orange = Color3.fromHex("FFA500")
 
 -- /* Other Functions */ --
 local function parseJSON(luau_table, indent, level, visited)
