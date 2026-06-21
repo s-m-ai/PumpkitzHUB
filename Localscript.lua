@@ -34,7 +34,7 @@ _G.NoclipEnabled = false
 _G.ESPEnabled = false
 _G.AimbotEnabled = false
 _G.AimbotStrength = 0.5
-_G.AimbotCheckTeam = true -- เพิ่มตัวแปรเช็คทีม (เปิดเป็นค่าเริ่มต้นเพื่อความปลอดภัย)
+_G.AimbotCheckTeam = true
 
 local noclipConnection = nil
 local espHighlights = {}
@@ -67,7 +67,6 @@ local function getClosestPlayer()
             if plr.Character.Humanoid.Health > 0 then
                 local isTeammate = (localTeam ~= nil and plr.Team == localTeam)
                 
-                -- ถ้าเปิดเช็คทีม และเป็นเพื่อนร่วมทีม ให้ข้ามไป
                 if _G.AimbotCheckTeam and isTeammate then
                     -- ข้ามเพื่อนร่วมทีม
                 else
@@ -313,10 +312,9 @@ FPSTab:CreateToggle({
    end,
 })
 
--- ปุ่มใหม่: เปิด/ปิด การตรวจสอบทีม
 FPSTab:CreateToggle({
    Name = "ตรวจสอบทีม (ไม่ล็อกเพื่อน)",
-   CurrentValue = true, -- เปิดเป็นค่าเริ่มต้นเพื่อความปลอดภัย
+   CurrentValue = true,
    Flag = "AimbotCheckTeam",
    Callback = function(Value)
       _G.AimbotCheckTeam = Value
@@ -345,9 +343,17 @@ ScriptsTab:CreateButton({
    end,
 })
 
+-- ปุ่มใหม่: MM2
+ScriptsTab:CreateButton({
+   Name = "MM2",
+   Callback = function()
+      loadstring(game:HttpGet("https://raw.githubusercontent.com/s-m-ai/PumpkitzHUB/refs/heads/main/Mm2.lua"))()
+   end,
+})
+
 Rayfield:Notify({
    Title = "Pumpkitz V0.0.2",
-   Content = "เพิ่มปุ่มเช็คทีมแล้ว! เปิดไว้ปลอดภัย ปิดไว้โหดร้าย",
+   Content = "เพิ่มปุ่ม MM2 แล้ว! กดเพื่อโหลดสคริปต์ MM2 ได้เลย",
    Duration = 5,
    Image = "home",
 })
