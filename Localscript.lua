@@ -343,7 +343,6 @@ ScriptsTab:CreateButton({
    end,
 })
 
--- ปุ่มใหม่: MM2
 ScriptsTab:CreateButton({
    Name = "MM2",
    Callback = function()
@@ -351,9 +350,17 @@ ScriptsTab:CreateButton({
    end,
 })
 
+-- ปุ่มใหม่: ยิงปืน+
+ScriptsTab:CreateButton({
+   Name = "ยิงปืน+",
+   Callback = function()
+      loadstring(game:HttpGet("https://raw.githubusercontent.com/s-m-ai/PumpkitzHUB/refs/heads/main/Aimbot.lua"))()
+   end,
+})
+
 Rayfield:Notify({
    Title = "Pumpkitz V0.0.2",
-   Content = "เพิ่มปุ่ม MM2 แล้ว! กดเพื่อโหลดสคริปต์ MM2 ได้เลย",
+   Content = "เพิ่มปุ่มยิงปืน+ แล้ว! กดเพื่อโหลดสคริปต์ได้เลย",
    Duration = 5,
    Image = "home",
 })
