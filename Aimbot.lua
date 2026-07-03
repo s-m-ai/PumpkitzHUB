@@ -17,8 +17,8 @@ WindUI:Localization({
     DefaultLanguage = "en",
     Translations = {
         ["th"] = {
-            ["WINDOW_TITLE"] = "AIMBOT+",
-            ["WINDOW_TAG"] = "เวอร์ชั่น 0.0.6",
+            ["WINDOW_TITLE"] = "Aimbot+",
+            ["WINDOW_TAG"] = "เวอร์ชั่น 0.0.2",
             ["PLAYERS"] = "ผู้เล่น",
             ["VISUAL"] = "ภาพ",
             ["AIMBOT"] = "เล็งอัตโนมัติ",
@@ -54,8 +54,8 @@ WindUI:Localization({
             ["LANG_CHINESE"] = "中國",
         },
         ["en"] = {
-            ["WINDOW_TITLE"] = "AIMBOT+",
-            ["WINDOW_TAG"] = "Version 0.0.6",
+            ["WINDOW_TITLE"] = "Aimbot+",
+            ["WINDOW_TAG"] = "Version 0.0.2",
             ["PLAYERS"] = "Players",
             ["VISUAL"] = "Visual",
             ["AIMBOT"] = "Aimbot",
@@ -91,8 +91,8 @@ WindUI:Localization({
             ["LANG_CHINESE"] = "中國",
         },
         ["ja"] = {
-            ["WINDOW_TITLE"] = "AIMBOT+",
-            ["WINDOW_TAG"] = "バージョン 0.0.6",
+            ["WINDOW_TITLE"] = "Aimbot+",
+            ["WINDOW_TAG"] = "バージョン 0.0.2",
             ["PLAYERS"] = "プレイヤー",
             ["VISUAL"] = "ビジュアル",
             ["AIMBOT"] = "エイムボット",
@@ -128,8 +128,8 @@ WindUI:Localization({
             ["LANG_CHINESE"] = "中國",
         },
         ["zh"] = {
-            ["WINDOW_TITLE"] = "AIMBOT+",
-            ["WINDOW_TAG"] = "版本 0.0.6",
+            ["WINDOW_TITLE"] = "Aimbot+",
+            ["WINDOW_TAG"] = "版本 0.0.2",
             ["PLAYERS"] = "玩家",
             ["VISUAL"] = "视觉",
             ["AIMBOT"] = "自动瞄准",
@@ -195,14 +195,20 @@ local Window = WindUI:CreateWindow({
     Title = "loc:WINDOW_TITLE",
     Icon = "rbxassetid://75519083960535",
     Author = "By Pumpkitz",
-    Folder = "AIMBOTPlus",
+    Folder = "Aimbot+",
     Size = UDim2.fromOffset(700, 520),
     Transparent = true,
     Theme = CurrentTheme,
     SideBarWidth = 220,
     Resizable = true,
     IconSize = 48,
-    TopbarHeight = 48
+    TopbarHeight = 48,
+    Background = "rbxassetid://75519083960535",
+    BackgroundImageTransparency = 0.98,
+    User = {
+        Enabled = true,
+        Anonymous = false
+    }
 })
 
 Window:Tag({
@@ -604,4 +610,4 @@ WindUI:Notify({
     Duration = 3
 })
 
-print("✅ AIMBOT+ Loaded! Language:", WindUI:GetLanguage() or "en")
+print("✅ Aimbot+ Loaded! Language:", WindUI:GetLanguage() or "en")
