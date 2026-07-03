@@ -1,35 +1,36 @@
---https://docs.sirius.menu/rayfield
-
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"))()
 local RunService = game:GetService("RunService")
 local player = game.Players.LocalPlayer
 local Lighting = game:GetService("Lighting")
 local camera = workspace.CurrentCamera
 
-local Window = Rayfield:CreateWindow({
-   Name = "Pumpkitz V0.0.2",
-   Icon = 75519083960535, 
-   LoadingTitle = "Pumpkitz V0.0.2",
-   LoadingSubtitle = "by Pumpkitz hub",
-   ShowText = "Pumpkitz",
-   Theme = "AmberGlow",
-   ToggleUIKeybind = "K",
-   DisableRayfieldPrompts = false,
-   DisableBuildWarnings = false,
-   ConfigurationSaving = {
-      Enabled = true,
-      FolderName = "Pumpkitz",
-      FileName = "Config"
-   },
-   Discord = {
-      Enabled = false,
-      Invite = "noinvitelink",
-      RememberJoins = true
-   },
-   KeySystem = false,
+-- สร้างหน้าต่างหลัก
+local Window = WindUI:CreateWindow({
+    Title = "Pumpkitz V0.0.2",
+    Icon = "rbxassetid://75519083960535",
+    Author = "By Pumpkitz",
+    Folder = "Pumpkitz",
+    Size = UDim2.fromOffset(700, 520),
+    Transparent = true,
+    Theme = "Amber",
+    SideBarWidth = 220,
+    Resizable = true,
+    IconSize = 48,
+    TopbarHeight = 48,
+    Background = "rbxassetid://75519083960535",
+    BackgroundImageTransparency = 0.98,
+    User = {
+        Enabled = true,
+        Anonymous = false
+    }
 })
 
--- ตัวแปรสถานะ Global เพื่อให้คงอยู่ตลอด
+Window:Tag({
+    Title = "Version 0.0.2",
+    Color = Color3.fromRGB(255, 191, 0)
+})
+
+-- ตัวแปรสถานะ Global
 _G.NoclipEnabled = false
 _G.ESPEnabled = false
 _G.AimbotEnabled = false
@@ -42,7 +43,7 @@ local playerAddedConn = nil
 local playerRemovingConn = nil
 local aimbotConnection = nil
 
--- ฟังก์ชันช่วยใส่ Noclip ให้ตัวละครทันที
+-- ฟังก์ชัน Noclip
 local function applyNoclipToCharacter()
     if _G.NoclipEnabled and player.Character then
         for _, part in pairs(player.Character:GetDescendants()) do
@@ -53,10 +54,9 @@ local function applyNoclipToCharacter()
     end
 end
 
--- ดักจับการเกิดใหม่ของตัวละครมึง เพื่อให้ Noclip ติดทันที 0 วิ
 player.CharacterAdded:Connect(applyNoclipToCharacter)
 
--- ฟังก์ชันหาผู้เล่นที่ใกล้ที่สุด (อัปเดต: เช็กทีมตามการตั้งค่า)
+-- ฟังก์ชันหาผู้เล่นใกล้ที่สุด
 local function getClosestPlayer()
     local closestPlayer = nil
     local closestDistance = 100000
@@ -83,7 +83,7 @@ local function getClosestPlayer()
     return closestPlayer
 end
 
--- ฟังก์ชันเช็คว่ามีกำแพงกั้นไหม
+-- ฟังก์ชันเช็คกำแพง
 local function hasWallBetween(target)
     if not player.Character or not player.Character:FindFirstChild("Head") then return true end
     
@@ -100,268 +100,365 @@ local function hasWallBetween(target)
     return result ~= nil
 end
 
--- Tab 1: หน้าหลัก
-local HomeTab = Window:CreateTab("หน้าหลัก", 4483362458)
+-- ============================================================
+-- TAB 1: หน้าหลัก (Home)
+-- ============================================================
+local HomeTab = Window:Tab({ Title = "หน้าหลัก", Icon = "house" })
 
-HomeTab:CreateSlider({
-   Name = "ปรับ FOV",
-   Range = {10, 120},
-   Increment = 1,
-   Suffix = " FOV",
-   CurrentValue = 70,
-   Flag = "FOVSlider",
-   Callback = function(Value)
-      workspace.CurrentCamera.FieldOfView = Value
-   end,
+local HomeSection = HomeTab:Section({ Title = "การตั้งค่าทั่วไป" })
+
+HomeSection:Slider({
+    Title = "ปรับ FOV",
+    Icon = "eye",
+    Value = { Min = 10, Max = 120, Default = 70 },
+    Step = 1,
+    Callback = function(value)
+        workspace.CurrentCamera.FieldOfView = value
+    end
 })
 
-HomeTab:CreateButton({
-   Name = "รีเซ็ท FOV",
-   Callback = function()
-      workspace.CurrentCamera.FieldOfView = 70
-   end,
+HomeSection:Button({
+    Title = "รีเซ็ท FOV",
+    Icon = "rotate-ccw",
+    Callback = function()
+        workspace.CurrentCamera.FieldOfView = 70
+        WindUI:Notify({
+            Title = "รีเซ็ท FOV",
+            Content = "FOV กลับเป็น 70 แล้ว",
+            Duration = 2
+        })
+    end
 })
 
-HomeTab:CreateToggle({
-   Name = "Remove Fog (ลบหมอก)",
-   CurrentValue = false,
-   Flag = "RemoveFog",
-   Callback = function(Value)
-      if Value then
-         Lighting.FogEnd = 1000000
-         Lighting.FogStart = 0
-      else
-         Lighting.FogEnd = 100000
-         Lighting.FogStart = 0
-      end
-   end,
+HomeSection:Toggle({
+    Title = "Remove Fog (ลบหมอก)",
+    Icon = "cloud",
+    Default = false,
+    Callback = function(state)
+        if state then
+            Lighting.FogEnd = 1000000
+            Lighting.FogStart = 0
+        else
+            Lighting.FogEnd = 100000
+            Lighting.FogStart = 0
+        end
+    end
 })
 
--- Tab 2: ผู้เล่น
-local PlayerTab = Window:CreateTab("ผู้เล่น", 4483362458)
+-- ============================================================
+-- TAB 2: ผู้เล่น (Player)
+-- ============================================================
+local PlayerTab = Window:Tab({ Title = "ผู้เล่น", Icon = "user" })
 
-PlayerTab:CreateSlider({
-   Name = "ปรับ WalkSpeed",
-   Range = {16, 500},
-   Increment = 1,
-   Suffix = "",
-   CurrentValue = 16,
-   Flag = "WalkSpeed",
-   Callback = function(Value)
-      if player.Character and player.Character:FindFirstChild("Humanoid") then
-         player.Character.Humanoid.WalkSpeed = Value
-      end
-   end,
+local PlayerSection = PlayerTab:Section({ Title = "การปรับแต่งตัวละคร" })
+
+PlayerSection:Slider({
+    Title = "ปรับ WalkSpeed",
+    Icon = "zap",
+    Value = { Min = 16, Max = 500, Default = 16 },
+    Step = 1,
+    Callback = function(value)
+        if player.Character and player.Character:FindFirstChild("Humanoid") then
+            player.Character.Humanoid.WalkSpeed = value
+        end
+    end
 })
 
-PlayerTab:CreateSlider({
-   Name = "ปรับ JumpPower",
-   Range = {50, 500},
-   Increment = 1,
-   Suffix = "",
-   CurrentValue = 50,
-   Flag = "JumpPower",
-   Callback = function(Value)
-      if player.Character and player.Character:FindFirstChild("Humanoid") then
-         player.Character.Humanoid.JumpPower = Value
-      end
-   end,
+PlayerSection:Slider({
+    Title = "ปรับ JumpPower",
+    Icon = "arrow-up",
+    Value = { Min = 50, Max = 500, Default = 50 },
+    Step = 1,
+    Callback = function(value)
+        if player.Character and player.Character:FindFirstChild("Humanoid") then
+            player.Character.Humanoid.JumpPower = value
+        end
+    end
 })
 
-PlayerTab:CreateButton({
-   Name = "Fly (บินได้)",
-   Callback = function()
-      loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Fly-gui-V3-II-REDUX-224789"))()
-   end,
+PlayerSection:Button({
+    Title = "Fly (บินได้)",
+    Icon = "wing",
+    Callback = function()
+        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Fly-gui-V3-II-REDUX-224789"))()
+        WindUI:Notify({
+            Title = "เปิด Fly",
+            Content = "เปิดโหมดบินแล้ว! กด Space เพื่อขึ้น",
+            Duration = 2
+        })
+    end
 })
 
-PlayerTab:CreateToggle({
-   Name = "Noclip (ทะลุกำแพง)",
-   CurrentValue = false,
-   Flag = "NoclipToggle",
-   Callback = function(Value)
-      _G.NoclipEnabled = Value
-      
-      if Value then
-         noclipConnection = RunService.Stepped:Connect(function()
-            applyNoclipToCharacter()
-         end)
-         applyNoclipToCharacter()
-      else
-         if noclipConnection then
-            noclipConnection:Disconnect()
-            noclipConnection = nil
-         end
-         if player.Character then
-            for _, part in pairs(player.Character:GetDescendants()) do
-               if part:IsA("BasePart") then
-                  part.CanCollide = true
-               end
-            end
-         end
-      end
-   end,
-})
-
-PlayerTab:CreateToggle({
-   Name = "ESP (Highlight สีส้ม)",
-   CurrentValue = false,
-   Flag = "EspToggle",
-   Callback = function(Value)
-      _G.ESPEnabled = Value
-      
-      local function addHighlight(plr)
-         if plr ~= player and plr.Character and not espHighlights[plr] then
-            local highlight = Instance.new("Highlight")
-            highlight.FillColor = Color3.fromRGB(255, 165, 0)
-            highlight.OutlineColor = Color3.fromRGB(255, 165, 0)
-            highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-            highlight.Parent = plr.Character
-            espHighlights[plr] = highlight
-         end
-      end
-
-      local function removeHighlight(plr)
-         if espHighlights[plr] then
-            espHighlights[plr]:Destroy()
-            espHighlights[plr] = nil
-         end
-      end
-
-      if Value then
-         for _, plr in ipairs(game.Players:GetPlayers()) do
-            addHighlight(plr)
-         end
-         
-         playerAddedConn = game.Players.PlayerAdded:Connect(function(plr)
-            plr.CharacterAdded:Connect(function()
-               if _G.ESPEnabled then addHighlight(plr) end
+PlayerSection:Toggle({
+    Title = "Noclip (ทะลุกำแพง)",
+    Icon = "shield",
+    Default = false,
+    Callback = function(state)
+        _G.NoclipEnabled = state
+        
+        if state then
+            noclipConnection = RunService.Stepped:Connect(function()
+                applyNoclipToCharacter()
             end)
-            if plr.Character then addHighlight(plr) end
-         end)
-         
-         playerRemovingConn = game.Players.PlayerRemoving:Connect(function(plr)
-            removeHighlight(plr)
-         end)
-      else
-         if playerAddedConn then playerAddedConn:Disconnect() end
-         if playerRemovingConn then playerRemovingConn:Disconnect() end
-         
-         for _, highlight in pairs(espHighlights) do
-            highlight:Destroy()
-         end
-         espHighlights = {}
-      end
-   end,
-})
-
--- Tab 3: เซิฟเวอร์
-local ServerTab = Window:CreateTab("เซิฟเวอร์", 4483362458)
-
-ServerTab:CreateToggle({
-   Name = "Fullbright (สว่างตลอด)",
-   CurrentValue = false,
-   Flag = "FullbrightToggle",
-   Callback = function(Value)
-      if Value then
-         Lighting.Brightness = 2
-         Lighting.ClockTime = 14
-         Lighting.FogEnd = 100000
-         Lighting.GlobalShadows = false
-      else
-         Lighting.Brightness = 1
-         Lighting.ClockTime = 12
-         Lighting.FogEnd = 100000
-         Lighting.GlobalShadows = true
-      end
-   end,
-})
-
--- Tab 4: FPS
-local FPSTab = Window:CreateTab("FPS", 4483362458)
-
-FPSTab:CreateToggle({
-   Name = "ล็อกหัว (Aimbot)",
-   CurrentValue = false,
-   Flag = "AimbotToggle",
-   Callback = function(Value)
-      _G.AimbotEnabled = Value
-      
-      if Value then
-         aimbotConnection = RunService.RenderStepped:Connect(function()
-            if not _G.AimbotEnabled then return end
-            if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then return end
-            
-            local target = getClosestPlayer()
-            if target and not hasWallBetween(target) then
-               local targetHead = target.Character.Head
-               local targetPos = targetHead.Position
-               local currentCF = camera.CFrame
-               local targetCF = CFrame.new(currentCF.Position, targetPos)
-               
-               local strength = _G.AimbotStrength
-               camera.CFrame = currentCF:Lerp(targetCF, strength)
+            applyNoclipToCharacter()
+            WindUI:Notify({
+                Title = "เปิด Noclip",
+                Content = "สามารถทะลุกำแพงได้แล้ว",
+                Duration = 2
+            })
+        else
+            if noclipConnection then
+                noclipConnection:Disconnect()
+                noclipConnection = nil
             end
-         end)
-      else
-         if aimbotConnection then
-            aimbotConnection:Disconnect()
-            aimbotConnection = nil
-         end
-      end
-   end,
+            if player.Character then
+                for _, part in pairs(player.Character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = true
+                    end
+                end
+            end
+            WindUI:Notify({
+                Title = "ปิด Noclip",
+                Content = "ไม่สามารถทะลุกำแพงได้แล้ว",
+                Duration = 2
+            })
+        end
+    end
 })
 
-FPSTab:CreateToggle({
-   Name = "ตรวจสอบทีม (ไม่ล็อกเพื่อน)",
-   CurrentValue = true,
-   Flag = "AimbotCheckTeam",
-   Callback = function(Value)
-      _G.AimbotCheckTeam = Value
-   end,
+PlayerSection:Toggle({
+    Title = "ESP (Highlight สีส้ม)",
+    Icon = "eye",
+    Default = false,
+    Callback = function(state)
+        _G.ESPEnabled = state
+        
+        local function addHighlight(plr)
+            if plr ~= player and plr.Character and not espHighlights[plr] then
+                local highlight = Instance.new("Highlight")
+                highlight.FillColor = Color3.fromRGB(255, 165, 0)
+                highlight.OutlineColor = Color3.fromRGB(255, 165, 0)
+                highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                highlight.Parent = plr.Character
+                espHighlights[plr] = highlight
+            end
+        end
+
+        local function removeHighlight(plr)
+            if espHighlights[plr] then
+                espHighlights[plr]:Destroy()
+                espHighlights[plr] = nil
+            end
+        end
+
+        if state then
+            for _, plr in ipairs(game.Players:GetPlayers()) do
+                addHighlight(plr)
+            end
+            
+            playerAddedConn = game.Players.PlayerAdded:Connect(function(plr)
+                plr.CharacterAdded:Connect(function()
+                    if _G.ESPEnabled then addHighlight(plr) end
+                end)
+                if plr.Character then addHighlight(plr) end
+            end)
+            
+            playerRemovingConn = game.Players.PlayerRemoving:Connect(function(plr)
+                removeHighlight(plr)
+            end)
+            WindUI:Notify({
+                Title = "เปิด ESP",
+                Content = "เห็นผู้เล่นทุกคนแล้ว",
+                Duration = 2
+            })
+        else
+            if playerAddedConn then playerAddedConn:Disconnect() end
+            if playerRemovingConn then playerRemovingConn:Disconnect() end
+            
+            for _, highlight in pairs(espHighlights) do
+                highlight:Destroy()
+            end
+            espHighlights = {}
+            WindUI:Notify({
+                Title = "ปิด ESP",
+                Content = "ปิดการเห็นผู้เล่นแล้ว",
+                Duration = 2
+            })
+        end
+    end
 })
 
-FPSTab:CreateSlider({
-   Name = "ความแรงล็อกหัว",
-   Range = {0, 1},
-   Increment = 0.01,
-   Suffix = "",
-   CurrentValue = 0.5,
-   Flag = "AimbotStrength",
-   Callback = function(Value)
-      _G.AimbotStrength = Value
-   end,
+-- ============================================================
+-- TAB 3: เซิร์ฟเวอร์ (Server)
+-- ============================================================
+local ServerTab = Window:Tab({ Title = "เซิร์ฟเวอร์", Icon = "server" })
+
+local ServerSection = ServerTab:Section({ Title = "การตั้งค่าเซิร์ฟเวอร์" })
+
+ServerSection:Toggle({
+    Title = "Fullbright (สว่างตลอด)",
+    Icon = "sun",
+    Default = false,
+    Callback = function(state)
+        if state then
+            Lighting.Brightness = 2
+            Lighting.ClockTime = 14
+            Lighting.FogEnd = 100000
+            Lighting.GlobalShadows = false
+            WindUI:Notify({
+                Title = "เปิด Fullbright",
+                Content = "เกมสว่างตลอดแล้ว",
+                Duration = 2
+            })
+        else
+            Lighting.Brightness = 1
+            Lighting.ClockTime = 12
+            Lighting.FogEnd = 100000
+            Lighting.GlobalShadows = true
+            WindUI:Notify({
+                Title = "ปิด Fullbright",
+                Content = "กลับสู่แสงปกติ",
+                Duration = 2
+            })
+        end
+    end
 })
 
--- Tab 5: สคริปต์อื่นๆ
-local ScriptsTab = Window:CreateTab("สคริปต์อื่นๆ", 4483362458)
+-- ============================================================
+-- TAB 4: FPS (Aimbot)
+-- ============================================================
+local FPSTab = Window:Tab({ Title = "FPS", Icon = "crosshair" })
 
-ScriptsTab:CreateButton({
-   Name = "เสกของ",
-   Callback = function()
-      loadstring(game:HttpGet("https://raw.githubusercontent.com/s-m-ai/Sekloso/refs/heads/main/Sekloso.lua"))()
-   end,
+local FPSSection = FPSTab:Section({ Title = "ระบบเล็งอัตโนมัติ" })
+
+FPSSection:Toggle({
+    Title = "ล็อกหัว (Aimbot)",
+    Icon = "crosshair",
+    Default = false,
+    Callback = function(state)
+        _G.AimbotEnabled = state
+        
+        if state then
+            aimbotConnection = RunService.RenderStepped:Connect(function()
+                if not _G.AimbotEnabled then return end
+                if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then return end
+                
+                local target = getClosestPlayer()
+                if target and not hasWallBetween(target) then
+                    local targetHead = target.Character.Head
+                    local targetPos = targetHead.Position
+                    local currentCF = camera.CFrame
+                    local targetCF = CFrame.new(currentCF.Position, targetPos)
+                    
+                    local strength = _G.AimbotStrength
+                    camera.CFrame = currentCF:Lerp(targetCF, strength)
+                end
+            end)
+            WindUI:Notify({
+                Title = "เปิด Aimbot",
+                Content = "ล็อกหัวอัตโนมัติแล้ว",
+                Duration = 2
+            })
+        else
+            if aimbotConnection then
+                aimbotConnection:Disconnect()
+                aimbotConnection = nil
+            end
+            WindUI:Notify({
+                Title = "ปิด Aimbot",
+                Content = "ปิดการล็อกหัวแล้ว",
+                Duration = 2
+            })
+        end
+    end
 })
 
-ScriptsTab:CreateButton({
-   Name = "MM2",
-   Callback = function()
-      loadstring(game:HttpGet("https://raw.githubusercontent.com/s-m-ai/PumpkitzHUB/refs/heads/main/Mm2.lua"))()
-   end,
+FPSSection:Toggle({
+    Title = "ตรวจสอบทีม (ไม่ล็อกเพื่อน)",
+    Icon = "users",
+    Default = true,
+    Callback = function(state)
+        _G.AimbotCheckTeam = state
+        if state then
+            WindUI:Notify({
+                Title = "เปิดตรวจสอบทีม",
+                Content = "ไม่ล็อกเพื่อนร่วมทีม",
+                Duration = 2
+            })
+        else
+            WindUI:Notify({
+                Title = "ปิดตรวจสอบทีม",
+                Content = "ล็อกทุกคนรวมเพื่อน",
+                Duration = 2
+            })
+        end
+    end
 })
 
--- ปุ่มใหม่: ยิงปืน+
-ScriptsTab:CreateButton({
-   Name = "ยิงปืน+",
-   Callback = function()
-      loadstring(game:HttpGet("https://raw.githubusercontent.com/s-m-ai/PumpkitzHUB/refs/heads/main/Aimbot.lua"))()
-   end,
+FPSSection:Slider({
+    Title = "ความแรงล็อกหัว",
+    Icon = "gauge",
+    Value = { Min = 0, Max = 1, Default = 0.5 },
+    Step = 0.01,
+    Callback = function(value)
+        _G.AimbotStrength = value
+    end
 })
 
-Rayfield:Notify({
-   Title = "Pumpkitz V0.0.2",
-   Content = "เพิ่มปุ่มยิงปืน+ แล้ว! กดเพื่อโหลดสคริปต์ได้เลย",
-   Duration = 5,
-   Image = "home",
+-- ============================================================
+-- TAB 5: สคริปต์อื่นๆ (Scripts)
+-- ============================================================
+local ScriptsTab = Window:Tab({ Title = "สคริปต์อื่นๆ", Icon = "code" })
+
+local ScriptsSection = ScriptsTab:Section({ Title = "โหลดสคริปต์เพิ่มเติม" })
+
+ScriptsSection:Button({
+    Title = "เสกของ",
+    Icon = "wand",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/s-m-ai/Sekloso/refs/heads/main/Sekloso.lua"))()
+        WindUI:Notify({
+            Title = "โหลดเสกของ",
+            Content = "โหลดสคริปต์เสกของเรียบร้อย",
+            Duration = 2
+        })
+    end
 })
 
+ScriptsSection:Button({
+    Title = "MM2",
+    Icon = "sword",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/s-m-ai/PumpkitzHUB/refs/heads/main/Mm2.lua"))()
+        WindUI:Notify({
+            Title = "โหลด MM2",
+            Content = "โหลดสคริปต์ MM2 เรียบร้อย",
+            Duration = 2
+        })
+    end
+})
+
+ScriptsSection:Button({
+    Title = "ยิงปืน+",
+    Icon = "target",
+    Callback = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/s-m-ai/PumpkitzHUB/refs/heads/main/Aimbot.lua"))()
+        WindUI:Notify({
+            Title = "โหลดยิงปืน+",
+            Content = "โหลดสคริปต์ยิงปืน+ เรียบร้อย",
+            Duration = 2
+        })
+    end
+})
+
+-- ============================================================
+-- Notify ตอนเปิด GUI
+-- ============================================================
+WindUI:Notify({
+    Title = "Pumpkitz V0.0.2",
+    Content = "โหลด GUI สำเร็จ! ทุกแท็บและปุ่มมีไอคอนแล้ว",
+    Duration = 5
+})
+
+print("✅ Pumpkitz V0.0.2 โหลดเสร็จเรียบร้อย!")
