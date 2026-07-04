@@ -28,7 +28,7 @@ local Window = WindUI:CreateWindow({
 
 -- เพิ่ม Tag
 Window:Tag({
-    Title = "Version 0.0.4",
+    Title = "Version 0.0.5",
     Color = Color3.fromRGB(255, 191, 0)
 })
 
@@ -74,11 +74,16 @@ _G.NoclipEnabled = false
 _G.AimbotEnabled = false
 _G.AimbotStrength = 0.5
 _G.AimbotCheckTeam = true
+_G.GodModeEnabled = false
 
 -- ตัวแปรสำหรับเก็บ Highlight
 local espHighlights = {}
 local playerAddedConn = nil
 local playerRemovingConn = nil
+
+-- ตัวแปรสำหรับ God Mode
+_G._godModeConnection = nil
+_G._godModeCharAdded = nil
 
 -- ============================================================
 -- ฟังก์ชัน ESP (ใช้ Highlight)
@@ -152,14 +157,38 @@ local function setupESPConnections()
 end
 
 -- ============================================================
--- TAB 1: อัปเดตใหม่ (V0.0.4)
+-- ฟังก์ชัน God Mode
+-- ============================================================
+local function applyGodMode()
+    local plr = game.Players.LocalPlayer
+    if not _G.GodModeEnabled then return end
+    if not plr.Character then return end
+    local humanoid = plr.Character:FindFirstChild("Humanoid")
+    if not humanoid then return end
+    
+    humanoid.MaxHealth = math.huge
+    humanoid.Health = math.huge
+    humanoid:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
+    
+    if _G._godModeConnection then
+        _G._godModeConnection:Disconnect()
+    end
+    _G._godModeConnection = humanoid.HealthChanged:Connect(function(health)
+        if health < humanoid.MaxHealth then
+            humanoid.Health = humanoid.MaxHealth
+        end
+    end)
+end
+
+-- ============================================================
+-- TAB 1: อัปเดตใหม่ (V0.0.5)
 -- ============================================================
 local updateTab = createTab("อัปเดตใหม่", "star")
 if updateTab then
-    local sec1 = createSection(updateTab, "📌 เวอร์ชันล่าสุด V.0.0.4")
+    local sec1 = createSection(updateTab, "📌 เวอร์ชันล่าสุด V.0.0.5")
     if sec1 then
         pcall(function()
-            sec1:Button({ Title = "🎉 ยินดีต้อนรับสู่ Pumpkitz HUB V.0.0.4", Icon = "party-popper", Callback = function() end })
+            sec1:Button({ Title = "🎉 ยินดีต้อนรับสู่ Pumpkitz HUB V.0.0.5", Icon = "party-popper", Callback = function() end })
             sec1:Button({ Title = "📅 อัปเดตล่าสุด: 4 กรกฎาคม 2026", Icon = "calendar", Callback = function() end })
         end)
     end
@@ -167,21 +196,25 @@ if updateTab then
     local sec2 = createSection(updateTab, "✨ อัปเดตใหม่ในเวอร์ชันนี้")
     if sec2 then
         pcall(function()
+            sec2:Button({ Title = "🛡️ เพิ่มโหมดพระเจ้า (God Mode)", Icon = "shield", Callback = function() end })
+            sec2:Button({ Title = "   • ไม่มีวันตาย 无敌!", Icon = "", Callback = function() end })
+            sec2:Button({ Title = "   • ใช้ได้กับทุกเกม", Icon = "", Callback = function() end })
+            sec2:Button({ Title = "", Icon = "", Callback = function() end })
             sec2:Button({ Title = "🔧 แยกหมวดหมู่ผู้เล่นเป็น 3 ส่วน", Icon = "wrench", Callback = function() end })
             sec2:Button({ Title = "   • ปรับตัวละคร (WalkSpeed, JumpPower)", Icon = "", Callback = function() end })
-            sec2:Button({ Title = "   • พลังวิเศษ (Fly, ล่องหน, Noclip)", Icon = "", Callback = function() end })
+            sec2:Button({ Title = "   • พลังวิเศษ (Fly, ล่องหน, Noclip, God Mode)", Icon = "", Callback = function() end })
             sec2:Button({ Title = "   • ตาเทพ (ESP พร้อมปรับสีและความใส)", Icon = "", Callback = function() end })
             sec2:Button({ Title = "", Icon = "", Callback = function() end })
             sec2:Button({ Title = "🎨 เพิ่ม VisualSection:Colorpicker ในตาเทพ", Icon = "palette", Callback = function() end })
             sec2:Button({ Title = "   • เลือกสีและปรับความใสในตัวเดียว", Icon = "", Callback = function() end })
             sec2:Button({ Title = "   • อัปเดต ESP แบบ Real-time", Icon = "", Callback = function() end })
             sec2:Button({ Title = "", Icon = "", Callback = function() end })
-            sec2:Button({ Title = "🐛 แก้ไขบั๊ก ESP ที่ใช้ไม่ได้", Icon = "bug", Callback = function() end })
-            sec2:Button({ Title = "   • ใช้ Highlight อย่างถูกต้อง", Icon = "", Callback = function() end })
+            sec2:Button({ Title = "🐛 แก้ไขบั๊กต่างๆ", Icon = "bug", Callback = function() end })
+            sec2:Button({ Title = "   • ESP ใช้ Highlight อย่างถูกต้อง", Icon = "", Callback = function() end })
             sec2:Button({ Title = "   • ปรับปรุงการเชื่อมต่อกับผู้เล่นเข้า-ออก", Icon = "", Callback = function() end })
             sec2:Button({ Title = "", Icon = "", Callback = function() end })
             sec2:Button({ Title = "📝 เปลี่ยนชื่อ GUI เป็น Pumpkitz HUB", Icon = "pencil", Callback = function() end })
-            sec2:Button({ Title = "⬆️ อัปเดตเวอร์ชันเป็น V.0.0.4", Icon = "arrow-up", Callback = function() end })
+            sec2:Button({ Title = "⬆️ อัปเดตเวอร์ชันเป็น V.0.0.5", Icon = "arrow-up", Callback = function() end })
         end)
     end
     
@@ -281,7 +314,7 @@ if playerTab then
         end)
     end
     
-    -- Section 2: พลังวิเศษ
+    -- Section 2: พลังวิเศษ (เพิ่มโหมดพระเจ้า)
     local sec2 = createSection(playerTab, "✨ พลังวิเศษ")
     if sec2 then
         pcall(function()
@@ -328,6 +361,84 @@ if playerTab then
                     end
                 end
             })
+            
+            -- ====== โหมดพระเจ้า (God Mode) ======
+            sec2:Toggle({
+                Title = "โหมดพระเจ้า (God Mode)",
+                Icon = "shield",
+                Default = false,
+                Callback = function(state)
+                    _G.GodModeEnabled = state
+                    local plr = game.Players.LocalPlayer
+                    
+                    if state then
+                        -- เปิดโหมดพระเจ้า
+                        local function applyGodModeNow()
+                            if not plr.Character then return end
+                            local humanoid = plr.Character:FindFirstChild("Humanoid")
+                            if not humanoid then return end
+                            
+                            humanoid.MaxHealth = math.huge
+                            humanoid.Health = math.huge
+                            humanoid:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
+                            
+                            if _G._godModeConnection then
+                                _G._godModeConnection:Disconnect()
+                            end
+                            _G._godModeConnection = humanoid.HealthChanged:Connect(function(health)
+                                if health < humanoid.MaxHealth then
+                                    humanoid.Health = humanoid.MaxHealth
+                                end
+                            end)
+                        end
+                        
+                        applyGodModeNow()
+                        
+                        if plr.Character then
+                            applyGodModeNow()
+                        end
+                        
+                        if _G._godModeCharAdded then
+                            _G._godModeCharAdded:Disconnect()
+                        end
+                        _G._godModeCharAdded = plr.CharacterAdded:Connect(function()
+                            task.wait(0.5)
+                            applyGodModeNow()
+                        end)
+                        
+                        WindUI:Notify({ 
+                            Title = "โหมดพระเจ้า", 
+                            Content = "เปิดแล้ว! คุณจะไม่มีวันตาย", 
+                            Duration = 2 
+                        })
+                    else
+                        -- ปิดโหมดพระเจ้า
+                        if plr.Character then
+                            local humanoid = plr.Character:FindFirstChild("Humanoid")
+                            if humanoid then
+                                humanoid:SetStateEnabled(Enum.HumanoidStateType.Dead, true)
+                                humanoid.MaxHealth = 100
+                                humanoid.Health = 100
+                            end
+                        end
+                        
+                        if _G._godModeConnection then
+                            _G._godModeConnection:Disconnect()
+                            _G._godModeConnection = nil
+                        end
+                        if _G._godModeCharAdded then
+                            _G._godModeCharAdded:Disconnect()
+                            _G._godModeCharAdded = nil
+                        end
+                        
+                        WindUI:Notify({ 
+                            Title = "โหมดพระเจ้า", 
+                            Content = "ปิดแล้ว! กลับสู่สภาวะปกติ", 
+                            Duration = 2 
+                        })
+                    end
+                end
+            })
         end)
     end
     
@@ -357,7 +468,7 @@ if playerTab then
                 end
             })
             
-            -- ====== VisualSection:Colorpicker (รวมสี + ความใสในตัวเดียว) ======
+            -- VisualSection:Colorpicker
             sec3:Colorpicker({
                 Title = "เลือกสีและปรับความใส ESP",
                 Icon = "palette",
@@ -614,13 +725,15 @@ if teleportTab then
                 local bp = Instance.new("BodyPosition")
                 bp.MaxForce = Vector3.new(1,1,1)*100000
                 bp.Position = hrp.Position + Vector3.new(0, _G.FloatHeight or 5, 0)
-                bp.P = 10000; bp.D = 2000
+                bp.P = 10000
+                bp.D = 2000
                 bp.Name = "FloatPosition"
                 bp.Parent = hrp
                 local bg = Instance.new("BodyGyro")
                 bg.MaxTorque = Vector3.new(1,1,1)*100000
                 bg.CFrame = hrp.CFrame
-                bg.P = 10000; bg.D = 500
+                bg.P = 10000
+                bg.D = 500
                 bg.Name = "FloatGyro"
                 bg.Parent = hrp
                 isFloating = true
@@ -639,21 +752,30 @@ if teleportTab then
                         end
                     end
                 end
-                if hum then hum.PlatformStand = false; hum.Sit = false end
+                if hum then
+                    hum.PlatformStand = false
+                    hum.Sit = false
+                end
                 isFloating = false
             end
             
             local function tweenToTarget()
                 if not _G.FloatToTarget then return end
                 local plr = game.Players.LocalPlayer
-                if not plr.Character or not plr.Character:FindFirstChild("HumanoidRootPart") then disableFloat(); return end
+                if not plr.Character or not plr.Character:FindFirstChild("HumanoidRootPart") then
+                    disableFloat()
+                    return
+                end
                 local target = game.Players:FindFirstChild(_G.TeleportTarget)
                 if not target or not target.Character or not target.Character:FindFirstChild("HumanoidRootPart") then return end
                 local hrp = plr.Character.HumanoidRootPart
                 local targetPos = target.Character.HumanoidRootPart.Position
                 local distance = (targetPos - hrp.Position).Magnitude
                 if distance < 1 then return end
-                if tween then tween:Cancel(); tween = nil end
+                if tween then
+                    tween:Cancel()
+                    tween = nil
+                end
                 local targetCF = CFrame.new(targetPos + Vector3.new(0, _G.FloatHeight or 5, 0))
                 local currentSpeed = _G.TweenMaxSpeed or 50
                 local duration = math.max(distance / currentSpeed, 0.1)
@@ -664,13 +786,18 @@ if teleportTab then
                     tween = nil
                     if isFloating and hrp then
                         local bp = hrp:FindFirstChild("FloatPosition")
-                        if bp then bp.Position = hrp.Position end
+                        if bp then
+                            bp.Position = hrp.Position
+                        end
                     end
                 end)
             end
             
             local function startFloat()
-                if floatConn then floatConn:Disconnect(); floatConn = nil end
+                if floatConn then
+                    floatConn:Disconnect()
+                    floatConn = nil
+                end
                 if not _G.TeleportTarget or _G.TeleportTarget == "" then
                     WindUI:Notify({ Title = "Float", Content = "เลือกผู้เล่นก่อน", Duration = 2 })
                     return
@@ -686,7 +813,10 @@ if teleportTab then
                 floatConn = game:GetService("RunService").Heartbeat:Connect(function()
                     if not _G.FloatToTarget then return end
                     local plr = game.Players.LocalPlayer
-                    if not plr.Character or not plr.Character:FindFirstChild("HumanoidRootPart") then disableFloat(); return end
+                    if not plr.Character or not plr.Character:FindFirstChild("HumanoidRootPart") then
+                        disableFloat()
+                        return
+                    end
                     local target = game.Players:FindFirstChild(_G.TeleportTarget)
                     if not target or not target.Character or not target.Character:FindFirstChild("HumanoidRootPart") then return end
                     local hrp = plr.Character.HumanoidRootPart
@@ -697,14 +827,22 @@ if teleportTab then
                     end
                     if isFloating and hrp then
                         local bp = hrp:FindFirstChild("FloatPosition")
-                        if bp then bp.Position = hrp.Position end
+                        if bp then
+                            bp.Position = hrp.Position
+                        end
                     end
                 end)
             end
             
             local function stopFloat()
-                if floatConn then floatConn:Disconnect(); floatConn = nil end
-                if tween then tween:Cancel(); tween = nil end
+                if floatConn then
+                    floatConn:Disconnect()
+                    floatConn = nil
+                end
+                if tween then
+                    tween:Cancel()
+                    tween = nil
+                end
                 disableFloat()
                 WindUI:Notify({ Title = "Float", Content = "หยุดลอยแล้ว", Duration = 2 })
             end
@@ -716,7 +854,11 @@ if teleportTab then
                 Default = false,
                 Callback = function(state)
                     _G.FloatToTarget = state
-                    if state then startFloat() else stopFloat() end
+                    if state then
+                        startFloat()
+                    else
+                        stopFloat()
+                    end
                 end
             })
             
@@ -743,9 +885,10 @@ if teleportTab then
                         if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
                             local hrp = plr.Character.HumanoidRootPart
                             local bp = hrp:FindFirstChild("FloatPosition")
-                            if bp then bp.Position = hrp.Position end
-                        end
-                    end
+                            if bp then
+                                bp.Position = hrp.Position
+                            end
+                        end                    end
                 end
             })
             
@@ -786,8 +929,8 @@ end
 
 -- ====== แจ้งเตือนสำเร็จ ======
 WindUI:Notify({
-    Title = "Pumpkitz HUB V0.0.4",
-    Content = "โหลด GUI สำเร็จ! มี VisualSection:Colorpicker ในตาเทพแล้ว",
+    Title = "Pumpkitz HUB V0.0.5",
+    Content = "โหลด GUI สำเร็จ! มีโหมดพระเจ้าแล้ว",
     Duration = 5
 })
-print("✅ Pumpkitz HUB V0.0.4 ทำงานครบทุก Tab")
+print("✅ Pumpkitz HUB V0.0.5 ทำงานครบทุก Tab")
