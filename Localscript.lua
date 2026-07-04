@@ -7,7 +7,7 @@ end
 
 -- ====== สร้างหน้าต่างหลัก ======
 local Window = WindUI:CreateWindow({
-    Title = "Pumpkitz V0.0.3",
+    Title = "Pumpkitz HUB",
     Icon = "rbxassetid://75519083960535",
     Author = "By Pumpkitz",
     Folder = "Pumpkitz",
@@ -28,7 +28,7 @@ local Window = WindUI:CreateWindow({
 
 -- เพิ่ม Tag
 Window:Tag({
-    Title = "Version 0.0.3",
+    Title = "Version 0.0.4",
     Color = Color3.fromRGB(255, 191, 0)
 })
 
@@ -60,144 +60,144 @@ local function createSection(tab, title)
 end
 
 -- ============================================================
--- TAB 1: อัปเดตใหม่ (ใช้ Button แทน Label)
+-- ตัวแปรเริ่มต้น
+-- ============================================================
+_G.TweenMaxSpeed = 50
+_G.FloatHeight = 5
+_G.FloatToTarget = false
+_G.TeleportTarget = ""
+_G.TweenEnabled = false
+_G.ESPColor = Color3.fromRGB(255, 165, 0)
+_G.ESPTransparency = 0.5
+_G.ESPEnabled = false
+_G.NoclipEnabled = false
+_G.AimbotEnabled = false
+_G.AimbotStrength = 0.5
+_G.AimbotCheckTeam = true
+
+-- ตัวแปรสำหรับเก็บ Highlight
+local espHighlights = {}
+local playerAddedConn = nil
+local playerRemovingConn = nil
+
+-- ============================================================
+-- ฟังก์ชัน ESP (ใช้ Highlight)
+-- ============================================================
+local function UpdateESP()
+    if not _G.ESPEnabled then return end
+    for _, plr in pairs(game.Players:GetPlayers()) do
+        if plr ~= game.Players.LocalPlayer and espHighlights[plr] then
+            espHighlights[plr].FillColor = _G.ESPColor
+            espHighlights[plr].OutlineColor = _G.ESPColor
+            espHighlights[plr].FillTransparency = _G.ESPTransparency
+            espHighlights[plr].OutlineTransparency = _G.ESPTransparency
+        end
+    end
+end
+
+local function addHighlight(plr)
+    if not _G.ESPEnabled then return end
+    if plr == game.Players.LocalPlayer then return end
+    if not plr.Character then return end
+    if espHighlights[plr] then 
+        espHighlights[plr]:Destroy()
+        espHighlights[plr] = nil
+    end
+    
+    local h = Instance.new("Highlight")
+    h.FillColor = _G.ESPColor
+    h.OutlineColor = _G.ESPColor
+    h.FillTransparency = _G.ESPTransparency
+    h.OutlineTransparency = _G.ESPTransparency
+    h.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+    h.Parent = plr.Character
+    espHighlights[plr] = h
+end
+
+local function removeHighlight(plr)
+    if espHighlights[plr] then
+        espHighlights[plr]:Destroy()
+        espHighlights[plr] = nil
+    end
+end
+
+local function updateAllHighlights()
+    for _, plr in pairs(game.Players:GetPlayers()) do
+        if plr ~= game.Players.LocalPlayer then
+            if _G.ESPEnabled then
+                addHighlight(plr)
+            else
+                removeHighlight(plr)
+            end
+        end
+    end
+end
+
+local function setupESPConnections()
+    if playerAddedConn then playerAddedConn:Disconnect() end
+    if playerRemovingConn then playerRemovingConn:Disconnect() end
+    
+    playerAddedConn = game.Players.PlayerAdded:Connect(function(plr)
+        if _G.ESPEnabled then
+            plr.CharacterAdded:Connect(function()
+                if _G.ESPEnabled then addHighlight(plr) end
+            end)
+            if plr.Character then addHighlight(plr) end
+        end
+    end)
+    
+    playerRemovingConn = game.Players.PlayerRemoving:Connect(function(plr)
+        removeHighlight(plr)
+    end)
+end
+
+-- ============================================================
+-- TAB 1: อัปเดตใหม่ (V0.0.4)
 -- ============================================================
 local updateTab = createTab("อัปเดตใหม่", "star")
 if updateTab then
-    -- Section 1: หัวข้อหลัก
-    local sec1 = createSection(updateTab, "📌 เวอร์ชันล่าสุด V.0.0.3")
+    local sec1 = createSection(updateTab, "📌 เวอร์ชันล่าสุด V.0.0.4")
     if sec1 then
         pcall(function()
-            sec1:Button({
-                Title = "🎉 ยินดีต้อนรับสู่ Pumpkitz V.0.0.3",
-                Icon = "party-popper",
-                Callback = function() end
-            })
-            sec1:Button({
-                Title = "📅 อัปเดตล่าสุด: 4 กรกฎาคม 2026",
-                Icon = "calendar",
-                Callback = function() end
-            })
+            sec1:Button({ Title = "🎉 ยินดีต้อนรับสู่ Pumpkitz HUB V.0.0.4", Icon = "party-popper", Callback = function() end })
+            sec1:Button({ Title = "📅 อัปเดตล่าสุด: 4 กรกฎาคม 2026", Icon = "calendar", Callback = function() end })
         end)
     end
     
-    -- Section 2: อัปเดตหลัก
     local sec2 = createSection(updateTab, "✨ อัปเดตใหม่ในเวอร์ชันนี้")
     if sec2 then
         pcall(function()
-            sec2:Button({
-                Title = "🔄 เปลี่ยนสคริปต์ Fly เป็นเวอร์ชันใหม่",
-                Icon = "wing",
-                Callback = function() end
-            })
-            sec2:Button({
-                Title = "   • ใช้ GUI ของตัวเอง",
-                Icon = "",
-                Callback = function() end
-            })
-            sec2:Button({
-                Title = "   • ปรับความเร็วด้วยปุ่ม + / -",
-                Icon = "",
-                Callback = function() end
-            })
-            sec2:Button({
-                Title = "   • ปุ่ม UP / DOWN สำหรับขึ้นลง",
-                Icon = "",
-                Callback = function() end
-            })
-            
-            sec2:Button({
-                Title = "",
-                Icon = "",
-                Callback = function() end
-            })
-            
-            sec2:Button({
-                Title = "📍 อัปเดต Tab เทเลพอร์ต",
-                Icon = "map-pin",
-                Callback = function() end
-            })
-            sec2:Button({
-                Title = "   • ระบบ Float + Tween ไปหาผู้เล่น",
-                Icon = "",
-                Callback = function() end
-            })
-            sec2:Button({
-                Title = "   • ปรับความเร็วในการเคลื่อนที่ได้",
-                Icon = "",
-                Callback = function() end
-            })
-            sec2:Button({
-                Title = "   • ปรับความสูงในการลอยได้",
-                Icon = "",
-                Callback = function() end
-            })
-            sec2:Button({
-                Title = "   • Tween อัตโนมัติเมื่อเป้าหมายเคลื่อนที่",
-                Icon = "",
-                Callback = function() end
-            })
-            
-            sec2:Button({
-                Title = "",
-                Icon = "",
-                Callback = function() end
-            })
-            
-            sec2:Button({
-                Title = "🐛 แก้ไขบั๊กต่างๆ",
-                Icon = "bug",
-                Callback = function() end
-            })
-            sec2:Button({
-                Title = "   • แก้ไขปัญหาการขึ้นลงของ Float",
-                Icon = "",
-                Callback = function() end
-            })
-            sec2:Button({
-                Title = "   • ปรับปรุงระบบ Tween ให้เนียนขึ้น",
-                Icon = "",
-                Callback = function() end
-            })
+            sec2:Button({ Title = "🔧 แยกหมวดหมู่ผู้เล่นเป็น 3 ส่วน", Icon = "wrench", Callback = function() end })
+            sec2:Button({ Title = "   • ปรับตัวละคร (WalkSpeed, JumpPower)", Icon = "", Callback = function() end })
+            sec2:Button({ Title = "   • พลังวิเศษ (Fly, ล่องหน, Noclip)", Icon = "", Callback = function() end })
+            sec2:Button({ Title = "   • ตาเทพ (ESP พร้อมปรับสีและความใส)", Icon = "", Callback = function() end })
+            sec2:Button({ Title = "", Icon = "", Callback = function() end })
+            sec2:Button({ Title = "🎨 เพิ่ม VisualSection:Colorpicker ในตาเทพ", Icon = "palette", Callback = function() end })
+            sec2:Button({ Title = "   • เลือกสีและปรับความใสในตัวเดียว", Icon = "", Callback = function() end })
+            sec2:Button({ Title = "   • อัปเดต ESP แบบ Real-time", Icon = "", Callback = function() end })
+            sec2:Button({ Title = "", Icon = "", Callback = function() end })
+            sec2:Button({ Title = "🐛 แก้ไขบั๊ก ESP ที่ใช้ไม่ได้", Icon = "bug", Callback = function() end })
+            sec2:Button({ Title = "   • ใช้ Highlight อย่างถูกต้อง", Icon = "", Callback = function() end })
+            sec2:Button({ Title = "   • ปรับปรุงการเชื่อมต่อกับผู้เล่นเข้า-ออก", Icon = "", Callback = function() end })
+            sec2:Button({ Title = "", Icon = "", Callback = function() end })
+            sec2:Button({ Title = "📝 เปลี่ยนชื่อ GUI เป็น Pumpkitz HUB", Icon = "pencil", Callback = function() end })
+            sec2:Button({ Title = "⬆️ อัปเดตเวอร์ชันเป็น V.0.0.4", Icon = "arrow-up", Callback = function() end })
         end)
     end
     
-    -- Section 3: การเปลี่ยนแปลงอื่นๆ
     local sec3 = createSection(updateTab, "📋 การเปลี่ยนแปลงอื่นๆ")
     if sec3 then
         pcall(function()
-            sec3:Button({
-                Title = "📝 อัปเดต UI ให้ใช้งานง่ายขึ้น",
-                Icon = "pencil",
-                Callback = function() end
-            })
-            sec3:Button({
-                Title = "🔧 ปรับปรุงประสิทธิภาพโดยรวม",
-                Icon = "wrench",
-                Callback = function() end
-            })
-            sec3:Button({
-                Title = "⚡ เพิ่มความเสถียรของระบบ",
-                Icon = "zap",
-                Callback = function() end
-            })
+            sec3:Button({ Title = "🔧 ปรับปรุงประสิทธิภาพโดยรวม", Icon = "wrench", Callback = function() end })
+            sec3:Button({ Title = "⚡ เพิ่มความเสถียรของระบบ", Icon = "zap", Callback = function() end })
         end)
     end
     
-    -- Section 4: หมายเหตุ
     local sec4 = createSection(updateTab, "📝 หมายเหตุ")
     if sec4 then
         pcall(function()
-            sec4:Button({
-                Title = "หากพบปัญหาแจ้งได้ที่ Discord",
-                Icon = "info",
-                Callback = function() end
-            })
-            sec4:Button({
-                Title = "ขอให้สนุกกับการใช้งานครับ! 😊",
-                Icon = "smile",
-                Callback = function() end
-            })
+            sec4:Button({ Title = "หากพบปัญหาแจ้งได้ที่ Discord", Icon = "info", Callback = function() end })
+            sec4:Button({ Title = "ขอให้สนุกกับการใช้งานครับ! 😊", Icon = "smile", Callback = function() end })
         end)
     end
 end
@@ -245,14 +245,16 @@ if homeTab then
 end
 
 -- ============================================================
--- TAB 3: ผู้เล่น (Player) - เพิ่มปุ่มล่องหน
+-- TAB 3: ผู้เล่น (Player) - แยกเป็น 3 Section
 -- ============================================================
 local playerTab = createTab("ผู้เล่น", "user")
 if playerTab then
-    local sec = createSection(playerTab, "การปรับแต่งตัวละคร")
-    if sec then
+    
+    -- Section 1: ปรับตัวละคร
+    local sec1 = createSection(playerTab, "⚡ ปรับตัวละคร")
+    if sec1 then
         pcall(function()
-            sec:Slider({
+            sec1:Slider({
                 Title = "WalkSpeed",
                 Icon = "zap",
                 Value = { Min = 16, Max = 500, Default = 16 },
@@ -264,7 +266,7 @@ if playerTab then
                     end
                 end
             })
-            sec:Slider({
+            sec1:Slider({
                 Title = "JumpPower",
                 Icon = "arrow-up",
                 Value = { Min = 50, Max = 500, Default = 50 },
@@ -276,7 +278,14 @@ if playerTab then
                     end
                 end
             })
-            sec:Button({
+        end)
+    end
+    
+    -- Section 2: พลังวิเศษ
+    local sec2 = createSection(playerTab, "✨ พลังวิเศษ")
+    if sec2 then
+        pcall(function()
+            sec2:Button({
                 Title = "Fly (บินได้)",
                 Icon = "wing",
                 Callback = function()
@@ -284,8 +293,7 @@ if playerTab then
                     WindUI:Notify({ Title = "Fly", Content = "เปิดโหมดบินแล้ว", Duration = 2 })
                 end
             })
-            -- ปุ่มล่องหน (เพิ่มใหม่)
-            sec:Button({
+            sec2:Button({
                 Title = "ล่องหน (Invisible)",
                 Icon = "eye-off",
                 Callback = function()
@@ -293,7 +301,7 @@ if playerTab then
                     WindUI:Notify({ Title = "ล่องหน", Content = "เปิดโหมดล่องหนแล้ว!", Duration = 2 })
                 end
             })
-            sec:Toggle({
+            sec2:Toggle({
                 Title = "Noclip",
                 Icon = "shield",
                 Default = false,
@@ -320,47 +328,52 @@ if playerTab then
                     end
                 end
             })
-            sec:Toggle({
-                Title = "ESP (Highlight)",
+        end)
+    end
+    
+    -- Section 3: ตาเทพ (ESP พร้อม VisualSection:Colorpicker)
+    local sec3 = createSection(playerTab, "👁️ ตาเทพ")
+    if sec3 then
+        pcall(function()
+            -- ESP Toggle
+            sec3:Toggle({
+                Title = "เปิด ESP",
                 Icon = "eye",
                 Default = false,
                 Callback = function(state)
                     _G.ESPEnabled = state
-                    local plr = game.Players.LocalPlayer
-                    local highlights = {}
-                    local function addHighlight(p)
-                        if p ~= plr and p.Character and not highlights[p] then
-                            local h = Instance.new("Highlight")
-                            h.FillColor = Color3.fromRGB(255,165,0)
-                            h.OutlineColor = Color3.fromRGB(255,165,0)
-                            h.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-                            h.Parent = p.Character
-                            highlights[p] = h
-                        end
-                    end
-                    local function removeHighlight(p)
-                        if highlights[p] then
-                            highlights[p]:Destroy()
-                            highlights[p] = nil
-                        end
-                    end
                     if state then
-                        for _, p in pairs(game.Players:GetPlayers()) do addHighlight(p) end
-                        _G._playerAddedConn = game.Players.PlayerAdded:Connect(function(p)
-                            p.CharacterAdded:Connect(function()
-                                if _G.ESPEnabled then addHighlight(p) end
-                            end)
-                            if p.Character then addHighlight(p) end
-                        end)
-                        _G._playerRemovingConn = game.Players.PlayerRemoving:Connect(function(p)
-                            removeHighlight(p)
-                        end)
+                        updateAllHighlights()
+                        setupESPConnections()
+                        WindUI:Notify({ Title = "ESP", Content = "เปิด ESP แล้ว!", Duration = 2 })
                     else
-                        if _G._playerAddedConn then _G._playerAddedConn:Disconnect() end
-                        if _G._playerRemovingConn then _G._playerRemovingConn:Disconnect() end
-                        for _, h in pairs(highlights) do h:Destroy() end
-                        highlights = {}
+                        for _, plr in pairs(game.Players:GetPlayers()) do
+                            removeHighlight(plr)
+                        end
+                        if playerAddedConn then playerAddedConn:Disconnect() end
+                        if playerRemovingConn then playerRemovingConn:Disconnect() end
+                        WindUI:Notify({ Title = "ESP", Content = "ปิด ESP แล้ว", Duration = 2 })
                     end
+                end
+            })
+            
+            -- ====== VisualSection:Colorpicker (รวมสี + ความใสในตัวเดียว) ======
+            sec3:Colorpicker({
+                Title = "เลือกสีและปรับความใส ESP",
+                Icon = "palette",
+                Default = _G.ESPColor,
+                Transparency = _G.ESPTransparency,
+                Callback = function(color, transparency)
+                    _G.ESPColor = color
+                    _G.ESPTransparency = transparency
+                    if _G.ESPEnabled then
+                        UpdateESP()
+                    end
+                    WindUI:Notify({ 
+                        Title = "ปรับ ESP", 
+                        Content = "สีและความใสอัปเดตแล้ว", 
+                        Duration = 1 
+                    })
                 end
             })
         end)
@@ -372,10 +385,10 @@ end
 -- ============================================================
 local serverTab = createTab("เซิร์ฟเวอร์", "server")
 if serverTab then
-    local sec = createSection(serverTab, "การตั้งค่าเซิร์ฟเวอร์")
-    if sec then
+    local sec1 = createSection(serverTab, "การตั้งค่าเซิร์ฟเวอร์")
+    if sec1 then
         pcall(function()
-            sec:Toggle({
+            sec1:Toggle({
                 Title = "Fullbright",
                 Icon = "sun",
                 Default = false,
@@ -392,6 +405,34 @@ if serverTab then
                         Lighting.FogEnd = 100000
                         Lighting.GlobalShadows = true
                     end
+                end
+            })
+        end)
+    end
+    
+    local sec2 = createSection(serverTab, "📷 มุมมองกล้อง")
+    if sec2 then
+        pcall(function()
+            sec2:Button({
+                Title = "ปรับมุมมองบุคคลที่ 1",
+                Icon = "eye",
+                Callback = function()
+                    local player = game.Players.LocalPlayer
+                    player.CameraMode = Enum.CameraMode.LockFirstPerson
+                    player.CameraMinZoomDistance = 0.5
+                    player.CameraMaxZoomDistance = 0.5
+                    WindUI:Notify({ Title = "มุมมองกล้อง", Content = "เปลี่ยนเป็นบุคคลที่ 1", Duration = 2 })
+                end
+            })
+            sec2:Button({
+                Title = "ปรับมุมมองบุคคลที่ 3",
+                Icon = "eye",
+                Callback = function()
+                    local player = game.Players.LocalPlayer
+                    player.CameraMode = Enum.CameraMode.Classic
+                    player.CameraMinZoomDistance = 6
+                    player.CameraMaxZoomDistance = 50
+                    WindUI:Notify({ Title = "มุมมองกล้อง", Content = "เปลี่ยนเป็นบุคคลที่ 3", Duration = 2 })
                 end
             })
         end)
@@ -519,6 +560,7 @@ if teleportTab then
                 end
                 return list
             end
+            
             targetDropdown = sec:Dropdown({
                 Title = "เลือกผู้เล่น",
                 Icon = "users",
@@ -528,40 +570,40 @@ if teleportTab then
                     _G.TeleportTarget = v
                 end
             })
-            -- รีเฟรชรายชื่อ
+            
+            -- ระบบอัปเดตรายชื่ออัตโนมัติ
+            local function refreshDropdown()
+                if not targetDropdown then return end
+                local currentValue = _G.TeleportTarget or ""
+                local newList = updateList()
+                targetDropdown:SetValues(newList)
+                if table.find(newList, currentValue) then
+                    targetDropdown:SetValue(currentValue)
+                else
+                    targetDropdown:SetValue("")
+                    _G.TeleportTarget = ""
+                end
+            end
+            
             game.Players.PlayerAdded:Connect(function()
                 task.wait(0.5)
-                if targetDropdown then
-                    local cur = _G.TeleportTarget or ""
-                    local newList = updateList()
-                    targetDropdown:SetValues(newList)
-                    if table.find(newList, cur) then
-                        targetDropdown:SetValue(cur)
-                    else
-                        targetDropdown:SetValue("")
-                        _G.TeleportTarget = ""
-                    end
-                end
+                refreshDropdown()
             end)
             game.Players.PlayerRemoving:Connect(function()
                 task.wait(0.5)
-                if targetDropdown then
-                    local cur = _G.TeleportTarget or ""
-                    local newList = updateList()
-                    targetDropdown:SetValues(newList)
-                    if table.find(newList, cur) then
-                        targetDropdown:SetValue(cur)
-                    else
-                        targetDropdown:SetValue("")
-                        _G.TeleportTarget = ""
-                    end
+                refreshDropdown()
+            end)
+            task.spawn(function()
+                while task.wait(5) do
+                    refreshDropdown()
                 end
             end)
 
-            -- ฟังก์ชัน Float
+            -- ฟังก์ชัน Float + Tween
             local floatConn = nil
             local tween = nil
             local isFloating = false
+            
             local function enableFloat()
                 if isFloating then return end
                 local plr = game.Players.LocalPlayer
@@ -583,6 +625,7 @@ if teleportTab then
                 bg.Parent = hrp
                 isFloating = true
             end
+            
             local function disableFloat()
                 if not isFloating then return end
                 local plr = game.Players.LocalPlayer
@@ -599,6 +642,7 @@ if teleportTab then
                 if hum then hum.PlatformStand = false; hum.Sit = false end
                 isFloating = false
             end
+            
             local function tweenToTarget()
                 if not _G.FloatToTarget then return end
                 local plr = game.Players.LocalPlayer
@@ -611,7 +655,8 @@ if teleportTab then
                 if distance < 1 then return end
                 if tween then tween:Cancel(); tween = nil end
                 local targetCF = CFrame.new(targetPos + Vector3.new(0, _G.FloatHeight or 5, 0))
-                local duration = math.max(distance / (_G.FloatSpeed or 16), 0.2)
+                local currentSpeed = _G.TweenMaxSpeed or 50
+                local duration = math.max(distance / currentSpeed, 0.1)
                 local info = TweenInfo.new(duration, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
                 tween = game:GetService("TweenService"):Create(hrp, info, {CFrame = targetCF})
                 tween:Play()
@@ -623,6 +668,7 @@ if teleportTab then
                     end
                 end)
             end
+            
             local function startFloat()
                 if floatConn then floatConn:Disconnect(); floatConn = nil end
                 if not _G.TeleportTarget or _G.TeleportTarget == "" then
@@ -655,6 +701,7 @@ if teleportTab then
                     end
                 end)
             end
+            
             local function stopFloat()
                 if floatConn then floatConn:Disconnect(); floatConn = nil end
                 if tween then tween:Cancel(); tween = nil end
@@ -662,6 +709,7 @@ if teleportTab then
                 WindUI:Notify({ Title = "Float", Content = "หยุดลอยแล้ว", Duration = 2 })
             end
 
+            -- UI Elements
             sec:Toggle({
                 Title = "Float + Tween ไปหา",
                 Icon = "move",
@@ -671,13 +719,18 @@ if teleportTab then
                     if state then startFloat() else stopFloat() end
                 end
             })
+            
             sec:Slider({
                 Title = "ความเร็ว Tween",
                 Icon = "gauge",
-                Value = { Min = 5, Max = 50, Default = 16 },
+                Value = { Min = 15, Max = 500000, Default = 50 },
                 Step = 1,
-                Callback = function(v) _G.FloatSpeed = v end
+                Callback = function(v)
+                    _G.TweenMaxSpeed = v
+                    WindUI:Notify({ Title = "ปรับความเร็ว Tween", Content = "ความเร็ว: " .. v, Duration = 1 })
+                end
             })
+            
             sec:Slider({
                 Title = "ความสูงในการลอย",
                 Icon = "arrow-up",
@@ -695,6 +748,7 @@ if teleportTab then
                     end
                 end
             })
+            
             sec:Button({
                 Title = "หยุด Float ทันที",
                 Icon = "stop-circle",
@@ -704,8 +758,9 @@ if teleportTab then
                     WindUI:Notify({ Title = "หยุด Float", Content = "หยุดแล้ว", Duration = 2 })
                 end
             })
+            
             sec:Button({
-                Title = "Teleport ทันที",
+                Title = "Teleport ไปหา (กระโดดทันที)",
                 Icon = "user-plus",
                 Callback = function()
                     if not _G.TeleportTarget or _G.TeleportTarget == "" then
@@ -718,7 +773,7 @@ if teleportTab then
                         if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
                             local pos = target.Character.HumanoidRootPart.Position + Vector3.new(0, _G.FloatHeight or 5, 0)
                             plr.Character.HumanoidRootPart.CFrame = CFrame.new(pos)
-                            WindUI:Notify({ Title = "Teleport", Content = "ไปหา "..target.Name, Duration = 2 })
+                            WindUI:Notify({ Title = "Teleport", Content = "ไปหา "..target.Name.." แล้ว", Duration = 2 })
                         end
                     else
                         WindUI:Notify({ Title = "Teleport", Content = "ไม่พบผู้เล่น", Duration = 2 })
@@ -731,8 +786,8 @@ end
 
 -- ====== แจ้งเตือนสำเร็จ ======
 WindUI:Notify({
-    Title = "Pumpkitz V0.0.3",
-    Content = "โหลด GUI สำเร็จ! (7 Tabs)",
+    Title = "Pumpkitz HUB V0.0.4",
+    Content = "โหลด GUI สำเร็จ! มี VisualSection:Colorpicker ในตาเทพแล้ว",
     Duration = 5
 })
-print("✅ Pumpkitz V0.0.3 ทำงานครบทุก Tab")
+print("✅ Pumpkitz HUB V0.0.4 ทำงานครบทุก Tab")
