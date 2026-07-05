@@ -200,6 +200,8 @@ if updateTab then
             sec2:Button({ Title = "   • แทนที่ปุ่ม Fling ทั้งหมดด้วยปุ่มเดียว", Icon = "", Callback = function() end })
             sec2:Button({ Title = "   • ปุ่ม 'เตะปลิว (ไม่ใช่ของฉัน)' เรียก GHSX Fling", Icon = "", Callback = function() end })
             sec2:Button({ Title = "", Icon = "", Callback = function() end })
+            sec2:Button({ Title = "🆕 เพิ่มปุ่ม 'กระโดดเตะ' ใน Tab ป่วน", Icon = "footprints", Callback = function() end })
+            sec2:Button({ Title = "", Icon = "", Callback = function() end })
             sec2:Button({ Title = "⬆️ อัปเดตเวอร์ชันเป็น V.0.0.6", Icon = "arrow-up", Callback = function() end })
         end)
     end
@@ -883,14 +885,14 @@ if teleportTab then
 end
 
 -- ============================================================
--- TAB 8: ป่วน (เฉพาะปุ่ม Fling)
+-- TAB 8: ป่วน
 -- ============================================================
 local chaosTab = createTab("ป่วน", "sparkle")
 if chaosTab then
     local sec = createSection(chaosTab, "💥 Fling")
     if sec then
         pcall(function()
-            -- ปุ่มเดียวสำหรับเรียก GHSX Fling GUI
+            -- ปุ่มสำหรับเรียก GHSX Fling GUI
             sec:Button({
                 Title = "เตะปลิว (ไม่ใช่ของฉัน)",
                 Icon = "footprints",
@@ -907,6 +909,30 @@ if chaosTab then
                     else
                         WindUI:Notify({ 
                             Title = "GHSX Fling", 
+                            Content = "โหลดไม่สำเร็จ: " .. tostring(err), 
+                            Duration = 3 
+                        })
+                    end
+                end
+            })
+            
+            -- ปุ่มสำหรับเรียก FE DropKick Script
+            sec:Button({
+                Title = "กระโดดเตะ (DropKick)",
+                Icon = "footprints",
+                Callback = function()
+                    local success, err = pcall(function()
+                        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Fe-DropKick-Script-165813"))()
+                    end)
+                    if success then
+                        WindUI:Notify({ 
+                            Title = "DropKick", 
+                            Content = "โหลด DropKick สำเร็จ!", 
+                            Duration = 3 
+                        })
+                    else
+                        WindUI:Notify({ 
+                            Title = "DropKick", 
                             Content = "โหลดไม่สำเร็จ: " .. tostring(err), 
                             Duration = 3 
                         })
