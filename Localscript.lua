@@ -75,6 +75,7 @@ _G.AimbotEnabled = false
 _G.AimbotStrength = 0.5
 _G.AimbotCheckTeam = true
 _G.GodModeEnabled = false
+_G.InfiniteJumpEnabled = false
 
 -- ตัวแปรสำหรับเก็บ Highlight
 local espHighlights = {}
@@ -181,6 +182,34 @@ local function applyGodMode()
 end
 
 -- ============================================================
+-- ฟังก์ชัน Infinite Jump (จาก Olemad Admin)
+-- ============================================================
+local function setupInfiniteJump()
+    local plr = game.Players.LocalPlayer
+    
+    -- ถ้ามี Connection เก่า ให้ลบก่อน
+    if _G._infiniteJumpConnection then
+        _G._infiniteJumpConnection:Disconnect()
+        _G._infiniteJumpConnection = nil
+    end
+    
+    if not _G.InfiniteJumpEnabled then return end
+    
+    -- ใช้ JumpRequest เพื่อตรวจจับการกระโดด (จาก Olemad)
+    _G._infiniteJumpConnection = game:GetService("UserInputService").JumpRequest:Connect(function()
+        if _G.InfiniteJumpEnabled then
+            local plr = game.Players.LocalPlayer
+            if plr and plr.Character then
+                local humanoid = plr.Character:FindFirstChild("Humanoid")
+                if humanoid then
+                    humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                end
+            end
+        end
+    end)
+end
+
+-- ============================================================
 -- TAB 1: อัปเดตใหม่ (V0.0.6)
 -- ============================================================
 local updateTab = createTab("อัปเดตใหม่", "star")
@@ -197,10 +226,17 @@ if updateTab then
     if sec2 then
         pcall(function()
             sec2:Button({ Title = "🔄 ปรับปรุง Tab ป่วน", Icon = "sparkle", Callback = function() end })
-            sec2:Button({ Title = "   • แทนที่ปุ่ม Fling ทั้งหมดด้วยปุ่มเดียว", Icon = "", Callback = function() end })
-            sec2:Button({ Title = "   • ปุ่ม 'เตะปลิว (ไม่ใช่ของฉัน)' เรียก GHSX Fling", Icon = "", Callback = function() end })
+            sec2:Button({ Title = "   • ปุ่ม 'เตะปลิว (ภายนอก)' เรียก GHSX Fling", Icon = "", Callback = function() end })
+            sec2:Button({ Title = "   • ปุ่ม 'กระโดดเตะ (ภายนอก)' เรียก DropKick", Icon = "", Callback = function() end })
             sec2:Button({ Title = "", Icon = "", Callback = function() end })
-            sec2:Button({ Title = "🆕 เพิ่มปุ่ม 'กระโดดเตะ' ใน Tab ป่วน", Icon = "footprints", Callback = function() end })
+            sec2:Button({ Title = "🆕 เพิ่ม Infinite Jump ในพลังวิเศษ", Icon = "arrow-up", Callback = function() end })
+            sec2:Button({ Title = "   • ใช้ระบบ JumpRequest จาก Olemad Admin", Icon = "", Callback = function() end })
+            sec2:Button({ Title = "", Icon = "", Callback = function() end })
+            sec2:Button({ Title = "🆕 เพิ่ม Section Tools ในเซิร์ฟเวอร์", Icon = "wrench", Callback = function() end })
+            sec2:Button({ Title = "   • Infinite Yield - Admin Command", Icon = "", Callback = function() end })
+            sec2:Button({ Title = "   • Dex Explorer - Explorer Game", Icon = "", Callback = function() end })
+            sec2:Button({ Title = "   • Simple Spy - Spy Remote Events", Icon = "", Callback = function() end })
+            sec2:Button({ Title = "   • Hydroxide - Debug Tool", Icon = "", Callback = function() end })
             sec2:Button({ Title = "", Icon = "", Callback = function() end })
             sec2:Button({ Title = "⬆️ อัปเดตเวอร์ชันเป็น V.0.0.6", Icon = "arrow-up", Callback = function() end })
         end)
@@ -303,6 +339,35 @@ if playerTab then
                     WindUI:Notify({ Title = "ล่องหน", Content = "เปิดโหมดล่องหนแล้ว!", Duration = 2 })
                 end
             })
+            
+            -- ====== Infinite Jump (จาก Olemad Admin) ======
+            sec2:Toggle({
+                Title = "Infinite Jump (กระโดดไม่จำกัด)",
+                Icon = "arrow-up",
+                Default = false,
+                Callback = function(state)
+                    _G.InfiniteJumpEnabled = state
+                    if state then
+                        setupInfiniteJump()
+                        WindUI:Notify({ 
+                            Title = "Infinite Jump", 
+                            Content = "เปิดแล้ว! กระโดดได้ไม่จำกัด", 
+                            Duration = 2 
+                        })
+                    else
+                        if _G._infiniteJumpConnection then
+                            _G._infiniteJumpConnection:Disconnect()
+                            _G._infiniteJumpConnection = nil
+                        end
+                        WindUI:Notify({ 
+                            Title = "Infinite Jump", 
+                            Content = "ปิดแล้ว! กระโดดปกติ", 
+                            Duration = 2 
+                        })
+                    end
+                end
+            })
+            
             sec2:Toggle({
                 Title = "Noclip",
                 Icon = "shield",
@@ -449,14 +514,14 @@ if playerTab then
 end
 
 -- ============================================================
--- TAB 4: เซิร์ฟเวอร์
+-- TAB 4: เซิร์ฟเวอร์ (เพิ่ม Section Tools)
 -- ============================================================
 local serverTab = createTab("เซิร์ฟเวอร์", "server")
 if serverTab then
-    local sec = createSection(serverTab, "การตั้งค่าเซิร์ฟเวอร์")
-    if sec then
+    local sec1 = createSection(serverTab, "การตั้งค่าเซิร์ฟเวอร์")
+    if sec1 then
         pcall(function()
-            sec:Toggle({
+            sec1:Toggle({
                 Title = "Fullbright",
                 Icon = "sun",
                 Default = false,
@@ -501,6 +566,45 @@ if serverTab then
                     player.CameraMinZoomDistance = 6
                     player.CameraMaxZoomDistance = 50
                     WindUI:Notify({ Title = "มุมมองกล้อง", Content = "เปลี่ยนเป็นบุคคลที่ 3", Duration = 2 })
+                end
+            })
+        end)
+    end
+    
+    -- ====== Section Tools (จาก Olemad Admin) ======
+    local sec3 = createSection(serverTab, "🔧 Tools")
+    if sec3 then
+        pcall(function()
+            sec3:Button({
+                Title = "Infinite Yield",
+                Icon = "terminal",
+                Callback = function()
+                    loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
+                    WindUI:Notify({ Title = "Infinite Yield", Content = "โหลด Admin Command สำเร็จ!", Duration = 3 })
+                end
+            })
+            sec3:Button({
+                Title = "Dex Explorer",
+                Icon = "folder-tree",
+                Callback = function()
+                    loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
+                    WindUI:Notify({ Title = "Dex Explorer", Content = "โหลด Dex Explorer สำเร็จ!", Duration = 3 })
+                end
+            })
+            sec3:Button({
+                Title = "Simple Spy",
+                Icon = "radar",
+                Callback = function()
+                    loadstring(game:HttpGet("https://raw.githubusercontent.com/78n/SimpleSpy/main/SimpleSpySource.lua"))()
+                    WindUI:Notify({ Title = "Simple Spy", Content = "โหลด Simple Spy สำเร็จ!", Duration = 3 })
+                end
+            })
+            sec3:Button({
+                Title = "Hydroxide",
+                Icon = "bug",
+                Callback = function()
+                    loadstring(game:HttpGet("https://raw.githubusercontent.com/Upbolt/Hydroxide/revision/init.lua"))()
+                    WindUI:Notify({ Title = "Hydroxide", Content = "โหลด Hydroxide สำเร็จ!", Duration = 3 })
                 end
             })
         end)
@@ -892,9 +996,9 @@ if chaosTab then
     local sec = createSection(chaosTab, "💥 Fling")
     if sec then
         pcall(function()
-            -- ปุ่มสำหรับเรียก GHSX Fling GUI
+            -- ปุ่มสำหรับเรียก GHSX Fling GUI (ภายนอก)
             sec:Button({
-                Title = "เตะปลิว (ไม่ใช่ของฉัน)",
+                Title = "เตะปลิว (ภายนอก)",
                 Icon = "footprints",
                 Callback = function()
                     local success, err = pcall(function()
@@ -916,9 +1020,9 @@ if chaosTab then
                 end
             })
             
-            -- ปุ่มสำหรับเรียก FE DropKick Script
+            -- ปุ่มสำหรับเรียก FE DropKick Script (ภายนอก)
             sec:Button({
-                Title = "กระโดดเตะ (DropKick)",
+                Title = "กระโดดเตะ (ภายนอก)",
                 Icon = "footprints",
                 Callback = function()
                     local success, err = pcall(function()
