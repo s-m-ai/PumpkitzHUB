@@ -28,13 +28,13 @@ local Window = WindUI:CreateWindow({
 
 -- เพิ่ม Tag
 Window:Tag({
-    Title = "Version 0.0.5",
+    Title = "Version 0.0.6",
     Color = Color3.fromRGB(255, 191, 0)
 })
 
 print("✅ สร้าง Window สำเร็จ")
 
--- ====== ฟังก์ชันสร้าง Tab แบบปลอดภัย ======
+-- ====== ฟังก์ชันสร้าง Tab ======
 local function createTab(title, icon)
     local success, tab = pcall(function()
         return Window:Tab({ Title = title, Icon = icon })
@@ -181,62 +181,32 @@ local function applyGodMode()
 end
 
 -- ============================================================
--- TAB 1: อัปเดตใหม่ (V0.0.5)
+-- TAB 1: อัปเดตใหม่ (V0.0.6)
 -- ============================================================
 local updateTab = createTab("อัปเดตใหม่", "star")
 if updateTab then
-    local sec1 = createSection(updateTab, "📌 เวอร์ชันล่าสุด V.0.0.5")
+    local sec1 = createSection(updateTab, "📌 เวอร์ชันล่าสุด V.0.0.6")
     if sec1 then
         pcall(function()
-            sec1:Button({ Title = "🎉 ยินดีต้อนรับสู่ Pumpkitz HUB V.0.0.5", Icon = "party-popper", Callback = function() end })
-            sec1:Button({ Title = "📅 อัปเดตล่าสุด: 4 กรกฎาคม 2026", Icon = "calendar", Callback = function() end })
+            sec1:Button({ Title = "🎉 ยินดีต้อนรับสู่ Pumpkitz HUB V.0.0.6", Icon = "party-popper", Callback = function() end })
+            sec1:Button({ Title = "📅 อัปเดตล่าสุด: 5 กรกฎาคม 2026", Icon = "calendar", Callback = function() end })
         end)
     end
     
     local sec2 = createSection(updateTab, "✨ อัปเดตใหม่ในเวอร์ชันนี้")
     if sec2 then
         pcall(function()
-            sec2:Button({ Title = "🛡️ เพิ่มโหมดพระเจ้า (God Mode)", Icon = "shield", Callback = function() end })
-            sec2:Button({ Title = "   • ไม่มีวันตาย 无敌!", Icon = "", Callback = function() end })
-            sec2:Button({ Title = "   • ใช้ได้กับทุกเกม", Icon = "", Callback = function() end })
+            sec2:Button({ Title = "🔄 ปรับปรุง Tab ป่วน", Icon = "sparkle", Callback = function() end })
+            sec2:Button({ Title = "   • แทนที่ปุ่ม Fling ทั้งหมดด้วยปุ่มเดียว", Icon = "", Callback = function() end })
+            sec2:Button({ Title = "   • ปุ่ม 'เตะปลิว (ไม่ใช่ของฉัน)' เรียก GHSX Fling", Icon = "", Callback = function() end })
             sec2:Button({ Title = "", Icon = "", Callback = function() end })
-            sec2:Button({ Title = "🔧 แยกหมวดหมู่ผู้เล่นเป็น 3 ส่วน", Icon = "wrench", Callback = function() end })
-            sec2:Button({ Title = "   • ปรับตัวละคร (WalkSpeed, JumpPower)", Icon = "", Callback = function() end })
-            sec2:Button({ Title = "   • พลังวิเศษ (Fly, ล่องหน, Noclip, God Mode)", Icon = "", Callback = function() end })
-            sec2:Button({ Title = "   • ตาเทพ (ESP พร้อมปรับสีและความใส)", Icon = "", Callback = function() end })
-            sec2:Button({ Title = "", Icon = "", Callback = function() end })
-            sec2:Button({ Title = "🎨 เพิ่ม VisualSection:Colorpicker ในตาเทพ", Icon = "palette", Callback = function() end })
-            sec2:Button({ Title = "   • เลือกสีและปรับความใสในตัวเดียว", Icon = "", Callback = function() end })
-            sec2:Button({ Title = "   • อัปเดต ESP แบบ Real-time", Icon = "", Callback = function() end })
-            sec2:Button({ Title = "", Icon = "", Callback = function() end })
-            sec2:Button({ Title = "🐛 แก้ไขบั๊กต่างๆ", Icon = "bug", Callback = function() end })
-            sec2:Button({ Title = "   • ESP ใช้ Highlight อย่างถูกต้อง", Icon = "", Callback = function() end })
-            sec2:Button({ Title = "   • ปรับปรุงการเชื่อมต่อกับผู้เล่นเข้า-ออก", Icon = "", Callback = function() end })
-            sec2:Button({ Title = "", Icon = "", Callback = function() end })
-            sec2:Button({ Title = "📝 เปลี่ยนชื่อ GUI เป็น Pumpkitz HUB", Icon = "pencil", Callback = function() end })
-            sec2:Button({ Title = "⬆️ อัปเดตเวอร์ชันเป็น V.0.0.5", Icon = "arrow-up", Callback = function() end })
-        end)
-    end
-    
-    local sec3 = createSection(updateTab, "📋 การเปลี่ยนแปลงอื่นๆ")
-    if sec3 then
-        pcall(function()
-            sec3:Button({ Title = "🔧 ปรับปรุงประสิทธิภาพโดยรวม", Icon = "wrench", Callback = function() end })
-            sec3:Button({ Title = "⚡ เพิ่มความเสถียรของระบบ", Icon = "zap", Callback = function() end })
-        end)
-    end
-    
-    local sec4 = createSection(updateTab, "📝 หมายเหตุ")
-    if sec4 then
-        pcall(function()
-            sec4:Button({ Title = "หากพบปัญหาแจ้งได้ที่ Discord", Icon = "info", Callback = function() end })
-            sec4:Button({ Title = "ขอให้สนุกกับการใช้งานครับ! 😊", Icon = "smile", Callback = function() end })
+            sec2:Button({ Title = "⬆️ อัปเดตเวอร์ชันเป็น V.0.0.6", Icon = "arrow-up", Callback = function() end })
         end)
     end
 end
 
 -- ============================================================
--- TAB 2: หน้าหลัก (Home)
+-- TAB 2: หน้าหลัก
 -- ============================================================
 local homeTab = createTab("หน้าหลัก", "house")
 if homeTab then
@@ -278,12 +248,10 @@ if homeTab then
 end
 
 -- ============================================================
--- TAB 3: ผู้เล่น (Player) - แยกเป็น 3 Section
+-- TAB 3: ผู้เล่น
 -- ============================================================
 local playerTab = createTab("ผู้เล่น", "user")
 if playerTab then
-    
-    -- Section 1: ปรับตัวละคร
     local sec1 = createSection(playerTab, "⚡ ปรับตัวละคร")
     if sec1 then
         pcall(function()
@@ -314,7 +282,6 @@ if playerTab then
         end)
     end
     
-    -- Section 2: พลังวิเศษ (เพิ่มโหมดพระเจ้า)
     local sec2 = createSection(playerTab, "✨ พลังวิเศษ")
     if sec2 then
         pcall(function()
@@ -361,8 +328,6 @@ if playerTab then
                     end
                 end
             })
-            
-            -- ====== โหมดพระเจ้า (God Mode) ======
             sec2:Toggle({
                 Title = "โหมดพระเจ้า (God Mode)",
                 Icon = "shield",
@@ -372,7 +337,6 @@ if playerTab then
                     local plr = game.Players.LocalPlayer
                     
                     if state then
-                        -- เปิดโหมดพระเจ้า
                         local function applyGodModeNow()
                             if not plr.Character then return end
                             local humanoid = plr.Character:FindFirstChild("Humanoid")
@@ -412,7 +376,6 @@ if playerTab then
                             Duration = 2 
                         })
                     else
-                        -- ปิดโหมดพระเจ้า
                         if plr.Character then
                             local humanoid = plr.Character:FindFirstChild("Humanoid")
                             if humanoid then
@@ -442,11 +405,9 @@ if playerTab then
         end)
     end
     
-    -- Section 3: ตาเทพ (ESP พร้อม VisualSection:Colorpicker)
     local sec3 = createSection(playerTab, "👁️ ตาเทพ")
     if sec3 then
         pcall(function()
-            -- ESP Toggle
             sec3:Toggle({
                 Title = "เปิด ESP",
                 Icon = "eye",
@@ -467,8 +428,6 @@ if playerTab then
                     end
                 end
             })
-            
-            -- VisualSection:Colorpicker
             sec3:Colorpicker({
                 Title = "เลือกสีและปรับความใส ESP",
                 Icon = "palette",
@@ -480,11 +439,7 @@ if playerTab then
                     if _G.ESPEnabled then
                         UpdateESP()
                     end
-                    WindUI:Notify({ 
-                        Title = "ปรับ ESP", 
-                        Content = "สีและความใสอัปเดตแล้ว", 
-                        Duration = 1 
-                    })
+                    WindUI:Notify({ Title = "ปรับ ESP", Content = "สีและความใสอัปเดตแล้ว", Duration = 1 })
                 end
             })
         end)
@@ -492,14 +447,14 @@ if playerTab then
 end
 
 -- ============================================================
--- TAB 4: เซิร์ฟเวอร์ (Server)
+-- TAB 4: เซิร์ฟเวอร์
 -- ============================================================
 local serverTab = createTab("เซิร์ฟเวอร์", "server")
 if serverTab then
-    local sec1 = createSection(serverTab, "การตั้งค่าเซิร์ฟเวอร์")
-    if sec1 then
+    local sec = createSection(serverTab, "การตั้งค่าเซิร์ฟเวอร์")
+    if sec then
         pcall(function()
-            sec1:Toggle({
+            sec:Toggle({
                 Title = "Fullbright",
                 Icon = "sun",
                 Default = false,
@@ -551,7 +506,7 @@ if serverTab then
 end
 
 -- ============================================================
--- TAB 5: FPS (Aimbot)
+-- TAB 5: FPS
 -- ============================================================
 local fpsTab = createTab("FPS", "crosshair")
 if fpsTab then
@@ -617,7 +572,7 @@ if fpsTab then
 end
 
 -- ============================================================
--- TAB 6: สคริปต์อื่นๆ (Scripts)
+-- TAB 6: สคริปต์อื่นๆ
 -- ============================================================
 local scriptTab = createTab("สคริปต์อื่นๆ", "code")
 if scriptTab then
@@ -653,14 +608,13 @@ if scriptTab then
 end
 
 -- ============================================================
--- TAB 7: เทเลพอร์ต (Teleport)
+-- TAB 7: เทเลพอร์ต
 -- ============================================================
 local teleportTab = createTab("เทเลพอร์ต", "map-pin")
 if teleportTab then
     local sec = createSection(teleportTab, "ระบบ Float + Tween")
     if sec then
         pcall(function()
-            -- ตัวแปรสำหรับ Dropdown
             local targetDropdown = nil
             local function updateList()
                 local list = {}
@@ -682,7 +636,6 @@ if teleportTab then
                 end
             })
             
-            -- ระบบอัปเดตรายชื่ออัตโนมัติ
             local function refreshDropdown()
                 if not targetDropdown then return end
                 local currentValue = _G.TeleportTarget or ""
@@ -710,7 +663,6 @@ if teleportTab then
                 end
             end)
 
-            -- ฟังก์ชัน Float + Tween
             local floatConn = nil
             local tween = nil
             local isFloating = false
@@ -721,7 +673,10 @@ if teleportTab then
                 if not plr.Character or not plr.Character:FindFirstChild("HumanoidRootPart") then return end
                 local hrp = plr.Character.HumanoidRootPart
                 local hum = plr.Character:FindFirstChild("Humanoid")
-                if hum then hum.PlatformStand = true; hum.Sit = true end
+                if hum then
+                    hum.PlatformStand = true
+                    hum.Sit = true
+                end
                 local bp = Instance.new("BodyPosition")
                 bp.MaxForce = Vector3.new(1,1,1)*100000
                 bp.Position = hrp.Position + Vector3.new(0, _G.FloatHeight or 5, 0)
@@ -847,7 +802,6 @@ if teleportTab then
                 WindUI:Notify({ Title = "Float", Content = "หยุดลอยแล้ว", Duration = 2 })
             end
 
-            -- UI Elements
             sec:Toggle({
                 Title = "Float + Tween ไปหา",
                 Icon = "move",
@@ -888,7 +842,8 @@ if teleportTab then
                             if bp then
                                 bp.Position = hrp.Position
                             end
-                        end                    end
+                        end
+                    end
                 end
             })
             
@@ -927,10 +882,45 @@ if teleportTab then
     end
 end
 
+-- ============================================================
+-- TAB 8: ป่วน (เฉพาะปุ่ม Fling)
+-- ============================================================
+local chaosTab = createTab("ป่วน", "sparkle")
+if chaosTab then
+    local sec = createSection(chaosTab, "💥 Fling")
+    if sec then
+        pcall(function()
+            -- ปุ่มเดียวสำหรับเรียก GHSX Fling GUI
+            sec:Button({
+                Title = "เตะปลิว (ไม่ใช่ของฉัน)",
+                Icon = "footprints",
+                Callback = function()
+                    local success, err = pcall(function()
+                        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-GHSX-FLING-GUI-158629"))()
+                    end)
+                    if success then
+                        WindUI:Notify({ 
+                            Title = "GHSX Fling", 
+                            Content = "โหลด Fling GUI สำเร็จ!", 
+                            Duration = 3 
+                        })
+                    else
+                        WindUI:Notify({ 
+                            Title = "GHSX Fling", 
+                            Content = "โหลดไม่สำเร็จ: " .. tostring(err), 
+                            Duration = 3 
+                        })
+                    end
+                end
+            })
+        end)
+    end
+end
+
 -- ====== แจ้งเตือนสำเร็จ ======
 WindUI:Notify({
-    Title = "Pumpkitz HUB V0.0.5",
-    Content = "โหลด GUI สำเร็จ! มีโหมดพระเจ้าแล้ว",
+    Title = "Pumpkitz HUB V0.0.6",
+    Content = "โหลด GUI สำเร็จ! อัปเดต V0.0.6 แล้ว",
     Duration = 5
 })
-print("✅ Pumpkitz HUB V0.0.5 ทำงานครบทุก Tab")
+print("✅ Pumpkitz HUB V0.0.6 ทำงานครบทุก Tab")
