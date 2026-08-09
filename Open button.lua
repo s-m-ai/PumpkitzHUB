@@ -1,11 +1,11 @@
 -- ============================================================
--- ระบบ OpenButton (ไม่มีล็อก)
+-- ระบบ OpenButton (แก้ไขตามคำแนะนำ)
 -- ============================================================
 local Player = game.Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
-local ViewportSize = game:GetService("Workspace").CurrentCamera.ViewportSize
+local Workspace = game:GetService("Workspace")
 
--- ตัวแปรหลัก (เฉพาะที่จำเป็น)
+-- ตัวแปรหลัก
 local OpenButton = nil
 local DragArea = nil
 local ScreenGui = nil
@@ -15,12 +15,23 @@ local isDragging = false
 local dragStart = nil
 local startPos = nil
 local lastClickTime = 0
+local dragInput = nil  -- สำหรับเช็ค Touch เดิม
 
 -- ============================================================
--- สร้างปุ่ม (เวอร์ชันเรียบง่าย)
+-- ฟังก์ชันอัปเดตตำแหน่ง DragArea
+-- ============================================================
+local function UpdateDragAreaPosition()
+    if not OpenButton or not DragArea then return end
+    DragArea.Position = UDim2.fromOffset(
+        OpenButton.Position.X.Offset - (ButtonSize * 0.75),
+        OpenButton.Position.Y.Offset - (ButtonSize * 0.75)
+    )
+end
+
+-- ============================================================
+-- สร้างปุ่ม
 -- ============================================================
 function CreateCustomButton()
-    -- ลบของเก่า
     if ScreenGui then
         pcall(function() ScreenGui:Destroy() end)
         ScreenGui = nil
@@ -67,7 +78,7 @@ function CreateCustomButton()
     Icon.ImageColor3 = Color3.fromRGB(255, 255, 255)
     Icon.Parent = OpenButton
     
-    -- ===== DragArea (โปร่งใส) =====
+    -- ===== DragArea =====
     DragArea = Instance.new("ImageButton")
     DragArea.Name = "DragArea"
     DragArea.Size = UDim2.fromOffset(ButtonSize * 2.5, ButtonSize * 2.5)
@@ -80,9 +91,14 @@ function CreateCustomButton()
     DragArea.AutoButtonColor = false
     DragArea.Parent = ScreenGui
     
-    -- ===== Events (เรียบง่าย ไม่มีล็อก) =====
+    -- ===== ตรวจจับ OpenButton ขยับ (จุดที่ 2) =====
+    OpenButton:GetPropertyChangedSignal("Position"):Connect(function()
+        UpdateDragAreaPosition()
+    end)
     
-    -- กดเริ่ม
+    -- ===== Events =====
+    
+    -- กดเริ่ม (จุดที่ 4: เก็บ Touch เดิม)
     DragArea.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or 
            input.UserInputType == Enum.UserInputType.Touch then
@@ -90,6 +106,7 @@ function CreateCustomButton()
             isDragging = true
             dragStart = input.Position
             startPos = OpenButton.Position
+            dragInput = input  -- เก็บ Touch Object
             
             if input.UserInputType == Enum.UserInputType.Touch then
                 input.StopPropagation()
@@ -103,8 +120,8 @@ function CreateCustomButton()
            input.UserInputType == Enum.UserInputType.Touch then
             
             isDragging = false
+            dragInput = nil
             
-            -- เช็คว่าเป็นคลิกหรือลาก
             if startPos and OpenButton.Position then
                 local dx = math.abs(OpenButton.Position.X.Offset - startPos.X.Offset)
                 local dy = math.abs(OpenButton.Position.Y.Offset - startPos.Y.Offset)
@@ -116,21 +133,34 @@ function CreateCustomButton()
         end
     end)
     
-    -- ลาก
+    -- ลาก (จุดที่ 4: เช็ค Touch เดิม)
     UserInputService.InputChanged:Connect(function(input)
         if not isDragging then return end
         if input.UserInputType ~= Enum.UserInputType.MouseMovement and 
            input.UserInputType ~= Enum.UserInputType.Touch then return end
         
+        -- เช็คว่าเป็น Touch เดิมหรือไม่
+        if input.UserInputType == Enum.UserInputType.Touch and input ~= dragInput then
+            return
+        end
+        
         local delta = input.Position - dragStart
-        local newX = startPos.X.Offset + delta.X
-        local newY = startPos.Y.Offset + delta.Y
+        local currentSize = Workspace.CurrentCamera.ViewportSize
+        
+        -- จุดที่ 7: Clamp ไม่ให้หลุดจอ
+        local newX = math.clamp(
+            startPos.X.Offset + delta.X,
+            0,
+            currentSize.X - ButtonSize
+        )
+        local newY = math.clamp(
+            startPos.Y.Offset + delta.Y,
+            0,
+            currentSize.Y - ButtonSize
+        )
         
         OpenButton.Position = UDim2.fromOffset(newX, newY)
-        DragArea.Position = UDim2.fromOffset(
-            newX - (ButtonSize * 0.75),
-            newY - (ButtonSize * 0.75)
-        )
+        -- DragArea จะอัปเดตอัตโนมัติผ่าน GetPropertyChangedSignal
     end)
     
     -- ซ่อนปุ่ม WindUI
@@ -139,7 +169,7 @@ function CreateCustomButton()
 end
 
 -- ============================================================
--- เปิด/ปิด GUI (ไม่มีล็อก)
+-- เปิด/ปิด GUI (จุดที่ 1: ใช้ ViewportSize ปัจจุบัน)
 -- ============================================================
 function ToggleWindow()
     if tick() - lastClickTime < 0.3 then return end
@@ -151,20 +181,18 @@ function ToggleWindow()
         Window:Open()
     else
         Window:Close()
-        -- ขยับไปชิดปุ่ม X
-        OpenButton.Position = UDim2.fromOffset(
-            ViewportSize.X - ButtonSize - 10,
-            10
-        )
-        DragArea.Position = UDim2.fromOffset(
-            ViewportSize.X - ButtonSize - 10 - (ButtonSize * 0.75),
-            10 - (ButtonSize * 0.75)
-        )
+        -- ใช้ ViewportSize ปัจจุบัน
+        local currentSize = Workspace.CurrentCamera.ViewportSize
+        local newX = math.clamp(currentSize.X - ButtonSize - 10, 0, currentSize.X - ButtonSize)
+        local newY = math.clamp(10, 0, currentSize.Y - ButtonSize)
+        
+        OpenButton.Position = UDim2.fromOffset(newX, newY)
+        -- DragArea จะอัปเดตอัตโนมัติ
     end
 end
 
 -- ============================================================
--- ซ่อนปุ่ม WindUI
+-- ซ่อนปุ่ม WindUI (จุดที่ 3: สแกนเฉพาะเมื่อมี WindUI)
 -- ============================================================
 function RemoveWindUIButtons()
     for _, gui in pairs(Player.PlayerGui:GetChildren()) do
@@ -180,7 +208,7 @@ function RemoveWindUIButtons()
 end
 
 -- ============================================================
--- ตรวจจับปุ่มหาย (เฉพาะกรณี)
+-- ตรวจจับปุ่มหาย
 -- ============================================================
 local function MonitorButton()
     while true do
@@ -194,17 +222,43 @@ end
 -- ============================================================
 -- เริ่มต้น
 -- ============================================================
+
+-- จุดที่ 5: เช็คสถานะ WindUI ว่ากำลังเปิดอยู่หรือไม่
+task.wait(0.5)
+if Window and Window.Visible then
+    WindowVisible = true
+    if DragArea then
+        DragArea.Visible = false
+    end
+end
+
 CreateCustomButton()
 task.spawn(MonitorButton)
 
-game:GetService("Workspace").CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(function()
-    ViewportSize = game:GetService("Workspace").CurrentCamera.ViewportSize
-    local newSize = ViewportSize.X < 800 and 45 or 50
+-- จุดที่ 3: สแกนเฉพาะ GUI ที่ชื่อ WindUI
+Player.PlayerGui.ChildAdded:Connect(function(gui)
+    if string.find(gui.Name, "WindUI") then
+        task.wait(0.2)
+        RemoveWindUIButtons()
+    end
+end)
+
+-- จุดที่ 1: อัปเดตเมื่อเปลี่ยนขนาดหน้าจอ
+Workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(function()
+    local currentSize = Workspace.CurrentCamera.ViewportSize
+    local newSize = currentSize.X < 800 and 45 or 50
+    
     if OpenButton then
         ButtonSize = newSize
         OpenButton.Size = UDim2.fromOffset(newSize, newSize)
         DragArea.Size = UDim2.fromOffset(newSize * 2.5, newSize * 2.5)
+        
+        -- ป้องกันปุ่มหลุดจอ
+        local currentPos = OpenButton.Position
+        local clampedX = math.clamp(currentPos.X.Offset, 0, currentSize.X - newSize)
+        local clampedY = math.clamp(currentPos.Y.Offset, 0, currentSize.Y - newSize)
+        OpenButton.Position = UDim2.fromOffset(clampedX, clampedY)
     end
 end)
 
-print("✅ OpenButton พร้อมใช้งาน!")
+print("✅ OpenButton พร้อมใช้งาน (แก้ไขครบทุกจุด)!")
