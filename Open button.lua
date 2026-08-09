@@ -1,5 +1,5 @@
 -- ============================================================
--- ระบบสร้างปุ่ม OpenButton (ปรับปรุงใหม่)
+-- ระบบสร้างปุ่ม OpenButton (ป้องกันการกดซ้ำ)
 -- ============================================================
 local Player = game.Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
@@ -20,12 +20,14 @@ local touchStartTime = 0
 local hasMoved = false
 local isCreating = false
 local buttonActive = true
+local isProcessingToggle = false  -- กันการกดซ้ำระหว่างกำลังทำงาน
 
 -- ============================================================
--- ฟังก์ชัน Hard Reset (ล้างทุกอย่างแล้วสร้างใหม่)
+-- ฟังก์ชัน Hard Reset
 -- ============================================================
 function HardResetButton()
     buttonActive = false
+    isProcessingToggle = false
     
     if ScreenGui then
         pcall(function() 
@@ -149,7 +151,7 @@ function CreateCustomButton()
     end
     
     DragArea.InputBegan:Connect(function(input)
-        if not OpenButton or not buttonActive then return end
+        if not OpenButton or not buttonActive or isProcessingToggle then return end
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             isDragging = false
             touchStartTime = tick()
@@ -164,7 +166,7 @@ function CreateCustomButton()
     end)
     
     DragArea.InputEnded:Connect(function(input)
-        if not OpenButton or not buttonActive then return end
+        if not OpenButton or not buttonActive or isProcessingToggle then return end
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             isDragging = false
             if not hasMoved then
@@ -179,7 +181,7 @@ function CreateCustomButton()
     end)
     
     UserInputService.InputChanged:Connect(function(input)
-        if not OpenButton or not DragArea or not buttonActive then return end
+        if not OpenButton or not DragArea or not buttonActive or isProcessingToggle then return end
         if isDragging and (input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseMovement) then
             local delta = input.Position - dragStart
             local distance = delta.Magnitude
@@ -210,20 +212,37 @@ function CreateCustomButton()
 end
 
 -- ============================================================
--- ฟังก์ชันเปิด/ปิดหน้าต่าง
+-- ฟังก์ชันเปิด/ปิดหน้าต่าง (ป้องกันการกดซ้ำ)
 -- ============================================================
 function ToggleWindow()
+    -- ถ้ากำลังทำงานอยู่ ให้ข้าม
+    if isProcessingToggle then
+        return
+    end
+    
+    -- กันการกดเร็วเกินไป
     if tick() - lastToggleTime < 0.5 then
         return
     end
-    lastToggleTime = tick()
     
+    -- ตรวจสอบปุ่ม
     if not OpenButton or not OpenButton.Parent then
         HardResetButton()
         return
     end
     
+    -- ล็อคไม่ให้กดซ้ำ
+    isProcessingToggle = true
+    lastToggleTime = tick()
+    
+    -- ปิดการโต้ตอบชั่วคราว (กันการค้าง)
+    if DragArea then
+        DragArea.Interactable = false
+    end
+    
+    -- เปลี่ยนสถานะ
     WindowVisible = not WindowVisible
+    
     if WindowVisible then
         Window:Open()
         if DragArea then 
@@ -243,6 +262,13 @@ function ToggleWindow()
             )
         end
     end
+    
+    -- ปลดล็อคหลังจากทำงานเสร็จ (รอให้ GUI โหลด)
+    task.wait(0.15)
+    if DragArea then
+        DragArea.Interactable = true
+    end
+    isProcessingToggle = false
 end
 
 -- ============================================================
@@ -270,7 +296,7 @@ function RemoveWindUIButtons()
 end
 
 -- ============================================================
--- ระบบตรวจจับและกู้คืนอัตโนมัติ
+-- ระบบตรวจจับและกู้คืน
 -- ============================================================
 
 Player.PlayerGui.ChildAdded:Connect(function(child)
@@ -309,9 +335,11 @@ local function MonitorWindow()
         task.wait(0.5)
         if Window and Window.Visible == false and WindowVisible == true then
             WindowVisible = false
+            isProcessingToggle = false
             if DragArea then 
                 DragArea.Visible = true 
                 DragArea.Active = true
+                DragArea.Interactable = true
             end
             if OpenButton then
                 OpenButton.Position = UDim2.fromOffset(
@@ -324,10 +352,11 @@ local function MonitorWindow()
 end
 
 -- ============================================================
--- คำสั่งรีเซ็ตด้วยปุ่มลัด (F5)
+-- คำสั่งรีเซ็ต (F5)
 -- ============================================================
 UserInputService.InputBegan:Connect(function(input)
     if input.KeyCode == Enum.KeyCode.F5 and input.UserInputType == Enum.UserInputType.Keyboard then
+        isProcessingToggle = false
         HardResetButton()
     end
 end)
