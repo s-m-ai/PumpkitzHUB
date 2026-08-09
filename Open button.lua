@@ -1,24 +1,48 @@
 -- ============================================================
--- Custom OpenButton (แยกโมดูล)
+-- ระบบสร้างปุ่ม OpenButton (แยกเป็นฟังก์ชันให้เรียกซ้ำได้)
 -- ============================================================
-local Players = game:GetService("Players")
-local Workspace = game:GetService("Workspace")
+local Player = game.Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
-local LocalPlayer = Players.LocalPlayer
+local ViewportSize = game:GetService("Workspace").CurrentCamera.ViewportSize
 
-local function CreateOpenButton(Window, IconId)
+local OpenButton = nil
+local DragArea = nil
+local ImageLabel = nil
+local UIStroke = nil
+local ScreenGui = nil
+local ButtonSize = 0
+local WindowVisible = false
+local lastToggleTime = 0
+local isDragging = false
+local dragStart = nil
+local startPos = nil
+local touchStartTime = 0
+local hasMoved = false
+local isCreating = false
+
+function CreateCustomButton()
+    if isCreating then return end
+    isCreating = true
+    
+    -- ลบของเก่า
+    if ScreenGui then
+        pcall(function() ScreenGui:Destroy() end)
+        ScreenGui = nil
+    end
+    
+    task.wait(0.3)
+    
     -- สร้าง ScreenGui
-    local ScreenGui = Instance.new("ScreenGui")
-    ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+    ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = "CustomOpenButton"
+    ScreenGui.Parent = Player:WaitForChild("PlayerGui")
     ScreenGui.ResetOnSpawn = false
-
-    local ViewportSize = Workspace.CurrentCamera.ViewportSize
+    
     local isMobile = ViewportSize.X < 800
-    local ButtonSize = isMobile and 45 or 50
-
-    -- ปุ่มหลัก
-    local OpenButton = Instance.new("ImageButton")
+    ButtonSize = isMobile and 45 or 50
+    
+    -- ========== ปุ่มหลัก ==========
+    OpenButton = Instance.new("ImageButton")
     OpenButton.Name = "OpenButton"
     OpenButton.Size = UDim2.fromOffset(ButtonSize, ButtonSize)
     OpenButton.Position = UDim2.fromOffset(15, 15)
@@ -27,33 +51,35 @@ local function CreateOpenButton(Window, IconId)
     OpenButton.BorderSizePixel = 0
     OpenButton.ClipsDescendants = true
     OpenButton.AutoButtonColor = false
+    OpenButton.ZIndex = 999
     OpenButton.Parent = ScreenGui
-
+    
     -- ขอบมน
     local Corner = Instance.new("UICorner")
     Corner.CornerRadius = UDim.new(0.2, 0)
     Corner.Parent = OpenButton
-
+    
     -- UIStroke สีส้ม
-    local UIStroke = Instance.new("UIStroke")
+    UIStroke = Instance.new("UIStroke")
     UIStroke.Name = "UIStroke"
     UIStroke.Color = Color3.fromRGB(255, 140, 0)
     UIStroke.Thickness = 2
     UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     UIStroke.Parent = OpenButton
-
-    -- รูปภาพ
-    local ImageLabel = Instance.new("ImageLabel")
+    
+    -- รูปภาพ (ใหญ่ขึ้น)
+    ImageLabel = Instance.new("ImageLabel")
     ImageLabel.Name = "ImageLabel"
     ImageLabel.Size = UDim2.fromScale(0.75, 0.75)
     ImageLabel.Position = UDim2.fromScale(0.125, 0.125)
     ImageLabel.BackgroundTransparency = 1
-    ImageLabel.Image = IconId or "rbxassetid://75519083960535"
+    ImageLabel.Image = "rbxassetid://75519083960535"
     ImageLabel.ImageColor3 = Color3.fromRGB(255, 255, 255)
+    ImageLabel.ZIndex = 999
     ImageLabel.Parent = OpenButton
-
-    -- DragArea (สำหรับลาก)
-    local DragArea = Instance.new("ImageButton")
+    
+    -- ========== DragArea (พื้นที่ลาก) ==========
+    DragArea = Instance.new("ImageButton")
     DragArea.Name = "DragArea"
     DragArea.Size = UDim2.fromOffset(ButtonSize * 2.5, ButtonSize * 2.5)
     DragArea.Position = UDim2.fromOffset(
@@ -63,26 +89,21 @@ local function CreateOpenButton(Window, IconId)
     DragArea.BackgroundTransparency = 1
     DragArea.BorderSizePixel = 0
     DragArea.AutoButtonColor = false
+    DragArea.ZIndex = 998
     DragArea.Parent = ScreenGui
-
+    
+    -- ========== ฟังก์ชันอัปเดตตำแหน่ง DragArea ==========
     local function UpdateDragAreaPosition()
+        if not OpenButton or not DragArea then return end
         DragArea.Position = UDim2.fromOffset(
             OpenButton.Position.X.Offset - (ButtonSize * 0.75),
             OpenButton.Position.Y.Offset - (ButtonSize * 0.75)
         )
     end
-    UpdateDragAreaPosition()
-
-    -- ระบบลาก
-    local isDragging = false
-    local dragStart = nil
-    local startPos = nil
-    local touchStartTime = 0
-    local hasMoved = false
-    local WindowVisible = false
-    local lastToggleTime = 0
-
+    
+    -- ========== Events DragArea ==========
     DragArea.InputBegan:Connect(function(input)
+        if not OpenButton then return end
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             isDragging = false
             touchStartTime = tick()
@@ -95,8 +116,9 @@ local function CreateOpenButton(Window, IconId)
             startPos = OpenButton.Position
         end
     end)
-
+    
     DragArea.InputEnded:Connect(function(input)
+        if not OpenButton then return end
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             isDragging = false
             if not hasMoved then
@@ -109,16 +131,20 @@ local function CreateOpenButton(Window, IconId)
             end
         end
     end)
-
+    
     UserInputService.InputChanged:Connect(function(input)
+        if not OpenButton or not DragArea then return end
         if isDragging and (input.UserInputType == Enum.UserInputType.Touch) then
             local delta = input.Position - dragStart
             local distance = delta.Magnitude
+            
             if distance > 10 then
                 hasMoved = true
             end
+            
             local newX = startPos.X.Offset + delta.X
             local newY = startPos.Y.Offset + delta.Y
+            
             OpenButton.Position = UDim2.fromOffset(newX, newY)
             DragArea.Position = UDim2.fromOffset(
                 newX - (ButtonSize * 0.75),
@@ -126,74 +152,127 @@ local function CreateOpenButton(Window, IconId)
             )
         end
     end)
+    
+    -- อัปเดต DragArea เมื่อ OpenButton ขยับ
+    OpenButton:GetPropertyChangedSignal("Position"):Connect(function()
+        UpdateDragAreaPosition()
+    end)
+    
+    -- ซ่อนปุ่ม WindUI
+    task.wait(0.1)
+    RemoveWindUIButtons()
+    
+    isCreating = false
+    print("✅ สร้างปุ่ม Custom เรียบร้อย!")
+end
 
-    -- ฟังก์ชันเปิด/ปิด
-    function ToggleWindow()
-        if tick() - lastToggleTime < 0.5 then
-            return
-        end
-        lastToggleTime = tick()
-        WindowVisible = not WindowVisible
-        if WindowVisible then
-            Window:Open()
-            DragArea.Visible = false
-        else
-            Window:Close()
-            DragArea.Visible = true
+-- ============================================================
+-- ฟังก์ชันเปิด/ปิดหน้าต่าง
+-- ============================================================
+function ToggleWindow()
+    if tick() - lastToggleTime < 0.5 then
+        return
+    end
+    lastToggleTime = tick()
+    
+    WindowVisible = not WindowVisible
+    if WindowVisible then
+        Window:Open()
+        if DragArea then DragArea.Visible = false end
+    else
+        Window:Close()
+        if DragArea then DragArea.Visible = true end
+        if OpenButton then
             OpenButton.Position = UDim2.fromOffset(
                 ViewportSize.X - ButtonSize - 10,
                 10
             )
-            UpdateDragAreaPosition()
         end
     end
+end
 
-    -- ฟังก์ชันสำหรับปรับขนาด (ถ้าต้องการ)
-    local function UpdateSize()
-        local newSize = Workspace.CurrentCamera.ViewportSize
-        local isMobileNew = newSize.X < 800
-        local newButtonSize = isMobileNew and 45 or 50
-        ButtonSize = newButtonSize
-        OpenButton.Size = UDim2.fromOffset(newButtonSize, newButtonSize)
-        DragArea.Size = UDim2.fromOffset(newButtonSize * 2.5, newButtonSize * 2.5)
-        UpdateDragAreaPosition()
-    end
-
-    Workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(UpdateSize)
-
-    -- ลบปุ่ม WindUI เดิม
-    task.wait(0.5)
-    local function RemoveWindUIButtons()
-        for _, gui in pairs(LocalPlayer.PlayerGui:GetChildren()) do
-            if gui.Name == "WindUI" or string.find(gui.Name, "WindUI") then
-                for _, child in pairs(gui:GetDescendants()) do
-                    if child:IsA("ImageButton") and child.Name == "OpenButton" then
-                        child.Visible = false
-                        child.Active = false
-                    end
-                    if child:IsA("ImageButton") and child.Name == "FullScreen" then
-                        child.Visible = false
-                        child.Active = false
-                    end
-                    if child:IsA("ImageButton") then
-                        if child.Name == "Fullscreen" or child.Name == "Maximize" then
+-- ============================================================
+-- ซ่อนปุ่มวงกลมและ FullScreen ของ WindUI
+-- ============================================================
+function RemoveWindUIButtons()
+    for _, gui in pairs(Player.PlayerGui:GetChildren()) do
+        if gui.Name == "WindUI" or string.find(gui.Name, "WindUI") then
+            for _, child in pairs(gui:GetDescendants()) do
+                if child:IsA("ImageButton") then
+                    if child.Name == "OpenButton" or 
+                       child.Name == "FullScreen" or 
+                       child.Name == "Fullscreen" or 
+                       child.Name == "Maximize" then
+                        pcall(function()
                             child.Visible = false
                             child.Active = false
-                        end
+                        end)
                     end
                 end
             end
         end
     end
-    RemoveWindUIButtons()
-    LocalPlayer.PlayerGui.ChildAdded:Connect(RemoveWindUIButtons)
-
-    return {
-        OpenButton = OpenButton,
-        DragArea = DragArea,
-        ToggleWindow = ToggleWindow,
-        UpdateSize = UpdateSize
-    }
 end
 
-return CreateOpenButton
+-- ============================================================
+-- ระบบตรวจจับและกู้คืนปุ่มอัตโนมัติ
+-- ============================================================
+
+-- ตรวจจับเมื่อ PlayerGui เปลี่ยน
+Player.PlayerGui.ChildAdded:Connect(function(child)
+    if child.Name == "CustomOpenButton" then
+        return
+    end
+    task.wait(0.5)
+    CreateCustomButton()
+end)
+
+-- ตรวจจับเมื่อปุ่มหายไป
+local function MonitorButton()
+    while true do
+        task.wait(2)
+        if not isCreating and (not OpenButton or not OpenButton.Parent) then
+            print("⚠️ ตรวจพบปุ่มหายไป กำลังสร้างใหม่...")
+            CreateCustomButton()
+        end
+    end
+end
+
+-- ตรวจจับเมื่อ Window ถูกปิดโดยวิธีอื่น
+local function MonitorWindow()
+    while true do
+        task.wait(1)
+        if Window and Window.Visible == false and WindowVisible == true then
+            WindowVisible = false
+            if DragArea then DragArea.Visible = true end
+            if OpenButton then
+                OpenButton.Position = UDim2.fromOffset(
+                    ViewportSize.X - ButtonSize - 10,
+                    10
+                )
+            end
+        end
+    end
+end
+
+-- ============================================================
+-- เริ่มต้นระบบ
+-- ============================================================
+CreateCustomButton()
+task.spawn(MonitorButton)
+task.spawn(MonitorWindow)
+
+-- ปรับขนาดตามหน้าจอ
+game:GetService("Workspace").CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(function()
+    ViewportSize = game:GetService("Workspace").CurrentCamera.ViewportSize
+    local isMobileNew = ViewportSize.X < 800
+    local newButtonSize = isMobileNew and 45 or 50
+    
+    if OpenButton then
+        ButtonSize = newButtonSize
+        OpenButton.Size = UDim2.fromOffset(newButtonSize, newButtonSize)
+        if DragArea then
+            DragArea.Size = UDim2.fromOffset(newButtonSize * 2.5, newButtonSize * 2.5)
+        end
+    end
+end)
