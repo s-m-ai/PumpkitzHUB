@@ -1,64 +1,38 @@
-local Players = game:GetService("Players")
-local UIS = game:GetService("UserInputService")
+-- แก้ไขเฉพาะส่วนที่เกี่ยวข้อง
 
-local Player = Players.LocalPlayer
+function CreateCustomButton()
+    -- ... (โค้ดสร้างปุ่มเหมือนเดิม) ...
 
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "PumpkitzOpenButton"
-ScreenGui.ResetOnSpawn = false
-ScreenGui.DisplayOrder = 999999
-ScreenGui.Parent = Player.PlayerGui
+    OpenButton = Instance.new("ImageButton")
+    OpenButton.Name = "OpenButton"
+    OpenButton.Size = UDim2.fromOffset(ButtonSize, ButtonSize)
+    OpenButton.Position = UDim2.fromOffset(20, 20)
+    OpenButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    OpenButton.BorderSizePixel = 0
+    OpenButton.AutoButtonColor = false
+    OpenButton.ClipsDescendants = true
+    OpenButton.ZIndex = 999999
+    OpenButton.Visible = true  -- ✅ ตั้งให้แสดงเสมอตอนสร้าง
+    OpenButton.Parent = ScreenGui
 
-local OpenButton = Instance.new("ImageButton")
-OpenButton.Size = UDim2.fromOffset(55,55)
-OpenButton.Position = UDim2.fromOffset(15,120)
-OpenButton.BackgroundColor3 = Color3.fromRGB(20,20,20)
-OpenButton.BorderSizePixel = 0
-OpenButton.Image = "rbxassetid://75519083960535"
-OpenButton.Parent = ScreenGui
+    -- ... (โค้ดอื่นๆ) ...
+end
 
-local Corner = Instance.new("UICorner")
-Corner.CornerRadius = UDim.new(0,14)
-Corner.Parent = OpenButton
+function ToggleWindow()
+    if tick() - lastClickTime < 0.3 then return end
+    lastClickTime = tick()
 
-local dragging = false
-local dragStart
-local startPos
+    if not OpenButton then return end  -- ✅ ตรวจสอบก่อนใช้
 
-OpenButton.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.Touch
-    or input.UserInputType == Enum.UserInputType.MouseButton1 then
+    WindowState = not WindowState
+    WindowVisible = WindowState
 
-        dragging = true
-        dragStart = input.Position
-        startPos = OpenButton.Position
+    if WindowState then
+        Window:Open()
+        OpenButton.Visible = false   -- ซ่อน
+    else
+        Window:Close()
+        OpenButton.Visible = true    -- แสดง
+        -- ไม่ขยับตำแหน่ง (คงเดิม)
     end
-end)
-
-UIS.InputChanged:Connect(function(input)
-    if dragging and (
-        input.UserInputType == Enum.UserInputType.Touch
-        or input.UserInputType == Enum.UserInputType.MouseMovement
-    ) then
-
-        local delta = input.Position - dragStart
-
-        OpenButton.Position = UDim2.fromOffset(
-            startPos.X.Offset + delta.X,
-            startPos.Y.Offset + delta.Y
-        )
-    end
-end)
-
-UIS.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.Touch
-    or input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = false
-    end
-end)
-
-OpenButton.MouseButton1Click:Connect(function()
-    if Window then
-        Window:Toggle()
-    end
-end)
+end
