@@ -5,7 +5,7 @@ local Player = game.Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
 local ViewportSize = game:GetService("Workspace").CurrentCamera.ViewportSize
 
--- ตัวแปรหลัก
+-- ตัวแปรหลัก (เฉพาะที่จำเป็น)
 local OpenButton = nil
 local DragArea = nil
 local ScreenGui = nil
@@ -17,9 +17,10 @@ local startPos = nil
 local lastClickTime = 0
 
 -- ============================================================
--- สร้างปุ่ม
+-- สร้างปุ่ม (เวอร์ชันเรียบง่าย)
 -- ============================================================
 function CreateCustomButton()
+    -- ลบของเก่า
     if ScreenGui then
         pcall(function() ScreenGui:Destroy() end)
         ScreenGui = nil
@@ -34,7 +35,6 @@ function CreateCustomButton()
     ScreenGui.Name = "OpenButton"
     ScreenGui.Parent = playerGui
     ScreenGui.ResetOnSpawn = false
-    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     
     -- ===== ปุ่มหลัก =====
     OpenButton = Instance.new("ImageButton")
@@ -67,7 +67,7 @@ function CreateCustomButton()
     Icon.ImageColor3 = Color3.fromRGB(255, 255, 255)
     Icon.Parent = OpenButton
     
-    -- ===== DragArea (โปร่งใส ขนาดใหญ่กว่าปุ่ม) =====
+    -- ===== DragArea (โปร่งใส) =====
     DragArea = Instance.new("ImageButton")
     DragArea.Name = "DragArea"
     DragArea.Size = UDim2.fromOffset(ButtonSize * 2.5, ButtonSize * 2.5)
@@ -80,7 +80,7 @@ function CreateCustomButton()
     DragArea.AutoButtonColor = false
     DragArea.Parent = ScreenGui
     
-    -- ===== Events (ไม่มีล็อก) =====
+    -- ===== Events (เรียบง่าย ไม่มีล็อก) =====
     
     -- กดเริ่ม
     DragArea.InputBegan:Connect(function(input)
@@ -104,7 +104,7 @@ function CreateCustomButton()
             
             isDragging = false
             
-            -- เช็คว่าเป็นการคลิกหรือลาก (ขยับน้อยกว่า 10px = คลิก)
+            -- เช็คว่าเป็นคลิกหรือลาก
             if startPos and OpenButton.Position then
                 local dx = math.abs(OpenButton.Position.X.Offset - startPos.X.Offset)
                 local dy = math.abs(OpenButton.Position.Y.Offset - startPos.Y.Offset)
@@ -149,7 +149,6 @@ function ToggleWindow()
     
     if WindowVisible then
         Window:Open()
-        -- ไม่ซ่อน DragArea ปล่อยให้ทำงานได้ตลอด
     else
         Window:Close()
         -- ขยับไปชิดปุ่ม X
@@ -181,7 +180,7 @@ function RemoveWindUIButtons()
 end
 
 -- ============================================================
--- ตรวจจับปุ่มหาย
+-- ตรวจจับปุ่มหาย (เฉพาะกรณี)
 -- ============================================================
 local function MonitorButton()
     while true do
@@ -208,4 +207,4 @@ game:GetService("Workspace").CurrentCamera:GetPropertyChangedSignal("ViewportSiz
     end
 end)
 
-print("✅ OpenButton พร้อมใช้งาน (ไม่มีล็อก)!")
+print("✅ OpenButton พร้อมใช้งาน!")
